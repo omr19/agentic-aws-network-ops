@@ -2,7 +2,9 @@
 
 ## Current Phase
 
-**Phase 1 — Business Requirements & Learning Objectives (in progress)**
+**Phase 2 — Architecture & Technical Design (not started)**
+
+Phase 1 — Business Requirements & Learning Objectives is **COMPLETE** and was formally reviewed and approved on 2026-08-28.
 
 Foundation validation is **COMPLETE**.
 
@@ -10,9 +12,9 @@ Foundation validation is **COMPLETE**.
 
 ## Current Session Status
 
-Phase 1 requirements have been drafted in `docs/requirements.md`, independently reviewed by Kiro against the authoritative project checklist, and updated to address the approved review findings.
+Phase 1 requirements in `docs/requirements.md` were independently reviewed by Kiro against the authoritative project checklist, updated to address the approved review findings, and subsequently reviewed and formally approved by the user on 2026-08-28.
 
-Final user review and approval remains pending before Phase 1 can be marked complete.
+The Phase 1 completion gate is satisfied. Phase 2 — Architecture & Technical Design is the current phase and has not yet started.
 
 Read-only AWS region reconnaissance was performed to identify a relatively clean candidate region for the project. `eu-west-1` (Ireland) is currently the preferred candidate because the VPC/networking categories inspected so far contain only AWS default networking resources and no identified custom networking resources.
 
@@ -40,7 +42,8 @@ Current working branch:
 - Independent Kiro Phase 1 requirements review completed
 - Kiro review findings evaluated rather than automatically accepted
 - Approved Phase 1 review findings incorporated into `docs/requirements.md`
-- Phase 1 checklist items completed except final user review/approval and the `Phase 1 COMPLETE` gate
+- Final user review and formal approval of Phase 1 requirements completed on 2026-08-28
+- `Phase 1 COMPLETE` gate satisfied
 - Read-only AWS region reconnaissance performed for `us-east-2`, `us-west-2`, and `eu-west-1`
 - `eu-west-1` identified as the preferred candidate project region pending formal Phase 2 service-availability confirmation
 
@@ -80,8 +83,9 @@ No additional Foundation work is currently required.
 - Kiro findings individually evaluated before changes were accepted
 - Approved findings incorporated into `docs/requirements.md`
 - Final Kiro coherence review completed after the approved changes
-- All substantive Phase 1 checklist requirements are currently checked
-- Final user review/approval and the `Phase 1 COMPLETE` gate remain intentionally unchecked
+- Final user review and formal approval of `docs/requirements.md` completed on 2026-08-28
+- All Phase 1 checklist requirements are checked
+- `Phase 1 COMPLETE` gate is satisfied
 
 ### AWS Region Reconnaissance
 
@@ -254,7 +258,7 @@ The following decisions remain intentionally deferred to **Phase 2 — Architect
 - Detailed content and boundaries for the five required architecture diagrams
 - Trust boundaries, IAM boundaries, and data/control-plane flows to represent
 
-No Phase 2 decision should be treated as finalized until Phase 1 has passed its explicit review and completion gate.
+Phase 1 has passed its explicit review and completion gate. The architecture decisions listed above are now authorized for evaluation during Phase 2 but remain unresolved until individually reviewed and documented.
 
 ---
 
@@ -266,24 +270,21 @@ No Phase 2 decision should be treated as finalized until Phase 1 has passed its 
 
 There is currently no technical, AWS, repository, cost, or governance blocker preventing the project from continuing according to the approved phase sequence.
 
-### Pending Completion Gate
+### Phase 1 Completion Gate
 
-Phase 1 remains **in progress** because final user review and approval of `docs/requirements.md` has not yet been completed.
+Phase 1 is **COMPLETE**.
 
-This is an intentional governance gate, not a project blocker.
+Final user review and formal approval of `docs/requirements.md` were completed on 2026-08-28.
 
-Phase 2 must not begin until:
+The required review/approval checklist item and `Phase 1 COMPLETE` gate are checked in `PROJECT_CHECKLIST.md`.
 
-- The final Phase 1 requirements review is completed
-- Any required corrections are incorporated
-- `Review and approve Phase 1 requirements before architecture design begins` is checked in `PROJECT_CHECKLIST.md`
-- `Phase 1 COMPLETE` is checked in `PROJECT_CHECKLIST.md`
+Phase 2 — Architecture & Technical Design is authorized to begin.
 
 ### Known Reconnaissance Limitations
 
 - RDS inventory in `eu-west-1` remains unverified because the current assumed role lacks `rds:DescribeDBInstances`
 - CloudFormation inventory in `eu-west-1` remains unverified because the current assumed role lacks `cloudformation:ListStacks`
-- These reconnaissance limitations do not currently block Phase 1
+- These reconnaissance limitations do not currently block Phase 2 architecture work
 - Whether additional verification is necessary will be evaluated during Phase 2 rather than broadening IAM permissions prematurely
 
 ---
@@ -314,31 +315,31 @@ Any intentionally retained resources or artifacts must be explicitly documented 
 
 ## Exact Next Step
 
-Complete the final user review of `docs/requirements.md`.
+Begin **Phase 2 — Architecture & Technical Design**.
 
-The Phase 1 requirements have already been drafted, independently reviewed, and updated. The remaining Phase 1 activity is the explicit final review and approval gate.
+The first Phase 2 activity is to formally validate and decide the target AWS region. `eu-west-1` is currently the preferred candidate based on read-only reconnaissance.
 
-If no material changes are required after the final review:
+Before formally selecting the region:
 
-1. Approve `docs/requirements.md`
-2. Check `Review and approve Phase 1 requirements before architecture design begins` in `PROJECT_CHECKLIST.md`
-3. Check `Phase 1 COMPLETE` in `PROJECT_CHECKLIST.md`
-4. Update `PROJECT_STATUS.md` to record Phase 1 completion and Phase 2 as the next phase
-5. Review the Phase 1 Git diff and validation status
-6. Commit the completed Phase 1 baseline
-7. Begin **Phase 2 — Architecture & Technical Design** only after the Phase 1 completion gate is satisfied
+1. Validate availability and suitability of the required Amazon Bedrock AgentCore capabilities in `eu-west-1`
+2. Validate other AWS services and regional capabilities required by the approved project requirements
+3. Identify any relevant regional limitations or architecture implications
+4. Confirm whether the existing RDS and CloudFormation reconnaissance gaps have any relevance to the planned architecture
+5. Record the resulting region decision and rationale
 
-The first Phase 2 activity will be to formally validate and decide the target AWS region. `eu-west-1` is currently the preferred candidate based on read-only reconnaissance, but it must not be treated as final until required Amazon Bedrock AgentCore capabilities and other necessary AWS service/features are confirmed.
+No AWS project infrastructure should be created during this architecture decision.
 
-Do not begin Phase 2 architecture work or implementation before the Phase 1 completion gate is satisfied.
+After the region decision, continue through the remaining Phase 2 architecture decisions in `PROJECT_CHECKLIST.md` before beginning implementation.
 
 ---
 
 ## Not Authorized Yet
 
-Until Phase 1 receives final user approval and its completion gate is checked, do not begin Phase 2 architecture work or any implementation activity.
+Phase 2 — Architecture & Technical Design is now authorized.
 
-The following are not yet authorized:
+Architecture evaluation, design work, documentation, professional architecture diagrams, justified read-only AWS inspection, and service-capability validation may proceed according to `PROJECT_CHECKLIST.md`.
+
+The following implementation activities are not yet authorized:
 
 - Terraform implementation
 - `terraform init`
@@ -348,15 +349,16 @@ The following are not yet authorized:
 - MCP implementation or deployment
 - Lambda implementation or deployment
 - API Gateway implementation or deployment
-- Creation, modification, or deletion of AWS resources through the AWS CLI, AWS Console, SDKs, Terraform, Kiro, or other tooling
+- Creation, modification, or deletion of AWS project resources through the AWS CLI, AWS Console, SDKs, Terraform, Kiro, or other tooling
 - IAM policy/role changes for project implementation
 - Broadening IAM permissions merely to complete optional reconnaissance
-- Phase 2 architecture implementation
+- Implementation of Phase 2 architecture decisions before the applicable later implementation phase
 - Public repository publication
 
 Read-only AWS inspection/reconnaissance may be performed when explicitly justified and authorized, provided it does not create, modify, or delete AWS resources.
 
-Phase 2 architecture decisions may begin only after the Phase 1 completion gate is satisfied. AWS implementation and provisioning must additionally wait for the applicable architecture/design decisions and later implementation-phase prerequisites defined in `PROJECT_CHECKLIST.md`.
+AWS implementation and provisioning must wait for the applicable architecture/design decisions and implementation-phase prerequisites defined in `PROJECT_CHECKLIST.md`.
 
 ---
-*Last updated: 2026-08-27*
+
+*Last updated: 2026-08-28*

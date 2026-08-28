@@ -56,7 +56,7 @@ Secondary audiences:
 
 An engineer asks the assistant to inspect relevant AWS network configuration and operational telemetry.
 
-The assistant selects appropriate read-only MCP tools and returns structured evidence without changing infrastructure.
+The assistant selects appropriate read-only MCP tools that expose controlled AWS network inspection capabilities backed by AWS APIs and Python/Boto3, and returns structured evidence without changing infrastructure.
 
 ### UC-2 — Diagnose Connectivity Failure
 
@@ -112,7 +112,7 @@ Implement an operational agent using Amazon Bedrock AgentCore that can dynamical
 
 ### LO-2 — Integrate MCP with AWS Network Operations
 
-Design and implement MCP contracts for AWS network inspection, deterministic diagnosis, telemetry retrieval, and controlled remediation, with AgentCore Gateway providing the managed integration path where appropriate.
+Design and implement standardized MCP tool contracts that allow the agent to securely invoke controlled AWS network inspection, deterministic diagnostic, telemetry, and remediation capabilities, using AgentCore Gateway as the managed integration boundary where appropriate.
 
 ### LO-3 — Combine Deterministic Networking Evidence with Generative AI
 
