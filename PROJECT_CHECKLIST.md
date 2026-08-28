@@ -28,9 +28,9 @@ Check items off only after they are completed and validated. Every phase has an 
   - Kiro must not reconstruct phase structure from chat history
   - Prefer minimal diffs; never rewrite an entire governance file for a small change
 - [x] Review governance changes with `git diff`
-- [ ] Commit approved governance baseline to Git
+- [x] Commit approved governance baseline to Git
 
-- [ ] **Foundation COMPLETE**
+- [x] **Foundation COMPLETE**
 
 ---
 
