@@ -36,33 +36,48 @@ Check items off only after they are completed and validated. Every phase has an 
 
 ## Phase 1 — Business Requirements & Learning Objectives
 
-- [ ] Write a concise real-world network-operations problem statement
-- [ ] Define intended users and primary use cases
-- [ ] Define 3–5 measurable learning objectives
-- [ ] Explain why Agentic AI / Amazon Bedrock AgentCore is appropriate
+- [x] Write a concise real-world network-operations problem statement
+
+- [x] Define intended users and primary use cases
+
+- [x] Define 3–5 measurable learning objectives
+
+- [x] Explain why Agentic AI / Amazon Bedrock AgentCore is appropriate
+
   - Dynamic tool selection
   - Correlation of evidence across AWS services
   - Explainable diagnosis based on deterministic evidence
   - Human-controlled remediation
-- [ ] Define success criteria / definition of done
-- [ ] Define MVP scope
-- [ ] Define advanced/stretch scope separately from MVP
-- [ ] Establish cost guardrails
+
+- [x] Define success criteria / definition of done
+
+- [x] Define MVP scope
+
+- [x] Define advanced/stretch scope separately from MVP
+
+- [x] Establish cost guardrails
+
   - Favor short-lived and consumption-based resources
   - Avoid unnecessary persistent services
   - Explicitly evaluate potentially expensive resources before deployment
-- [ ] Establish security guardrails
+
+- [x] Establish security guardrails
+
   - AI reasoning does not equal authorization
   - Diagnostic/read operations and remediation/write operations remain separated
   - Human approval required for remediation
-- [ ] Define portfolio audience
+
+- [x] Define portfolio audience
+
   - Hiring managers
   - Cloud/network architects and engineers
   - GenAI/Agentic AI practitioners
-- [ ] Document Phase 1 requirements in the repository
-- [ ] Review and approve Phase 1 requirements before architecture design begins
 
-- [ ] **Phase 1 COMPLETE**
+- [x] Document Phase 1 requirements in the repository
+
+- [] Review and approve Phase 1 requirements before architecture design begins
+
+- [] **Phase 1 COMPLETE**
 
 ---
 

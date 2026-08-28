@@ -10,9 +10,15 @@ Foundation validation is **COMPLETE**.
 
 ## Current Session Status
 
-Repository governance and hygiene are being established before implementation begins.
+Phase 1 requirements have been drafted in `docs/requirements.md`, independently reviewed by Kiro against the authoritative project checklist, and updated to address the approved review findings.
 
-No AWS resources, Terraform infrastructure, Python application code, AgentCore resources, MCP tools, Lambda functions, API Gateway resources, or other project infrastructure have been created yet.
+Final user review and approval remains pending before Phase 1 can be marked complete.
+
+Read-only AWS region reconnaissance was performed to identify a relatively clean candidate region for the project. `eu-west-1` (Ireland) is currently the preferred candidate because the VPC/networking categories inspected so far contain only AWS default networking resources and no identified custom networking resources.
+
+No AWS resources were created, modified, or deleted during the reconnaissance.
+
+No Terraform infrastructure, Python application code, AgentCore resources, MCP tools, Lambda functions, API Gateway resources, or other project infrastructure have been created.
 
 Current working branch:
 
@@ -27,6 +33,16 @@ Current working branch:
 - `.gitignore` configured for Terraform, Python, macOS, environment files, secrets, and credential artifacts
 - `develop` branch created and selected
 - `PROJECT_CHECKLIST.md` created and saved as the authoritative master roadmap
+- `PROJECT_STATUS.md` established as the current project checkpoint record
+- Persistent Kiro project governance/steering instructions established
+- Foundation repository/governance baseline completed and committed
+- Phase 1 business requirements drafted in `docs/requirements.md`
+- Independent Kiro Phase 1 requirements review completed
+- Kiro review findings evaluated rather than automatically accepted
+- Approved Phase 1 review findings incorporated into `docs/requirements.md`
+- Phase 1 checklist items completed except final user review/approval and the `Phase 1 COMPLETE` gate
+- Read-only AWS region reconnaissance performed for `us-east-2`, `us-west-2`, and `eu-west-1`
+- `eu-west-1` identified as the preferred candidate project region pending formal Phase 2 service-availability confirmation
 
 ---
 
@@ -34,123 +50,313 @@ Current working branch:
 
 **COMPLETE**
 
-Repository governance, initial history validation, Kiro steering, Git review, and governance baseline commit have been completed.
+Repository governance, repository hygiene, initial Git history validation, Kiro persistent steering, governance-file validation, Git diff review, and governance baseline commits have been completed.
+
+The Foundation completion gate in `PROJECT_CHECKLIST.md` is checked.
+
+No additional Foundation work is currently required.
 
 ---
 
 ## Validation Performed
 
+### Foundation Validation
+
 - Manual `.gitignore` review completed
 - Verified `.terraform.lock.hcl` is not ignored
 - Repository root inspected
 - `PROJECT_CHECKLIST.md` verified on disk
+- `PROJECT_STATUS.md` verified on disk
 - Complete initial Git commit history inspected
 - No raw secrets, AWS credentials, account IDs, tokens, private keys, or sensitive environment values found in initial commit history
 - Persistent Kiro steering instructions created
 - Kiro successfully tested reading `project-governance.md`, `PROJECT_CHECKLIST.md`, and `PROJECT_STATUS.md` directly from disk
-- No Terraform validation performed
-- No application tests performed
-- No AWS deployment validation performed
+
+### Phase 1 Requirements Validation
+
+- `docs/requirements.md` created as the Phase 1 requirements document
+- Phase 1 requirements cross-checked against the authoritative `PROJECT_CHECKLIST.md`
+- Independent Kiro requirements review completed
+- Kiro findings individually evaluated before changes were accepted
+- Approved findings incorporated into `docs/requirements.md`
+- Final Kiro coherence review completed after the approved changes
+- All substantive Phase 1 checklist requirements are currently checked
+- Final user review/approval and the `Phase 1 COMPLETE` gate remain intentionally unchecked
+
+### AWS Region Reconnaissance
+
+Read-only AWS CLI reconnaissance was performed using the existing `rizwan-sts-role` profile. No AWS resources were created, modified, or deleted.
+
+- `us-east-2` contains the default VPC plus an existing custom VPC
+- `us-west-2` contains the default VPC plus two existing custom VPCs
+- `eu-west-1` contains only the default VPC in the VPC inventory inspected
+- `eu-west-1` contains three default subnets associated with the default VPC
+- `eu-west-1` contains only the default security group in the security-group inventory inspected
+- `eu-west-1` contains only the default NACL in the NACL inventory inspected
+- `eu-west-1` contains the main/default route table associated with the default VPC
+- No EC2 instances were returned by the `eu-west-1` read-only inventory
+- No Lambda functions were returned by the `eu-west-1` read-only inventory
+- No ELBv2 load balancers were returned by the `eu-west-1` read-only inventory
+- RDS inventory remains **unverified** because the assumed role lacks `rds:DescribeDBInstances`
+- CloudFormation inventory remains **unverified** because the assumed role lacks `cloudformation:ListStacks`
+- The reconnaissance is not an exhaustive inventory of every AWS service in `eu-west-1`
+
+### Implementation Validation
+
+- No Terraform validation performed yet
+- No application tests performed yet
+- No AWS deployment validation performed yet
+- No AgentCore deployment validation performed yet
+- No MCP implementation validation performed yet
 
 ---
 
 ## AWS Resources & Cost
 
+### Project-Created AWS Resources
+
 Project-created AWS resources currently active:
 
 **None**
+
+No AWS resources were created, modified, or deleted during Foundation or Phase 1 work.
+
+The AWS CLI activity performed during Phase 1 was limited to read-only reconnaissance of existing resources for regional evaluation.
+
+### Project Infrastructure Cost
 
 Incremental AWS infrastructure cost from this project:
 
 **$0.00**
 
-No AgentCore model/runtime usage has occurred for this project.
+No project infrastructure has been deployed.
 
-AWS Budget/cost alert configuration is planned for Phase 9.
+No AgentCore Runtime, Gateway, Identity, Observability, Memory, model, or other AgentCore project usage has occurred.
+
+No project Lambda, API Gateway, EC2, load balancer, NAT Gateway, Transit Gateway, VPC Flow Logs, CloudWatch monitoring infrastructure, or other billable project infrastructure has been deployed.
+
+### Cost Controls
+
+Cost remains a project design constraint.
+
+Potentially persistent or higher-cost AWS resources must be explicitly evaluated before deployment according to the approved project requirements and architecture process.
+
+AWS Budget/cost alert configuration remains planned for Phase 9.
 
 ---
 
 ## Current Design / Governance Decisions
 
-- `PROJECT_CHECKLIST.md` defines approved project scope and exact phase order
-- `PROJECT_STATUS.md` records only current progress, decisions, blockers, active resources, cost, cleanup status, and next step
-- Repository files are authoritative; Kiro chat memory is not authoritative
-- Kiro must read repository governance files before implementation work
-- Kiro may challenge architecture decisions but must not silently alter scope or phase structure
-- `.terraform.lock.hcl` should be committed when generated during Phase 3
+### Project Governance
+
+- `PROJECT_CHECKLIST.md` defines the approved project scope and exact phase order
+- `PROJECT_STATUS.md` records current progress, validation, decisions, blockers, active resources, cost, cleanup status, and exact next step
+- Repository governance files are authoritative; Kiro chat memory is not authoritative
+- Kiro must read repository governance files from disk before project work
+- Kiro must not reconstruct or alter the approved phase structure from conversational memory
+- Kiro may challenge architecture or implementation decisions but must not silently alter approved scope, phase order, or governance
+- Prefer minimal repository diffs rather than whole-file rewrites for small changes
+- Completion must not be inferred; checklist completion gates are checked only after the corresponding work has been completed and validated
+- Development work currently occurs on the `develop` branch
+
+### Terraform / Repository Decisions
+
+- `.terraform.lock.hcl` must not be ignored and should be committed when generated during Phase 3
 - `.env.example` and `.env.template` may be tracked
-- No blanket ignore rule for `.vscode/`, `.kiro/`, or `.mcp/`
+- No blanket ignore rule is used for `.vscode/`, `.kiro/`, or `.mcp/`
+- Terraform implementation and backend/state strategy remain deferred until their approved phases
+
+### Agentic Architecture Principles
+
 - Amazon Bedrock AgentCore baseline includes Runtime, Gateway, Identity/IAM, and Observability
-- AgentCore Memory remains optional until architecture review
-- MCP is a first-class integration layer
-- Diagnostic READ tools and remediation WRITE tools remain separated
-- Human approval is required for remediation
-- Development work currently occurs on `develop`
+- AgentCore Memory remains optional pending Phase 2 architecture evaluation
+- MCP is a first-class integration layer rather than an optional enhancement
+- Diagnostic READ tools and remediation WRITE tools must remain separately authorized
+- AI reasoning does not equal authorization
+- Human approval is required before remediation/write execution
+- The human-approval control must ultimately be enforced structurally outside the LLM rather than relying only on prompting
+- Deterministic AWS evidence must establish network facts; the LLM/agent correlates, explains, and recommends rather than inventing reachability conclusions
+- VPC Reachability Analyzer is a key deterministic diagnostic source where applicable
+
+### Region Direction
+
+- `eu-west-1` (Ireland) is currently the preferred candidate project region
+- Read-only reconnaissance found no custom VPCs in the inspected `eu-west-1` VPC inventory and only default networking resources in the networking categories inspected
+- Common compute inventory inspected in `eu-west-1` returned no EC2 instances, Lambda functions, or ELBv2 load balancers
+- RDS and CloudFormation remain unverified because the current assumed role lacks the required read permissions
+- `eu-west-1` is not yet the formally approved project region
+- Final region selection remains a Phase 2 architecture decision and requires confirmation that all required AgentCore and other project services/features are available and suitable in the region
+- Existing AWS default resources will remain untouched; the project will create its own explicitly identified Terraform-managed resources when implementation is authorized
+- Current IAM permissions will not be broadened merely to make reconnaissance easier; required deployment and operational permissions will be deliberately designed according to least privilege during the appropriate architecture/implementation phases
 
 ---
 
 ## Open Architecture Decisions
 
-To be resolved during Phase 2:
+The following decisions remain intentionally deferred to **Phase 2 — Architecture & Technical Design**:
 
-- Target AWS region
-- Terraform backend/state strategy
-- API Gateway + Lambda entry path
-- Single-agent vs multi-agent architecture
-- Network topology details
-- NAT requirement
-- Transit Gateway / peering requirement
+### AWS Region & Service Availability
+
+- Formally confirm `eu-west-1` as the target project region
+- Validate availability and suitability of all required Amazon Bedrock AgentCore capabilities in `eu-west-1`
+- Validate other required AWS services/features and any relevant regional limitations
+- Determine whether the current RDS and CloudFormation inventory gaps require further verification; do not broaden IAM permissions unless there is a justified project need
+
+### Network Architecture
+
+- Final VPC count and network topology
+- Public/private subnet requirements
+- Internet-egress requirements
+- NAT Gateway requirement
+- VPC endpoint requirements
+- DNS architecture
+- VPC Flow Logs placement and scope
+- VPC Reachability Analyzer usage points
+- Whether VPC peering, Transit Gateway, or neither provides sufficient architectural and demonstration value
+- Expected healthy and intentionally blocked connectivity paths
+
+### AgentCore & Application Architecture
+
+- Final AgentCore Runtime approach
+- Final AgentCore Gateway approach
+- Final AgentCore Identity/IAM approach
+- Final AgentCore Observability approach
 - AgentCore Memory usage
+- Agent entry/invocation path
+- API Gateway + Lambda entry-path decision
+- Single-agent MVP vs. multi-agent advanced architecture
+
+### MCP & Security Architecture
+
+- MCP hosting/deployment approach
+- Local MCP development/testing path
+- Deployed AgentCore Gateway integration path
+- MCP authentication and IAM boundaries
+- Diagnostic READ-tool authorization boundary
+- Remediation WRITE-tool authorization boundary
+- Human-approval enforcement mechanism
+- MCP input/output schema conventions
+- MCP tool-call tracing requirements
+
+### Terraform & Engineering
+
+- Terraform backend/state strategy
+- Terraform module structure
+- `terraform.tfvars.example` strategy
+- Branch/PR workflow appropriate for a solo portfolio project
+- Formatting, linting, validation, and testing approach
+- Kiro Spec structure based on approved Phase 1 and Phase 2 decisions
+- Architecture decision-recording approach
+
+### Architecture Documentation
+
+- Professional diagramming tool and editable source format
+- Detailed content and boundaries for the five required architecture diagrams
+- Trust boundaries, IAM boundaries, and data/control-plane flows to represent
+
+No Phase 2 decision should be treated as finalized until Phase 1 has passed its explicit review and completion gate.
 
 ---
 
 ## Blockers
 
-No current blockers.
+### Current Project Blockers
 
-Foundation governance is complete, and Phase 1 requirements work may begin.
+**None identified.**
+
+There is currently no technical, AWS, repository, cost, or governance blocker preventing the project from continuing according to the approved phase sequence.
+
+### Pending Completion Gate
+
+Phase 1 remains **in progress** because final user review and approval of `docs/requirements.md` has not yet been completed.
+
+This is an intentional governance gate, not a project blocker.
+
+Phase 2 must not begin until:
+
+- The final Phase 1 requirements review is completed
+- Any required corrections are incorporated
+- `Review and approve Phase 1 requirements before architecture design begins` is checked in `PROJECT_CHECKLIST.md`
+- `Phase 1 COMPLETE` is checked in `PROJECT_CHECKLIST.md`
+
+### Known Reconnaissance Limitations
+
+- RDS inventory in `eu-west-1` remains unverified because the current assumed role lacks `rds:DescribeDBInstances`
+- CloudFormation inventory in `eu-west-1` remains unverified because the current assumed role lacks `cloudformation:ListStacks`
+- These reconnaissance limitations do not currently block Phase 1
+- Whether additional verification is necessary will be evaluated during Phase 2 rather than broadening IAM permissions prematurely
 
 ---
 
 ## Cleanup Status
 
-No cleanup required.
+### Project Resources
 
-No project-created AWS resources exist.
+No cleanup is currently required.
+
+No AWS resources have been created, modified, or deployed by this project.
+
+The read-only AWS region reconnaissance performed during Phase 1 did not create, modify, or delete any AWS resources.
+
+### Local / Repository State
+
+No project-generated Terraform infrastructure or application runtime artifacts currently require cleanup.
+
+Terraform has not been initialized for this project, and no Terraform-managed AWS resources exist.
+
+### Future Cleanup
+
+Formal project teardown and independent AWS resource verification remain scheduled for **Phase 11 — Destroy & Cost Verification** after implementation and testing are complete.
+
+Any intentionally retained resources or artifacts must be explicitly documented at that time.
 
 ---
 
 ## Exact Next Step
 
-Begin **Phase 1 — Business Requirements & Learning Objectives**.
+Complete the final user review of `docs/requirements.md`.
 
-Start with:
+The Phase 1 requirements have already been drafted, independently reviewed, and updated. The remaining Phase 1 activity is the explicit final review and approval gate.
 
-1. Real-world problem statement
-2. Intended users and primary use cases
-3. 3–5 measurable learning objectives
-4. Definition of success / completion criteria
+If no material changes are required after the final review:
 
-Do not begin Phase 2 architecture design or implementation until Phase 1 requirements are reviewed and approved.
+1. Approve `docs/requirements.md`
+2. Check `Review and approve Phase 1 requirements before architecture design begins` in `PROJECT_CHECKLIST.md`
+3. Check `Phase 1 COMPLETE` in `PROJECT_CHECKLIST.md`
+4. Update `PROJECT_STATUS.md` to record Phase 1 completion and Phase 2 as the next phase
+5. Review the Phase 1 Git diff and validation status
+6. Commit the completed Phase 1 baseline
+7. Begin **Phase 2 — Architecture & Technical Design** only after the Phase 1 completion gate is satisfied
+
+The first Phase 2 activity will be to formally validate and decide the target AWS region. `eu-west-1` is currently the preferred candidate based on read-only reconnaissance, but it must not be treated as final until required Amazon Bedrock AgentCore capabilities and other necessary AWS service/features are confirmed.
+
+Do not begin Phase 2 architecture work or implementation before the Phase 1 completion gate is satisfied.
 
 ---
 
 ## Not Authorized Yet
 
-Do not begin:
+Until Phase 1 receives final user approval and its completion gate is checked, do not begin Phase 2 architecture work or any implementation activity.
+
+The following are not yet authorized:
 
 - Terraform implementation
 - `terraform init`
+- Terraform-managed AWS resource creation
 - Python application implementation
-- AgentCore deployment
-- MCP implementation
-- Lambda implementation
-- API Gateway implementation
-- AWS CLI or AWS Console changes
-- AWS resource provisioning
+- AgentCore deployment or configuration
+- MCP implementation or deployment
+- Lambda implementation or deployment
+- API Gateway implementation or deployment
+- Creation, modification, or deletion of AWS resources through the AWS CLI, AWS Console, SDKs, Terraform, Kiro, or other tooling
+- IAM policy/role changes for project implementation
+- Broadening IAM permissions merely to complete optional reconnaissance
 - Phase 2 architecture implementation
 - Public repository publication
 
----
+Read-only AWS inspection/reconnaissance may be performed when explicitly justified and authorized, provided it does not create, modify, or delete AWS resources.
 
+Phase 2 architecture decisions may begin only after the Phase 1 completion gate is satisfied. AWS implementation and provisioning must additionally wait for the applicable architecture/design decisions and later implementation-phase prerequisites defined in `PROJECT_CHECKLIST.md`.
+
+---
 *Last updated: 2026-08-27*
