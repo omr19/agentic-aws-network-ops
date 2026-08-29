@@ -102,6 +102,67 @@ def validate_request(request: Mapping[str, Any]) -> None:
         raise RemediationContractError("request_hash does not match the canonical request")
 
 
+def _validate_action_parameters(action: str, operation: str, parameters: Mapping[str, Any]) -> None:
+    allowed: dict[str, tuple[str, ...]] = {
+        "restore_security_group_ingress": ("AuthorizeSecurityGroupIngress",),
+        "restore_vpc_peering_route": ("CreateRoute", "ReplaceRoute"),
+        "restore_network_acl_entry": ("ReplaceNetworkAclEntry",),
+    }
+    if operation not in allowed[action]:
+        raise RemediationContractError("operation is not supported for action")
+    expected_keys = {
+        "restore_security_group_ingress": {
+            "protocol",
+            "from_port",
+            "to_port",
+            "cidr_ip",
+        },
+        "restore_vpc_peering_route": {
+            "route_table_id",
+            "destination_cidr",
+            "vpc_peering_connection_id",
+        },
+        "restore_network_acl_entry": {
+            "rule_number",
+            "egress",
+            "protocol",
+            "from_port",
+            "to_port",
+            "cidr_block",
+            "rule_action",
+        },
+    }[action]
+    if set(parameters) != expected_keys:
+        raise RemediationContractError("arbitrary remediation parameters are unsupported")
+    if action == "restore_security_group_ingress" and dict(parameters) != {
+        "protocol": "tcp",
+        "from_port": 443,
+        "to_port": 443,
+        "cidr_ip": "10.10.0.0/16",
+    }:
+        raise RemediationContractError(
+            "security-group parameters are outside the approved manifest"
+        )
+    if action == "restore_network_acl_entry" and dict(parameters) != {
+        "rule_number": 100,
+        "egress": False,
+        "protocol": "tcp",
+        "from_port": 443,
+        "to_port": 443,
+        "cidr_block": "10.10.0.0/16",
+        "rule_action": "allow",
+    }:
+        raise RemediationContractError("NACL parameters are outside the approved manifest")
+    if action == "restore_vpc_peering_route":
+        if parameters.get("destination_cidr") not in {"10.10.0.0/16", "10.20.0.0/16"}:
+            raise RemediationContractError("route destination is outside the approved manifest")
+        if not all(
+            isinstance(parameters.get(key), str) and parameters[key]
+            for key in ("route_table_id", "vpc_peering_connection_id")
+        ):
+            raise RemediationContractError("route identifiers must be non-empty strings")
+
+
 def create_proposal(
     *,
     request: Mapping[str, Any],
@@ -118,6 +179,7 @@ def create_proposal(
 
     if action not in SUPPORTED_ACTIONS:
         raise RemediationContractError("action is unsupported")
+    _validate_action_parameters(action, operation, parameters)
     validate_request(request)
     if proposed_at.tzinfo is None:
         raise RemediationContractError("proposed_at must be timezone-aware")

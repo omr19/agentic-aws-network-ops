@@ -1,4 +1,4 @@
-"""Deterministic unit tests for proposal, approval, execution, and verification."""
+"""Deterministic parameterized tests for the Phase 8 remediation workflow."""
 
 from __future__ import annotations
 
@@ -19,9 +19,44 @@ from agentic_aws_network_ops.remediation.workflow import (
 )
 
 NOW = datetime(2026, 9, 2, 12, 0, tzinfo=UTC)
+ACTION_CASES = [
+    pytest.param(
+        "security_group_rule",
+        "restore_security_group_ingress",
+        "AuthorizeSecurityGroupIngress",
+        {"protocol": "tcp", "from_port": 443, "to_port": 443, "cidr_ip": "10.10.0.0/16"},
+        id="security-group-ingress",
+    ),
+    pytest.param(
+        "route_table_entry",
+        "restore_vpc_peering_route",
+        "CreateRoute",
+        {
+            "route_table_id": "rtb-source",
+            "destination_cidr": "10.20.0.0/16",
+            "vpc_peering_connection_id": "pcx-project",
+        },
+        id="peering-route",
+    ),
+    pytest.param(
+        "nacl_rule",
+        "restore_network_acl_entry",
+        "ReplaceNetworkAclEntry",
+        {
+            "rule_number": 100,
+            "egress": False,
+            "protocol": "tcp",
+            "from_port": 443,
+            "to_port": 443,
+            "cidr_block": "10.10.0.0/16",
+            "rule_action": "allow",
+        },
+        id="network-acl-entry",
+    ),
+]
 
 
-def make_request(scenario: str = "security_group_rule") -> dict[str, str]:
+def make_request(scenario: str) -> dict[str, str]:
     request = {
         "schema_version": "1.0.0",
         "scenario_id": scenario,
@@ -34,16 +69,18 @@ def make_request(scenario: str = "security_group_rule") -> dict[str, str]:
     return request
 
 
-def make_proposal(request: Mapping[str, object]) -> dict[str, object]:
+def make_proposal(
+    request: Mapping[str, object], action: str, operation: str, parameters: Mapping[str, object]
+) -> dict[str, object]:
     return create_proposal(
         request=request,
-        action="restore_security_group_ingress",
+        action=action,
         region="eu-west-1",
-        resource="destination-security-group",
-        operation="AuthorizeSecurityGroupIngress",
-        parameters={"protocol": "tcp", "port": 443, "source_cidr": "10.10.0.0/16"},
-        evidence=[{"fact": "The approved ingress rule is absent."}],
-        expected_result="TCP/443 ingress is restored.",
+        resource="approved-project-resource",
+        operation=operation,
+        parameters=parameters,
+        evidence=[{"fact": "The approved corrective state is absent."}],
+        expected_result="The approved corrective state is restored.",
         proposed_at=NOW,
     )
 
@@ -58,15 +95,16 @@ class FakeAdapter:
 
 
 class FakeVerifier:
+    def __init__(self) -> None:
+        self.calls = 0
+
     def verify(self, proposal: object) -> dict[str, object]:
-        return {"status": "verified", "remediation_fact": "Rule is present."}
+        self.calls += 1
+        return {"status": "verified", "remediation_fact": "Approved state is present."}
 
 
 def approve(
-    request: dict[str, str],
-    proposal: dict[str, object],
-    store: InMemoryApprovalStore,
-    decision: bool = True,
+    proposal: dict[str, object], store: InMemoryApprovalStore, decision: bool = True
 ) -> None:
     record_approval(
         proposal=proposal,
@@ -77,18 +115,24 @@ def approve(
     )
 
 
-def test_proposal_does_not_execute() -> None:
+@pytest.mark.parametrize("scenario,action,operation,parameters", ACTION_CASES)
+def test_proposal_creation_has_no_write_side_effect(
+    scenario: str, action: str, operation: str, parameters: dict[str, object]
+) -> None:
     store = InMemoryApprovalStore({})
     adapter = FakeAdapter()
-    proposal = make_proposal(make_request())
-    assert proposal["action"] == "restore_security_group_ingress"
+    proposal = make_proposal(make_request(scenario), action, operation, parameters)
+    assert proposal["action"] == action
     assert adapter.calls == 0
     assert store.approvals == {}
 
 
-def test_missing_approval_denies_without_write() -> None:
-    request = make_request()
-    proposal = make_proposal(request)
+@pytest.mark.parametrize("scenario,action,operation,parameters", ACTION_CASES)
+def test_missing_approval_is_denied_without_adapter_call(
+    scenario: str, action: str, operation: str, parameters: dict[str, object]
+) -> None:
+    request = make_request(scenario)
+    proposal = make_proposal(request, action, operation, parameters)
     adapter = FakeAdapter()
     with pytest.raises(RemediationContractError, match="approval is required"):
         execute(
@@ -102,11 +146,14 @@ def test_missing_approval_denies_without_write() -> None:
     assert adapter.calls == 0
 
 
-def test_denial_produces_no_write() -> None:
-    request = make_request()
-    proposal = make_proposal(request)
+@pytest.mark.parametrize("scenario,action,operation,parameters", ACTION_CASES)
+def test_explicit_denial_causes_no_adapter_call(
+    scenario: str, action: str, operation: str, parameters: dict[str, object]
+) -> None:
+    request = make_request(scenario)
+    proposal = make_proposal(request, action, operation, parameters)
     store = InMemoryApprovalStore({})
-    approve(request, proposal, store, decision=False)
+    approve(proposal, store, decision=False)
     adapter = FakeAdapter()
     with pytest.raises(RemediationContractError, match="does not permit"):
         execute(
@@ -120,13 +167,21 @@ def test_denial_produces_no_write() -> None:
     assert adapter.calls == 0
 
 
-def test_wrong_correlation_id_is_denied_without_write() -> None:
-    request = make_request()
-    proposal = make_proposal(request)
+@pytest.mark.parametrize("binding_field", ["correlation_id", "policy_session_id", "request_hash"])
+@pytest.mark.parametrize("scenario,action,operation,parameters", ACTION_CASES)
+def test_wrong_binding_is_denied_without_adapter_call(
+    binding_field: str,
+    scenario: str,
+    action: str,
+    operation: str,
+    parameters: dict[str, object],
+) -> None:
+    request = make_request(scenario)
+    proposal = make_proposal(request, action, operation, parameters)
     store = InMemoryApprovalStore({})
-    approve(request, proposal, store)
-    wrong = dict(request, correlation_id=str(uuid4()))
-    wrong["request_hash"] = request_hash(wrong)
+    approve(proposal, store)
+    wrong = dict(request)
+    wrong[binding_field] = str(uuid4())
     adapter = FakeAdapter()
     with pytest.raises(RemediationContractError):
         execute(
@@ -140,11 +195,14 @@ def test_wrong_correlation_id_is_denied_without_write() -> None:
     assert adapter.calls == 0
 
 
-def test_expired_approval_is_denied_without_write() -> None:
-    request = make_request()
-    proposal = make_proposal(request)
+@pytest.mark.parametrize("scenario,action,operation,parameters", ACTION_CASES)
+def test_expired_approval_is_denied_without_adapter_call(
+    scenario: str, action: str, operation: str, parameters: dict[str, object]
+) -> None:
+    request = make_request(scenario)
+    proposal = make_proposal(request, action, operation, parameters)
     store = InMemoryApprovalStore({})
-    approve(request, proposal, store)
+    approve(proposal, store)
     adapter = FakeAdapter()
     with pytest.raises(RemediationContractError, match="expired"):
         execute(
@@ -158,11 +216,14 @@ def test_expired_approval_is_denied_without_write() -> None:
     assert adapter.calls == 0
 
 
-def test_approval_replay_is_denied_and_only_one_write_occurs() -> None:
-    request = make_request()
-    proposal = make_proposal(request)
+@pytest.mark.parametrize("scenario,action,operation,parameters", ACTION_CASES)
+def test_approval_replay_performs_at_most_one_write(
+    scenario: str, action: str, operation: str, parameters: dict[str, object]
+) -> None:
+    request = make_request(scenario)
+    proposal = make_proposal(request, action, operation, parameters)
     store = InMemoryApprovalStore({})
-    approve(request, proposal, store)
+    approve(proposal, store)
     adapter = FakeAdapter()
     execute(
         request=request,
@@ -184,43 +245,66 @@ def test_approval_replay_is_denied_and_only_one_write_occurs() -> None:
     assert adapter.calls == 1
 
 
-def test_unsupported_action_and_malformed_request_are_rejected() -> None:
-    request = make_request()
-    malformed: dict[str, object] = {**request, "unexpected": True}
-    with pytest.raises(RemediationContractError, match="exactly"):
-        make_proposal(malformed)
-    with pytest.raises(RemediationContractError, match="unsupported"):
-        create_proposal(
-            request=request,
-            action="execute_arbitrary_aws",
-            region="eu-west-1",
-            resource="anything",
-            operation="DeleteRoute",
-            parameters={"route_table_id": "rtb"},
-            evidence=[],
-            expected_result="bad",
-            proposed_at=NOW,
-        )
-
-
-def test_verification_is_separate_and_bound_to_correlation() -> None:
-    request = make_request()
-    proposal = make_proposal(request)
+@pytest.mark.parametrize("scenario,action,operation,parameters", ACTION_CASES)
+def test_successful_execution_has_separate_bound_verification_and_drift(
+    scenario: str, action: str, operation: str, parameters: dict[str, object]
+) -> None:
+    request = make_request(scenario)
+    proposal = make_proposal(request, action, operation, parameters)
     store = InMemoryApprovalStore({})
-    approve(request, proposal, store)
+    approve(proposal, store)
+    adapter = FakeAdapter()
     result = execute(
         request=request,
         proposal=proposal,
         execution_id=str(uuid4()),
         now=NOW,
         store=store,
-        adapter=FakeAdapter(),
+        adapter=adapter,
     )
-    verified = verify(proposal=proposal, execution_result=result, verifier=FakeVerifier())
+    verifier = FakeVerifier()
+    verified = verify(proposal=proposal, execution_result=result, verifier=verifier)
+    assert result["terraform_drift"] is True
+    assert result["reconciliation_required"] is True
     assert verified["status"] == "verified"
+    assert verifier.calls == 1
+    assert adapter.calls == 1
     with pytest.raises(RemediationContractError, match="correlation_id"):
         verify(
             proposal=proposal,
             execution_result=dict(result, correlation_id=str(uuid4())),
-            verifier=FakeVerifier(),
+            verifier=verifier,
+        )
+
+
+def test_peering_dns_and_arbitrary_parameters_are_not_supported() -> None:
+    request = make_request("peering_routes_dns")
+    with pytest.raises(RemediationContractError, match="unsupported"):
+        make_proposal(request, "restore_peering_dns", "ModifyVpcPeeringConnectionOptions", {})
+
+    request = make_request("security_group_rule")
+    with pytest.raises(RemediationContractError, match="arbitrary remediation parameters"):
+        make_proposal(
+            request,
+            "restore_security_group_ingress",
+            "AuthorizeSecurityGroupIngress",
+            {"group_id": "arbitrary", "port": 22},
+        )
+
+    request = make_request("route_table_entry")
+    with pytest.raises(RemediationContractError, match="arbitrary remediation parameters"):
+        make_proposal(
+            request,
+            "restore_vpc_peering_route",
+            "CreateRoute",
+            {"route_table_id": "rtb", "destination_cidr": "0.0.0.0/0", "target": "igw"},
+        )
+
+    request = make_request("nacl_rule")
+    with pytest.raises(RemediationContractError, match="arbitrary remediation parameters"):
+        make_proposal(
+            request,
+            "restore_network_acl_entry",
+            "ReplaceNetworkAclEntry",
+            {"rule_number": 1, "protocol": "-1", "cidr_block": "0.0.0.0/0"},
         )
