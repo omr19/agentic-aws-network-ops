@@ -42,6 +42,17 @@
     "tcp_443_probe_sent": false,
     "reason": "ssm:SendCommand denied by the current operator role"
   },
+  "ssm_readiness": {
+    "source_instance_profile": null,
+    "destination_instance_profile": null,
+    "instances_ssm_managed": false,
+    "send_command_ready": false,
+    "instance_side_ssm_authorization_present": false,
+    "ssm_describe_instance_information": "denied_by_current_operator_role",
+    "instance_profile_added": false,
+    "ssm_endpoint_added": false,
+    "additional_iam_permission_added": false
+  },
   "evidence": {
     "flow_log_record_delivered": false,
     "logs_insights_query": false,
@@ -54,6 +65,11 @@
     "temporary_roles_absent_after_cleanup": true,
     "log_group_delete_call_succeeded": true,
     "direct_log_group_verification": "operator lacks logs:DescribeLogGroups"
+  },
+  "cloudwatch_metrics": {
+    "validated": true,
+    "ec2_metric_listing": "succeeded",
+    "get_metric_data": "succeeded"
   },
   "existing_roles_unchanged": true,
   "additional_resources_created": false,
