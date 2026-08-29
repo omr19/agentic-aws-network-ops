@@ -6,6 +6,10 @@
 
 Phase 6 is complete. The Phase 7 local deterministic diagnosis foundation is implemented for healthy evidence and the four implemented failure classes, with normalized evidence/result schemas, fact-versus-recommendation separation, incomplete/conflicting evidence rejection, tracked Phase 6 fixture tests, and documented limitations. Flow Logs and CloudWatch metrics integration remain pending; Phase 7 completion remains unchecked.
 
+### Phase 7 observability validation limitation
+
+The explicitly authorized temporary validation started both tagged Phase 4 EC2 instances and restored both to `stopped`. No Flow Logs were created. No test traffic was generated. The current least-privilege role denied `ssm:DescribeInstanceInformation`, `cloudwatch:GetMetricData`, and `logs:DescribeLogGroups`, so the validation produced no live Flow Logs or CloudWatch evidence. The existing diagnostic and Runtime IAM roles must not be broadened to overcome this boundary. A separate temporary read-only observability role is a future enhancement. Sanitized evidence is recorded in `docs/evidence/phase-7/observability-validation-limitation.json`.
+
 P5-01 and P5-02 are implemented, independently reviewed by Kiro, and validated locally,
 but not yet committed or pushed.
 The diagnostic Lambda and its execution role/log group are deployed. An AgentCore MCP
@@ -434,7 +438,7 @@ Project-created AWS resources currently active:
 **35 Terraform-managed Phase 4 resources plus one retained tagged healthy-path
 Reachability Analyzer analysis record in `eu-west-1`.**
 
-Active cost-bearing resources are two running `t3.nano` instances and two encrypted
+Active cost-bearing resources are two stopped `t3.nano` instances and two encrypted
 8-GiB gp3 root volumes. The remaining resources are the private VPC networking baseline,
 one managed Network Insights Path, and one retained successful healthy-path analysis
 record. All taggable resources use
@@ -578,7 +582,7 @@ Any intentionally retained resources or artifacts must be explicitly documented 
 
 ## Exact Next Step
 
-Phase 6 is complete. The Phase 7 local deterministic diagnosis foundation is implemented and validated for healthy evidence and the four implemented failure classes. The next governed work is to add and validate the remaining Flow Logs and CloudWatch evidence integrations; Phase 7 remains in progress and its completion gate is unchecked.
+Phase 6 is complete. The Phase 7 local deterministic diagnosis foundation is implemented and validated for healthy evidence and the four implemented failure classes. The optional observability validation was attempted under explicit temporary authorization, but produced no live Flow Logs or CloudWatch evidence because the current least-privilege role denied the required SSM and CloudWatch read actions. Both instances were restored to stopped, no Flow Logs were created, and the next governed work is a separately authorized temporary read-only observability role enhancement; Phase 7 remains in progress and its completion gate is unchecked.
 
 The preceding Phase 5 implementation checkpoint is retained below for historical context.
 

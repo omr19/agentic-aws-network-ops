@@ -14,7 +14,10 @@ This local-only foundation correlates normalized READ evidence; it does not call
 
 The result contract is defined in `schemas/diagnostic/diagnosis-result.schema.json`. Recommendations are descriptive only; this module has no AWS client, Terraform, IAM, or write-tool dependency.
 
-## Optional observability evidence
+## Live observability validation limitation
+
+A temporary validation run was authorized locally and in AWS operational scope to start both tagged Phase 4 EC2 instances, but both were restored to `stopped` before the validation ended. No Flow Logs were created. No test traffic was generated. The current least-privilege role denied `ssm:DescribeInstanceInformation`, `cloudwatch:GetMetricData`, and `logs:DescribeLogGroups`; consequently, no live Flow Logs or CloudWatch evidence was collected. The existing diagnostic and Runtime IAM roles must not be broadened for this optional validation. A separate temporary read-only observability role is a future enhancement. Sanitized evidence is recorded in `docs/evidence/phase-7/observability-validation-limitation.json`.
+
 
 `flow_logs` and `cloudwatch` are optional top-level normalized inputs. Their absence adds a limitation and does not change a healthy or supported diagnosis into a failure. A supplied source must use the closed schema, carry an observation timestamp no more than 15 minutes older than the diagnosis, and use a supported signal. Flow Logs use `path_outcome` (`accepted`, `rejected`, or `unknown`); CloudWatch uses `network_error` (`true` or `false`). Signals that contradict Reachability Analyzer are rejected as `CONFLICTING_EVIDENCE`; stale signals are rejected as `STALE_OBSERVABILITY_EVIDENCE`. No AWS query or log/metric retrieval occurs in this module.
 
