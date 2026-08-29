@@ -1,0 +1,80 @@
+default_install_hook_types: [pre-commit, pre-push]
+
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: Ruff lint
+        entry: uv run ruff check
+        language: system
+        types: [python]
+
+      - id: ruff-format
+        name: Ruff format check
+        entry: uv run ruff format --check
+        language: system
+        types: [python]
+
+      - id: mypy
+        name: mypy strict typing
+        entry: uv run mypy
+        language: system
+        pass_filenames: false
+        types: [python]
+
+      - id: pytest
+        name: pytest
+        entry: uv run pytest
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+
+      - id: bandit
+        name: Bandit security lint
+        entry: uv run bandit -c pyproject.toml -r src -q
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+
+      - id: pip-audit
+        name: Python dependency audit
+        entry: uv run pip-audit
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+
+      - id: terraform-fmt
+        name: Terraform format check
+        entry: terraform fmt -check -recursive terraform
+        language: system
+        pass_filenames: false
+        types_or: [terraform]
+
+      - id: terraform-validate
+        name: Terraform validate
+        entry: terraform -chdir=terraform/environments/lab validate
+        language: system
+        pass_filenames: false
+        types_or: [terraform]
+
+      - id: tflint
+        name: TFLint
+        entry: tflint --chdir=terraform/environments/lab
+        language: system
+        pass_filenames: false
+        types_or: [terraform]
+        stages: [pre-push]
+
+      - id: checkov
+        name: Checkov IaC security scan
+        entry: uvx --from checkov==3.3.15 checkov -d terraform --framework terraform --compact --quiet
+        language: system
+        pass_filenames: false
+        types_or: [terraform]
+        stages: [pre-push]
+
+      - id: no-private-keys
+        name: Reject private keys
+        entry: '(?i)-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----'
+        language: pygrep
+        types: [text]

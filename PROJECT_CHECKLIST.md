@@ -85,95 +85,97 @@ Check items off only after they are completed and validated. Every phase has an 
 
 ### 2.1 AWS & Network Architecture
 
-- [ ] Confirm target AWS region and required service availability
-- [ ] Design the minimum useful AWS network lab topology
-- [ ] Decide VPC count, subnet structure, routing, security groups, NACLs, endpoints, and DNS requirements
-- [ ] Evaluate whether VPC peering, Transit Gateway, or neither adds sufficient learning/demo value
-- [ ] Evaluate internet-egress requirements
+- [x] Confirm target AWS region and required service availability
+- [x] Design the minimum useful AWS network lab topology
+- [x] Decide VPC count, subnet structure, routing, security groups, NACLs, endpoints, and DNS requirements
+- [x] Evaluate whether VPC peering, Transit Gateway, or neither adds sufficient learning/demo value
+- [x] Evaluate internet-egress requirements
   - Do not assume NAT Gateway is required
   - Consider no arbitrary internet egress where possible
   - Consider VPC endpoints for supported AWS-service access
   - Evaluate NAT only where the traffic flow genuinely requires it
-- [ ] Document expected healthy connectivity paths and intentionally blocked paths
-- [ ] Define where VPC Reachability Analyzer provides deterministic validation
-- [ ] Decide whether and where VPC Flow Logs are required
+- [x] Document expected healthy connectivity paths and intentionally blocked paths
+- [x] Define where VPC Reachability Analyzer provides deterministic validation
+- [x] Decide whether and where VPC Flow Logs are required
 
 ### 2.2 AgentCore Architecture
 
-- [ ] Finalize Amazon Bedrock AgentCore Runtime approach
-- [ ] Finalize AgentCore Gateway approach
-- [ ] Finalize AgentCore Identity/IAM approach
-- [ ] Finalize AgentCore Observability approach
-- [ ] Evaluate AgentCore Memory as optional/advanced functionality
-- [ ] Define agent entry/invocation path
-- [ ] Evaluate API Gateway + Lambda where they provide a defensible purpose
+- [x] Finalize Amazon Bedrock AgentCore Runtime approach
+- [x] Finalize AgentCore Gateway approach
+- [x] Finalize AgentCore Identity/IAM approach
+- [x] Finalize AgentCore Observability approach
+- [x] Evaluate AgentCore Memory as optional/advanced functionality
+- [x] Define agent entry/invocation path
+- [x] Evaluate API Gateway + Lambda where they provide a defensible purpose
   - External/demo entry point
   - Authentication/request validation
   - Rate limiting
   - Webhook/non-MCP integration
-- [ ] Evaluate single-agent MVP vs. multi-agent advanced architecture
+- [x] Evaluate single-agent MVP vs. multi-agent advanced architecture
   - Use multiple agents only when responsibility separation justifies additional complexity
 
 ### 2.3 MCP & Tool Architecture
 
-- [ ] Define MCP as a first-class integration layer
-- [ ] Define MCP hosting/deployment approach
-- [ ] Define local development/testing path
-- [ ] Define deployed AgentCore Gateway path
-- [ ] Define read-only diagnostic tool boundary
-- [ ] Define separately authorized remediation/write tool boundary
-- [ ] Define MCP input/output schema conventions
-- [ ] Define MCP authentication and IAM boundaries
-- [ ] Define MCP tool-call tracing requirements
+- [x] Define MCP as a first-class integration layer
+- [x] Define MCP hosting/deployment approach
+- [x] Define local development/testing path
+- [x] Define deployed AgentCore Gateway path
+- [x] Define read-only diagnostic tool boundary
+- [x] Define separately authorized remediation/write tool boundary
+- [x] Define MCP input/output schema conventions
+- [x] Define MCP authentication and IAM boundaries
+- [x] Define explicit human-approval binding, expiration, replay protection, and atomic consumption
+- [x] Define exact MVP remediation tools, AWS actions, resource scope, and prohibited operations
+- [x] Define MCP tool-call tracing requirements
 
 ### 2.4 Deterministic Diagnosis Principle
 
-- [ ] Document architectural principle:
+- [x] Document architectural principle:
   - LLM must not guess network reachability
   - AWS APIs, Reachability Analyzer, Flow Logs, CloudWatch, and other deterministic sources establish facts
   - The agent correlates, explains, and recommends based on that evidence
 
 ### 2.5 Terraform & Engineering Decisions
 
-- [ ] Select Terraform backend/state strategy
+- [x] Select Terraform backend/state strategy
   - Do not assume S3 + DynamoDB until evaluated
-- [ ] Define `terraform.tfvars.example` strategy
-- [ ] Define Terraform module structure
-- [ ] Define branch/PR strategy appropriate for a solo portfolio project
-- [ ] Define linting, formatting, validation, and test approach
-- [ ] Define Kiro Spec approach based on approved requirements
-- [ ] Record significant design decisions and rationale
+- [x] Define `terraform.tfvars.example` strategy
+- [x] Define Terraform module structure
+- [x] Define branch/PR strategy appropriate for a solo portfolio project
+- [x] Define linting, formatting, validation, and test approach
+- [x] Define Kiro Spec approach based on approved requirements
+- [x] Record significant design decisions and rationale
 
 ### 2.6 Architecture Documentation Planning
 
-- [ ] Establish professional diagramming approach using official AWS architecture icons where applicable
-- [ ] Define editable diagram source format/tool
-- [ ] Plan the five required diagrams
-- [ ] Identify trust boundaries, IAM boundaries, and data/control-plane flows that diagrams must show
-- [ ] Review architecture before implementation begins
+- [x] Establish professional diagramming approach using official AWS architecture icons where applicable
+- [x] Define editable diagram source format/tool
+- [x] Plan the five required diagrams
+- [x] Identify trust boundaries, IAM boundaries, and data/control-plane flows that diagrams must show
+- [x] Review architecture before implementation begins
 
-- [ ] **Phase 2 COMPLETE**
+- [x] **Phase 2 COMPLETE**
 
 ---
 
 ## Phase 3 — Kiro Spec & Git/Terraform Foundation
 
-- [ ] Create structured Kiro Spec from approved Phase 1 and Phase 2 decisions
-- [ ] Establish repository directory structure
-- [ ] Initialize Terraform root configuration
-- [ ] Configure Terraform backend according to Phase 2 decision
-- [ ] Run `terraform init`
-- [ ] Verify `.terraform.lock.hcl` is generated
-- [ ] Verify `.terraform.lock.hcl` is tracked by Git
-- [ ] Run `terraform validate`
-- [ ] Establish Terraform modules/variables/outputs/environment conventions
-- [ ] Create `terraform.tfvars.example` with placeholder values only
-- [ ] Establish Python project/tooling structure where required
-- [ ] Configure agreed formatting/linting/testing checks
-- [ ] Review Git diff before committing foundation code
-- [ ] Commit validated Phase 3 foundation
+- [x] Create structured Kiro Spec from approved Phase 1 and Phase 2 decisions
+- [x] Establish repository directory structure
+- [x] Initialize Terraform root configuration
+- [x] Configure Terraform backend according to Phase 2 decision
+- [x] Run `terraform init`
+- [x] Verify `.terraform.lock.hcl` is generated
+- [x] Verify `.terraform.lock.hcl` is tracked by Git
+- [x] Run `terraform validate`
+- [x] Establish Terraform modules/variables/outputs/environment conventions
+- [x] Create `terraform.tfvars.example` with placeholder values only
+- [x] Establish Python project/tooling structure where required
+- [x] Configure agreed formatting/linting/testing checks
+- [x] Review Git diff before committing foundation code
+- [x] Commit validated Phase 3 foundation
 
-- [ ] **Phase 3 COMPLETE**
+- [x] **Phase 3 COMPLETE**
 
 ---
 
@@ -329,6 +331,8 @@ For each implemented scenario:
 - [ ] Re-run Reachability Analyzer where applicable
 - [ ] Confirm expected connectivity/state is restored
 - [ ] Surface verification result with remediation record
+- [ ] Detect and report configuration drift when runtime remediation changes a Terraform-managed resource
+- [ ] Require explicit Terraform source reconciliation before a later apply can restore the broken state
 
 - [ ] **Phase 8 COMPLETE**
 
@@ -557,4 +561,4 @@ Each diagram requires an editable source file plus PNG/SVG export. Use professio
 
 ---
 
-*Last updated: 2026-08-27*
+*Last updated: 2026-08-28*

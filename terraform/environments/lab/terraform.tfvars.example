@@ -1,0 +1,10 @@
+# Copy this file to terraform.tfvars for local use. Real .tfvars files are ignored.
+# Keep credentials, account IDs, secrets, and private configuration out of this file.
+
+aws_region   = "eu-west-1"
+project_name = "agentic-aws-network-ops"
+environment  = "lab"
+
+# Enable only during an explicitly controlled diagnostic or demo session.
+enable_flow_logs       = false
+flow_log_retention_days = 7

@@ -2,11 +2,16 @@
 
 ## Current Phase
 
-**Phase 2 — Architecture & Technical Design (not started)**
+**Phase 4 — AWS Network Lab (ready to begin)**
 
 Phase 1 — Business Requirements & Learning Objectives is **COMPLETE** and was formally reviewed and approved on 2026-08-28.
 
+Phase 2 — Architecture & Technical Design is **COMPLETE** and was independently reviewed and formally closed with user approval on 2026-08-28.
+
 Foundation validation is **COMPLETE**.
+
+Phase 3 — Kiro Spec & Git/Terraform Foundation is **COMPLETE** and was committed
+locally with explicit user authorization on 2026-08-28.
 
 ---
 
@@ -14,9 +19,48 @@ Foundation validation is **COMPLETE**.
 
 Phase 1 requirements in `docs/requirements.md` were independently reviewed by Kiro against the authoritative project checklist, updated to address the approved review findings, and subsequently reviewed and formally approved by the user on 2026-08-28.
 
-The Phase 1 completion gate is satisfied. Phase 2 — Architecture & Technical Design is the current phase and has not yet started.
+The Phase 1 and Phase 2 completion gates are satisfied. Twenty-three approved Phase 2 architecture decisions are recorded in `docs/architecture/phase-2-design.md` and `docs/adr/`. The final independent Phase 2 architecture review found no confirmed defects, and the user approved Phase 2 closure on 2026-08-28.
 
-Read-only AWS region reconnaissance was performed to identify a relatively clean candidate region for the project. `eu-west-1` (Ireland) is currently the preferred candidate because the VPC/networking categories inspected so far contain only AWS default networking resources and no identified custom networking resources.
+The user authorized Phase 3 on 2026-08-28. The three-file Kiro Spec under
+`.kiro/specs/agentic-aws-network-ops/` passed local structural/traceability validation
+and independent Kiro review. Confirmed traceability and Phase 7 defects were corrected,
+revalidated locally, and the corresponding Phase 3 checklist item is complete.
+
+The approved repository scaffold is now established and documented for Terraform,
+Python boundaries, MCP schemas, tests/fixtures, scripts, and diagrams. This scaffold
+contains no Python implementation. The safe Terraform `lab` root now declares bounded
+Terraform/AWS provider requirements, the approved `eu-west-1` region, and default
+ownership tags. An explicit local backend writes `terraform.tfstate` to the lab root,
+where it remains ignored. The root contains no resources, modules, or data sources.
+
+`terraform init` completed successfully in the lab root, installed the signed HashiCorp
+AWS provider v6.62.0, and generated `.terraform.lock.hcl`. The provider cache is ignored,
+the lock file is staged for Git tracking, and no deployable root `terraform.tfstate`
+was created. Terraform's ignored `.terraform/terraform.tfstate` contains backend
+initialization metadata only and records zero resources.
+
+`terraform validate` subsequently passed for the root configuration. Validation did not
+create state, plan infrastructure, contact AWS APIs, or change IAM/resources.
+
+Terraform conventions now define the `lab` environment, typed/validated root inputs,
+fixed approved topology locals, non-sensitive context outputs, and three initial
+responsibility boundaries: reusable VPC, replaceable VPC peering, and test workload.
+The module directories contain documentation only; AWS resource blocks remain absent.
+
+A trackable `terraform.tfvars.example` now documents only the five approved,
+non-sensitive lab inputs. Real `terraform.tfvars` files remain ignored.
+
+The Python project is pinned to Python 3.13, which is recommended for AgentCore direct
+code deployment and supported by Lambda. `pyproject.toml`, `.python-version`, typed
+package markers, and responsibility-based namespace boundaries are established with no
+runtime/development dependencies or application behavior yet.
+
+The ADR 023 quality toolchain is configured and locked. Local checks pass for Python
+3.13, Ruff, mypy, pytest/coverage, Bandit, pip-audit, Terraform format/validate, TFLint,
+Checkov, pre-commit configuration, and CI workflow syntax. GitHub Actions uses read-only
+repository permissions, immutable action SHAs, and no AWS credentials or deployment steps.
+
+Read-only AWS region reconnaissance identified `eu-west-1` (Ireland) as a relatively clean candidate, and Phase 2 service-availability review subsequently confirmed it as the approved target region.
 
 No AWS resources were created, modified, or deleted during the reconnaissance.
 
@@ -45,7 +89,35 @@ Current working branch:
 - Final user review and formal approval of Phase 1 requirements completed on 2026-08-28
 - `Phase 1 COMPLETE` gate satisfied
 - Read-only AWS region reconnaissance performed for `us-east-2`, `us-west-2`, and `eu-west-1`
-- `eu-west-1` identified as the preferred candidate project region pending formal Phase 2 service-availability confirmation
+- `eu-west-1` formally selected as the target project region after Phase 2 service-availability review
+- Twenty-three Phase 2 architecture decisions approved and recorded
+- Phase 2 architecture decision register and ADR structure created
+- Phase 2 completeness review performed against the authoritative checklist and status
+- Independent read-only Kiro review of the Phase 2 documentation completed
+- Approved review corrections incorporated for local-testing status, explicit core MCP contracts, Terraform drift reporting, and dated region review
+- Two-VPC peering MVP topology, CIDRs, TCP/443 test path, and required failure paths approved and recorded
+- Controlled VPC Flow Logs scope, CloudWatch Logs destination, and seven-day retention approved
+- Post-MVP three-VPC Transit Gateway evolution recorded as ADR 018
+- AgentCore Runtime/Gateway and separate non-VPC diagnostic/remediation Lambda placement recorded as ADR 019
+- IAM/SigV4 selected for the native MVP client; no VPC endpoints required for the peering MVP
+- Shared tool logic, thin Lambda adapters, `pytest`, Botocore `Stubber`, JSON Schema, event fixtures, and `agentcore dev` local path recorded as ADR 020
+- Five-minute one-time human approval, temporal policy, interceptor validation, atomic consumption, and replay protection recorded as ADR 021
+- Three narrow MVP remediation tools and their exact EC2/IAM blast-radius restrictions recorded as ADR 022
+- Traceable Kiro Spec structure and Python/Terraform quality toolchain recorded as ADR 023
+- Final independent Phase 2 architecture review passed with no confirmed defects
+- Approved AgentCore availability and AWS-managed Lambda networking clarifications incorporated
+- `Phase 2 COMPLETE` gate satisfied with user approval on 2026-08-28
+- Structured Phase 3 Kiro Spec created with requirements, design, and ordered tasks
+- Independent Kiro Spec review completed; confirmed findings corrected and revalidated
+- Approved Phase 3 repository directory structure established and documented
+- Safe Terraform `lab` root and AWS provider foundation created
+- Explicit local Terraform backend configured according to ADR 015
+- Terraform initialized successfully and provider dependency lock file generated/tracked
+- Terraform root configuration validated successfully
+- Terraform module, variable, output, environment, naming, and tagging conventions established
+- Safe placeholder-only `terraform.tfvars.example` created and validated
+- Python 3.13 project metadata and package/tooling structure established
+- ADR 023 quality tooling, dependency lock, pre-commit hooks, and non-destructive CI configured
 
 ---
 
@@ -105,13 +177,128 @@ Read-only AWS CLI reconnaissance was performed using the existing `rizwan-sts-ro
 - CloudFormation inventory remains **unverified** because the assumed role lacks `cloudformation:ListStacks`
 - The reconnaissance is not an exhaustive inventory of every AWS service in `eu-west-1`
 
+### Phase 2 Documentation Validation
+
+- Confirmed all 23 numbered ADRs are present; ADRs 001–017 passed independent Kiro consistency review and ADRs 018–023 record subsequently approved decisions
+- Confirmed the authoritative phase structure and governance remain unchanged
+- Confirmed no credentials, secrets, account IDs, Terraform state, or sensitive configuration were introduced
+- Confirmed new README documentation links resolve in the working tree
+- Verified the temporarily reopened local development/testing-path item was resolved by ADR 020
+- Enumerated all nine required diagnostic MCP contracts in the Phase 2 architecture document
+- Added explicit Phase 8 requirements to surface and reconcile Terraform drift after runtime remediation
+- Confirmed the final independent review passed with no confirmed defects
+- Confirmed both remaining Phase 2 checklist gates were checked only after review and explicit user approval
+
 ### Implementation Validation
 
-- No Terraform validation performed yet
-- No application tests performed yet
+- Terraform foundation configuration validation completed; no infrastructure plan/apply performed
+- Seven Python foundation tests completed; no application behavior exists yet
 - No AWS deployment validation performed yet
 - No AgentCore deployment validation performed yet
 - No MCP implementation validation performed yet
+
+### Phase 3 Kiro Spec Validation
+
+- Confirmed the required `requirements.md`, `design.md`, and `tasks.md` files exist
+- Confirmed 37 stable requirement IDs map explicitly into design and task/test coverage
+- Confirmed 31 ordered tasks preserve the authoritative phase sequence
+- Confirmed apply/deploy, IAM, destructive, commit, and push authorization remain separate
+- Confirmed documentation diff formatting passes `git diff --check`
+- Independent Kiro review completed with three confirmed documentation/traceability findings
+- Corrected the design matrix so all 31 task IDs are explicitly traceable
+- Restored the exact authoritative Phase 7 name and deterministic-diagnosis scope
+- Added explicit correlation, IAM-condition prerequisite, and portfolio-audit mappings
+- Revalidated all 37 requirement IDs and all 31 task IDs with no missing mappings
+
+### Phase 3 Repository Structure Validation
+
+- Confirmed all 17 planned scaffold directories exist
+- Confirmed Terraform, Python, schemas, tests/fixtures, scripts, and diagram boundaries are documented
+- Confirmed no Terraform `.tf` files or Python `.py` implementation files were introduced
+- Confirmed Terraform state and real `.tfvars` paths remain ignored
+- Confirmed `.terraform.lock.hcl` remains eligible for Git tracking
+- Confirmed repository diff formatting passes `git diff --check`
+
+### Phase 3 Terraform Root Validation
+
+- Confirmed `versions.tf` and `providers.tf` exist under `terraform/environments/lab/`
+- Confirmed Terraform is bounded to `>= 1.5.7, < 2.0.0`
+- Confirmed the HashiCorp AWS provider is bounded to compatible 6.x releases
+- Confirmed the provider uses the approved `eu-west-1` region and ownership tags
+- Confirmed no resource, module, data-source, credential, or account-ID content exists
+- Confirmed Terraform was not initialized or otherwise executed
+
+### Phase 3 Terraform Backend Validation
+
+- Confirmed an explicit `local` backend is declared in `backend.tf`
+- Confirmed its `terraform.tfstate` path is covered by `.gitignore`
+- Confirmed no state file, `.terraform` directory, remote backend, or backend credential exists
+- Confirmed Terraform was not initialized or otherwise executed
+
+### Phase 3 Terraform Initialization Validation
+
+- Confirmed the local backend initialized successfully
+- Confirmed signed `hashicorp/aws` provider v6.62.0 was installed from the constrained 6.x series
+- Confirmed `.terraform/` is ignored and contains only local initialization/provider cache data
+- Confirmed `.terraform.lock.hcl` was generated, contains no sensitive values, and is staged for Git tracking
+- Confirmed no `terraform.tfstate` file was created
+- Confirmed no Terraform plan/apply and no AWS or IAM operation occurred
+
+### Phase 3 Terraform Configuration Validation
+
+- Ran `terraform validate -no-color` in `terraform/environments/lab/`
+- Result: `Success! The configuration is valid.`
+- Confirmed validation created no state and performed no plan/apply or AWS/IAM change
+
+### Phase 3 Terraform Convention Validation
+
+- Confirmed the reusable `vpc`, replaceable `vpc_peering`, and `test_workload` boundaries
+- Confirmed provider configuration remains in the `lab` root and child modules own no backend/provider configuration
+- Confirmed typed variables constrain the approved Region/environment and default Flow Logs to disabled with seven-day retention
+- Confirmed fixed Source/Destination CIDRs, private subnets, and TCP/443 healthy path match Phase 2
+- Confirmed root outputs expose only non-sensitive deployment/topology context
+- Ran recursive Terraform formatting and successfully revalidated the initialized lab root
+- Confirmed no Terraform resource/data blocks, state, plan/apply, or AWS/IAM changes exist
+
+### Phase 3 Terraform Example Variables Validation
+
+- Confirmed exactly five approved non-sensitive example assignments
+- Confirmed the example is eligible for Git tracking while real `.tfvars` remain ignored
+- Confirmed no credential, secret, account-ID, private-key, or password assignment exists
+- Revalidated the Terraform root successfully after adding the example
+
+### Phase 3 Python Structure Validation
+
+- Confirmed official AWS guidance recommends Python 3.13 for AgentCore direct code deployment
+- Confirmed Lambda supports the Python 3.13 managed runtime
+- Confirmed `.python-version` and `requires-python` consistently pin the 3.13 minor series
+- Confirmed seven package markers parse successfully and `py.typed` is present
+- Confirmed runtime/development dependency lists are empty pending the tooling task
+- Confirmed no executable application, Lambda, MCP, AgentCore, or AWS behavior was introduced
+
+### Phase 3 Quality Toolchain Validation
+
+- Locked 63 Python development packages for Python 3.13 with uv 0.12.7
+- Ruff lint and format checks passed
+- Strict mypy validation passed for eight source/test files
+- Seven pytest foundation tests passed with branch coverage enabled
+- Bandit security lint passed
+- pip-audit reported no known vulnerabilities in the locked project environment
+- Checkov 3.3.15 isolated from project dependencies and passed one Terraform check with zero failures
+- Terraform format and validation passed
+- TFLint 0.64.0 with signed AWS ruleset 0.48.0 passed
+- Pre-commit configuration and GitHub Actions YAML parsed successfully
+- CI actions are pinned to immutable SHAs with read-only contents permission and no AWS credentials
+
+### Phase 3 Foundation Diff Review
+
+- `git diff --check` passed with no whitespace errors
+- Confirmed the authoritative checklist retains exactly 13 phases
+- Confirmed all 23 numbered ADRs are present and all relative Markdown links resolve
+- Confirmed generated caches, provider files, TFLint plugins, and local Terraform metadata are ignored
+- Confirmed no Terraform resource/data blocks, deployable state, credentials, or AWS account IDs are present
+- Confirmed CI contains no Terraform plan/apply/destroy, AWS CLI use, AWS credential setup, or write permission
+- Confirmed the only staged file is `.terraform.lock.hcl`; all other reviewed changes remain unstaged pending atomic commit authorization
 
 ---
 
@@ -168,7 +355,7 @@ AWS Budget/cost alert configuration remains planned for Phase 9.
 - `.terraform.lock.hcl` must not be ignored and should be committed when generated during Phase 3
 - `.env.example` and `.env.template` may be tracked
 - No blanket ignore rule is used for `.vscode/`, `.kiro/`, or `.mcp/`
-- Terraform implementation and backend/state strategy remain deferred until their approved phases
+- Local Terraform state selected for the single-engineer MVP; implementation remains deferred to Phase 3
 
 ### Agentic Architecture Principles
 
@@ -184,12 +371,11 @@ AWS Budget/cost alert configuration remains planned for Phase 9.
 
 ### Region Direction
 
-- `eu-west-1` (Ireland) is currently the preferred candidate project region
+- `eu-west-1` (Ireland) is the approved target project region
 - Read-only reconnaissance found no custom VPCs in the inspected `eu-west-1` VPC inventory and only default networking resources in the networking categories inspected
 - Common compute inventory inspected in `eu-west-1` returned no EC2 instances, Lambda functions, or ELBv2 load balancers
 - RDS and CloudFormation remain unverified because the current assumed role lacks the required read permissions
-- `eu-west-1` is not yet the formally approved project region
-- Final region selection remains a Phase 2 architecture decision and requires confirmation that all required AgentCore and other project services/features are available and suitable in the region
+- Required AgentCore availability and suitability were reviewed before formal selection
 - Existing AWS default resources will remain untouched; the project will create its own explicitly identified Terraform-managed resources when implementation is authorized
 - Current IAM permissions will not be broadened merely to make reconnaissance easier; required deployment and operational permissions will be deliberately designed according to least privilege during the appropriate architecture/implementation phases
 
@@ -197,68 +383,14 @@ AWS Budget/cost alert configuration remains planned for Phase 9.
 
 ## Open Architecture Decisions
 
-The following decisions remain intentionally deferred to **Phase 2 — Architecture & Technical Design**:
+**None for Phase 2.**
 
-### AWS Region & Service Availability
+Twenty-three architecture decisions are approved and recorded. Implementation details
+explicitly assigned to later phases remain governed by their corresponding checklist
+items and ADR reevaluation triggers; they do not reopen Phase 2.
 
-- Formally confirm `eu-west-1` as the target project region
-- Validate availability and suitability of all required Amazon Bedrock AgentCore capabilities in `eu-west-1`
-- Validate other required AWS services/features and any relevant regional limitations
-- Determine whether the current RDS and CloudFormation inventory gaps require further verification; do not broaden IAM permissions unless there is a justified project need
-
-### Network Architecture
-
-- Final VPC count and network topology
-- Public/private subnet requirements
-- Internet-egress requirements
-- NAT Gateway requirement
-- VPC endpoint requirements
-- DNS architecture
-- VPC Flow Logs placement and scope
-- VPC Reachability Analyzer usage points
-- Whether VPC peering, Transit Gateway, or neither provides sufficient architectural and demonstration value
-- Expected healthy and intentionally blocked connectivity paths
-
-### AgentCore & Application Architecture
-
-- Final AgentCore Runtime approach
-- Final AgentCore Gateway approach
-- Final AgentCore Identity/IAM approach
-- Final AgentCore Observability approach
-- AgentCore Memory usage
-- Agent entry/invocation path
-- API Gateway + Lambda entry-path decision
-- Single-agent MVP vs. multi-agent advanced architecture
-
-### MCP & Security Architecture
-
-- MCP hosting/deployment approach
-- Local MCP development/testing path
-- Deployed AgentCore Gateway integration path
-- MCP authentication and IAM boundaries
-- Diagnostic READ-tool authorization boundary
-- Remediation WRITE-tool authorization boundary
-- Human-approval enforcement mechanism
-- MCP input/output schema conventions
-- MCP tool-call tracing requirements
-
-### Terraform & Engineering
-
-- Terraform backend/state strategy
-- Terraform module structure
-- `terraform.tfvars.example` strategy
-- Branch/PR workflow appropriate for a solo portfolio project
-- Formatting, linting, validation, and testing approach
-- Kiro Spec structure based on approved Phase 1 and Phase 2 decisions
-- Architecture decision-recording approach
-
-### Architecture Documentation
-
-- Professional diagramming tool and editable source format
-- Detailed content and boundaries for the five required architecture diagrams
-- Trust boundaries, IAM boundaries, and data/control-plane flows to represent
-
-Phase 1 has passed its explicit review and completion gate. The architecture decisions listed above are now authorized for evaluation during Phase 2 but remain unresolved until individually reviewed and documented.
+RDS and CloudFormation reconnaissance gaps remain irrelevant to the approved
+architecture and do not justify broader IAM permissions.
 
 ---
 
@@ -278,7 +410,7 @@ Final user review and formal approval of `docs/requirements.md` were completed o
 
 The required review/approval checklist item and `Phase 1 COMPLETE` gate are checked in `PROJECT_CHECKLIST.md`.
 
-Phase 2 — Architecture & Technical Design is authorized to begin.
+Phase 2 — Architecture & Technical Design is **COMPLETE**.
 
 ### Known Reconnaissance Limitations
 
@@ -303,7 +435,9 @@ The read-only AWS region reconnaissance performed during Phase 1 did not create,
 
 No project-generated Terraform infrastructure or application runtime artifacts currently require cleanup.
 
-Terraform has not been initialized for this project, and no Terraform-managed AWS resources exist.
+Terraform has been initialized locally for dependency/provider setup. Its ignored
+`.terraform/terraform.tfstate` is backend initialization metadata with zero resources;
+no deployable root state or Terraform-managed AWS resource exists.
 
 ### Future Cleanup
 
@@ -315,34 +449,21 @@ Any intentionally retained resources or artifacts must be explicitly documented 
 
 ## Exact Next Step
 
-Begin **Phase 2 — Architecture & Technical Design**.
-
-The first Phase 2 activity is to formally validate and decide the target AWS region. `eu-west-1` is currently the preferred candidate based on read-only reconnaissance.
-
-Before formally selecting the region:
-
-1. Validate availability and suitability of the required Amazon Bedrock AgentCore capabilities in `eu-west-1`
-2. Validate other AWS services and regional capabilities required by the approved project requirements
-3. Identify any relevant regional limitations or architecture implications
-4. Confirm whether the existing RDS and CloudFormation reconnaissance gaps have any relevance to the planned architecture
-5. Record the resulting region decision and rationale
-
-No AWS project infrastructure should be created during this architecture decision.
-
-After the region decision, continue through the remaining Phase 2 architecture decisions in `PROJECT_CHECKLIST.md` before beginning implementation.
+Begin Phase 4 by implementing the approved healthy two-VPC peering network in Terraform,
+then run non-destructive local checks and review the generated plan. Obtain separate
+explicit authorization before any `terraform apply` or other AWS-changing action.
 
 ---
 
 ## Not Authorized Yet
 
-Phase 2 — Architecture & Technical Design is now authorized.
-
-Architecture evaluation, design work, documentation, professional architecture diagrams, justified read-only AWS inspection, and service-capability validation may proceed according to `PROJECT_CHECKLIST.md`.
+Phase 2 and Phase 3 are complete. Phase 4 Terraform implementation, planning, and AWS
+deployment have not started. Push remains unauthorized.
 
 The following implementation activities are not yet authorized:
 
-- Terraform implementation
-- `terraform init`
+- Terraform resource/module implementation until Phase 4 work begins
+- Terraform plan/apply
 - Terraform-managed AWS resource creation
 - Python application implementation
 - AgentCore deployment or configuration

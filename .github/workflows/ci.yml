@@ -1,0 +1,89 @@
+name: Non-destructive validation
+
+on:
+  pull_request:
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python-quality:
+    name: Python and repository quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install uv and Python
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: "0.12.7"
+          python-version: "3.13"
+          enable-cache: true
+
+      - name: Install locked dependencies
+        run: uv sync --locked
+
+      - name: Ruff lint
+        run: uv run ruff check .
+
+      - name: Ruff format check
+        run: uv run ruff format --check .
+
+      - name: Strict typing
+        run: uv run mypy
+
+      - name: Unit tests and coverage
+        run: uv run pytest
+
+      - name: Python security lint
+        run: uv run bandit -c pyproject.toml -r src -q
+
+      - name: Dependency vulnerability audit
+        run: uv run pip-audit
+
+      - name: Validate pre-commit configuration
+        run: uv run pre-commit validate-config .pre-commit-config.yaml
+
+  terraform-quality:
+    name: Terraform quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: "1.5.7"
+
+      - name: Install TFLint
+        uses: terraform-linters/setup-tflint@6e1e0642c0289bd619021bf6b34e3c08ed1e005a # v6.3.0
+        with:
+          tflint_version: "v0.64.0"
+
+      - name: Install uv for isolated Checkov
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: "0.12.7"
+
+      - name: Terraform format check
+        run: terraform fmt -check -recursive terraform
+
+      - name: Terraform initialize without backend
+        run: terraform -chdir=terraform/environments/lab init -backend=false -input=false
+
+      - name: Terraform validate
+        run: terraform -chdir=terraform/environments/lab validate
+
+      - name: Initialize TFLint plugins
+        run: tflint --chdir=terraform/environments/lab --init
+
+      - name: TFLint
+        run: tflint --chdir=terraform/environments/lab
+
+      - name: Checkov IaC security scan
+        run: uvx --from checkov==3.3.15 checkov -d terraform --framework terraform --compact --quiet
