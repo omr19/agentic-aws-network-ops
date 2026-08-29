@@ -4,7 +4,7 @@
 
 **Phase 6 — Network Failure Scenarios is AUTHORIZED and IN PROGRESS**
 
-Phase 6 evidence now records the controlled `broken_sg` and `broken_route` scenarios as completed and restored, with sanitized summaries tracked under `docs/evidence/phase-6/`. The `broken_nacl`, `broken_dns`, and `broken_peering` scenarios remain pending. Phase 6 remains in progress and its completion gate remains unchecked.
+Phase 6 evidence now records the controlled `broken_sg`, `broken_route`, and `broken_nacl` scenarios as completed and restored, with sanitized summaries tracked under `docs/evidence/phase-6/`. The `broken_dns` and `broken_peering` scenarios remain pending. Phase 6 remains in progress and its completion gate remains unchecked.
 
 P5-01 and P5-02 are implemented, independently reviewed by Kiro, and validated locally,
 but not yet committed or pushed.
@@ -578,7 +578,7 @@ Any intentionally retained resources or artifacts must be explicitly documented 
 
 ## Exact Next Step
 
-The controlled `broken_sg` and `broken_route` Phase 6 tests are completed and restored, with tracked sanitized evidence under `docs/evidence/phase-6/`. The exact next step is to retain Phase 6 in progress while separately authorizing and implementing any remaining scenario work; `broken_nacl`, `broken_dns`, and `broken_peering` remain pending. No Phase 6 completion claim is made.
+The controlled `broken_sg`, `broken_route`, and `broken_nacl` Phase 6 tests are completed and restored, with tracked sanitized evidence under `docs/evidence/phase-6/`. The exact next step is to retain Phase 6 in progress while separately authorizing and implementing any remaining scenario work; `broken_dns` and `broken_peering` remain pending. No Phase 6 completion claim is made.
 
 The preceding Phase 5 implementation checkpoint is retained below for historical context.
 
@@ -650,7 +650,7 @@ explicitly authorized.
 
 ## Not Authorized Yet
 
-Phases 2, 3, and 4 are complete. Phase 5 local implementation is complete locally. The controlled Phase 6 `broken_sg` and `broken_route` tests are completed and restored, and their sanitized evidence is tracked under `docs/evidence/phase-6/`. The `broken_nacl`, `broken_dns`, and `broken_peering` scenarios remain pending. Further apply/destroy, IAM changes, Phase 5 AWS deployment, additional analyses/path changes, pending scenario injection, any additional commit, and push remain unauthorized.
+Phases 2, 3, and 4 are complete. Phase 5 local implementation is complete locally. The controlled Phase 6 `broken_sg`, `broken_route`, and `broken_nacl` tests are completed and restored, and their sanitized evidence is tracked under `docs/evidence/phase-6/`. The `broken_dns` and `broken_peering` scenarios remain pending. Further apply/destroy, IAM changes, Phase 5 AWS deployment, additional analyses/path changes, pending scenario injection, any additional commit, and push remain unauthorized.
 
 The following implementation activities remain unauthorized unless separately authorized for a pending scenario:
 

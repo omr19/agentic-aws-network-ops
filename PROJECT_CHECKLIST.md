@@ -261,7 +261,7 @@ Required candidates:
 
 - [x] Broken security-group rule
 - [x] Broken route-table entry
-- [ ] Broken NACL
+- [x] Broken NACL
 - [ ] Broken VPC endpoint configuration where endpoints are deployed
 - [ ] DNS-related failure where applicable
 - [ ] TGW/peering failure only if that component was selected in Phase 2
