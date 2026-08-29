@@ -1,4 +1,6 @@
-# Development Scripts
+# Local packaging scripts
 
-This directory is reserved for non-destructive local validation and development helper
-scripts. Scripts must not embed credentials or perform AWS-changing actions by default.
+`package_diagnostic_lambda.py` prepares the ignored local Phase 5 diagnostic Lambda ZIP.
+It uses the frozen runtime dependency graph, includes the source package and complete
+schema tree, writes checksum/manifest files, and runs an offline fake-service handler
+smoke test. It does not contact AWS or perform deployment.

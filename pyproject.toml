@@ -4,13 +4,15 @@ version = "0.1.0"
 description = "Agentic AI for controlled AWS network diagnostics and remediation."
 readme = "README.md"
 requires-python = ">=3.13,<3.14"
-dependencies = []
+dependencies = [
+    "boto3>=1.35.49",
+    "jsonschema>=4.26.0",
+    "referencing>=0.37.0",
+]
 
 [dependency-groups]
 dev = [
     "bandit>=1.9.4",
-    "boto3>=1.35.49",
-    "jsonschema>=4.26.0",
     "mypy>=2.3.1",
     "pip-audit>=2.10.1",
     "pre-commit>=4.6.2",

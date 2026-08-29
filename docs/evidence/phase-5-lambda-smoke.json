@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0.0",
+  "phase": "5",
+  "evidence_type": "diagnostic_lambda_smoke",
+  "captured_at": "2026-08-29T17:45:11Z",
+  "account_id": "redacted",
+  "region": "eu-west-1",
+  "function_name": "agentic-aws-network-ops-phase5-diagnostic",
+  "tool": "describe_vpcs",
+  "request_correlation_id": "corr-test-0001",
+  "invocation": {
+    "status_code": 200,
+    "function_error": null,
+    "version": "$LATEST",
+    "duration_ms": 1890.87,
+    "billed_duration_ms": 2721,
+    "memory_mb": 256,
+    "max_memory_used_mb": 100
+  },
+  "result": {
+    "status": "success",
+    "authorization_decision": "allowed",
+    "evidence_completeness": "complete",
+    "evidence_sources": ["ec2:DescribeVpcs"],
+    "resources_returned": 2,
+    "errors": [],
+    "limitations": []
+  },
+  "structured_log": {
+    "event": "diagnostic_tool_call",
+    "tool": "describe_vpcs",
+    "status": "success",
+    "correlation_id": "corr-test-0001",
+    "evidence_completeness": "complete"
+  },
+  "raw_resource_ids": "redacted",
+  "notes": [
+    "First network attempt failed before invocation; retry succeeded.",
+    "No write-capable tool, IAM operation, or network mutation was invoked."
+  ]
+}

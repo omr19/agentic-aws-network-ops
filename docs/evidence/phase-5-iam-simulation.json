@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0.0",
+  "phase": "5",
+  "evidence_type": "diagnostic_iam_simulation",
+  "captured_at": "2026-08-29T17:35:00Z",
+  "account_id": "redacted",
+  "region": "eu-west-1",
+  "role": "agentic-aws-network-ops-lab-diagnostic",
+  "policy": "Phase5DiagnosticRead",
+  "source": "iam:SimulatePrincipalPolicy",
+  "allowed": [
+    "cloudwatch:GetMetricStatistics",
+    "ec2:DescribeNetworkAcls",
+    "ec2:DescribeNetworkInsightsAnalyses",
+    "ec2:DescribeRouteTables",
+    "ec2:DescribeSecurityGroups",
+    "ec2:DescribeSubnets",
+    "ec2:DescribeVpcEndpoints",
+    "ec2:DescribeVpcs",
+    "logs:GetQueryResults",
+    "logs:StartQuery (exact project log-group ARN)"
+  ],
+  "denied": [
+    "ec2:CreateRoute",
+    "ec2:StartNetworkInsightsAnalysis",
+    "ec2:StopInstances",
+    "ec2:TerminateInstances",
+    "iam:PassRole",
+    "lambda:InvokeFunction",
+    "sts:AssumeRole"
+  ],
+  "negative_scope_check": "logs:StartQuery against Resource=* returned implicitDeny; exact project log-group ARN returned allowed",
+  "missing_context_values": [],
+  "aws_changes": "role created and one inline policy attached; no Lambda, AgentCore, or network resource changed",
+  "limitations": [
+    "Simulation validates the selected role and policy but not Lambda invocation or deployed AgentCore behavior.",
+    "The diagnostic role has no basic logging policy yet; Lambda deployment requires a separately reviewed logging policy."
+  ]
+}

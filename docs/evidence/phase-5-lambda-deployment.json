@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0.0",
+  "phase": "5",
+  "evidence_type": "diagnostic_lambda_deployment",
+  "captured_at": "2026-08-29T17:45:00Z",
+  "account_id": "redacted",
+  "region": "eu-west-1",
+  "function_name": "agentic-aws-network-ops-phase5-diagnostic",
+  "function_arn": "redacted",
+  "handler": "agentic_aws_network_ops.adapters.diagnostic_lambda.handler",
+  "runtime": "python3.13",
+  "architecture": "x86_64",
+  "package_type": "Zip",
+  "memory_mb": 256,
+  "timeout_seconds": 30,
+  "state": "Active",
+  "last_update_status": "Successful",
+  "artifact_sha256": "5c60ffc37b2272212ba5d47775f58288b1e5e86d45a9c9640c0e89effd0638d4",
+  "aws_code_sha256_base64": "XGD/w3siciErpdR3dfWCiLHl6G1FqclkDA6J7/0GONQ=",
+  "execution_role": "agentic-aws-network-ops-lab-diagnostic",
+  "execution_policies": ["Phase5DiagnosticRead", "Phase5DiagnosticLogging"],
+  "log_group": "/aws/lambda/agentic-aws-network-ops-phase5-diagnostic",
+  "log_retention_days": 7,
+  "tags": {
+    "Project": "agentic-aws-network-ops",
+    "Environment": "lab",
+    "ManagedBy": "manual"
+  },
+  "invocation_performed": false,
+  "limitations": [
+    "No smoke invocation has been performed yet; invocation is a separate validation gate.",
+    "AgentCore Runtime and Gateway are not deployed or configured."
+  ]
+}

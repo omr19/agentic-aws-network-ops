@@ -82,6 +82,30 @@ At the beginning of a project task:
 4. Identify the exact authorized task.
 5. State any prerequisite or blocker before implementation.
 
+## Session Efficiency
+
+- Batch related local implementation, tests, and documentation into one bounded task.
+- Continue through routine, reversible, non-critical implementation decisions when the
+  approved architecture and security boundaries already determine the answer.
+- Reserve explicit approval pauses only for AWS changes, IAM changes, destructive
+  actions, commits, pushes, architecture changes, and choices that materially affect
+  security, cost, or scope.
+- Assign each bounded implementation task to either Codex or Kiro as its single owner.
+  Use the other tool for one focused independent review instead of duplicating the work.
+- Prefer assigning suitable bounded implementation/review work to Kiro when the user
+  wants to preserve the shared ChatGPT/Codex allowance and has Kiro capacity available.
+  Cost or credit availability must never weaken security, validation, or approval gates.
+- Prefer a lower-cost/faster model for routine, well-bounded edits, tests, formatting,
+  and documentation when the active tool supports model selection. Reserve stronger
+  models for architecture, security/IAM, difficult debugging, and deployment review.
+- Use deterministic local checks for repetitive validation. Use Kiro at meaningful
+  independent review gates such as schemas, IAM/security, coverage, and final diffs.
+- Avoid repeating unchanged repository reads, test output, or completed reviews.
+- At the end of every project task, record a concise model recommendation for the next
+  task: keep or switch the Codex and Kiro models based on task complexity, security
+  sensitivity, validation needs, and remaining usage/credits.
+- End each session at a recoverable checkpoint and record the exact next task.
+
 ## Session End
 
 Before concluding meaningful project work, report:

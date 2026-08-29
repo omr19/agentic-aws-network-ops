@@ -2,7 +2,18 @@
 
 ## Current Phase
 
-**Phase 4 — AWS Network Lab is COMPLETE; Phase 5 is not yet authorized**
+**Phase 5 — AgentCore + MCP Diagnostic Tooling is AUTHORIZED and IN PROGRESS**
+
+P5-01 and P5-02 are implemented, independently reviewed by Kiro, and validated locally,
+but not yet committed or pushed.
+The diagnostic Lambda and its execution role/log group are deployed. An AgentCore MCP
+Gateway with one diagnostic Lambda target is now deployed and READY; Runtime deployment
+and end-to-end Gateway invocation remain separately gated.
+
+On 2026-08-29, the user stopped both tagged Phase 4 `t3.nano` project instances in
+`eu-west-1` through the AWS Console to pause EC2 compute charges. They were stopped, not
+terminated. The encrypted gp3 volumes and the remaining network lab resources are still
+present. Live TCP/443 testing requires restarting both instances first.
 
 Phase 1 — Business Requirements & Learning Objectives is **COMPLETE** and was formally reviewed and approved on 2026-08-28.
 
@@ -26,9 +37,9 @@ The user authorized Phase 3 on 2026-08-28. The three-file Kiro Spec under
 and independent Kiro review. Confirmed traceability and Phase 7 defects were corrected,
 revalidated locally, and the corresponding Phase 3 checklist item is complete.
 
-The approved repository scaffold is now established and documented for Terraform,
-Python boundaries, MCP schemas, tests/fixtures, scripts, and diagrams. This scaffold
-contains no Python implementation. The safe Terraform `lab` root now declares bounded
+The approved repository scaffold is established and documented for Terraform,
+Python boundaries, MCP schemas, tests/fixtures, scripts, and diagrams. Phase 5 now adds
+local diagnostic READ implementation within those boundaries. The safe Terraform `lab` root declares bounded
 Terraform/AWS provider requirements, the approved `eu-west-1` region, and default
 ownership tags. An explicit local backend writes `terraform.tfstate` to the lab root,
 where it remains ignored. The root contains no resources, modules, or data sources.
@@ -45,15 +56,16 @@ create state, plan infrastructure, contact AWS APIs, or change IAM/resources.
 Terraform conventions now define the `lab` environment, typed/validated root inputs,
 fixed approved topology locals, non-sensitive context outputs, and three initial
 responsibility boundaries: reusable VPC, replaceable VPC peering, and test workload.
-The module directories contain documentation only; AWS resource blocks remain absent.
+At the Phase 3 checkpoint, the module directories contained documentation only; Phase 4
+subsequently implemented and deployed the approved network resources.
 
 A trackable `terraform.tfvars.example` now documents only the five approved,
 non-sensitive lab inputs. Real `terraform.tfvars` files remain ignored.
 
 The Python project is pinned to Python 3.13, which is recommended for AgentCore direct
 code deployment and supported by Lambda. `pyproject.toml`, `.python-version`, typed
-package markers, and responsibility-based namespace boundaries are established with no
-runtime/development dependencies or application behavior yet.
+package markers, and responsibility-based namespace boundaries are established. Phase 5
+adds locked runtime/development dependencies and the first read-only diagnostic behavior.
 
 The ADR 023 quality toolchain is configured and locked. Local checks pass for Python
 3.13, Ruff, mypy, pytest/coverage, Bandit, pip-audit, Terraform format/validate, TFLint,
@@ -102,8 +114,28 @@ the managed TCP/443 path and successful healthy analysis remain present.
 
 Read-only AWS region reconnaissance identified `eu-west-1` (Ireland) as a relatively clean candidate, and Phase 2 service-availability review subsequently confirmed it as the approved target region.
 
-No Python application, AgentCore, MCP, Lambda, API Gateway, Flow Log, NAT, endpoint, TGW,
-load-balancer, or project IAM resource has been deployed.
+No AgentCore Runtime, API Gateway, Flow Log, NAT, VPC endpoint, TGW, or load balancer has
+been deployed. The Phase 5 diagnostic Lambda, its read-only execution role/log group, and
+the single tagged AgentCore Gateway/diagnostic target are deployed as recorded in
+`docs/evidence/phase-5-agentcore-gateway.json`. A read-only SigV4 Gateway smoke invocation
+successfully called `describe_vpcs` through the Lambda target; sanitized evidence is in
+`docs/evidence/phase-5-gateway-smoke.json`. Runtime deployment remains outstanding.
+
+The local Runtime entry point now implements AgentCore `/ping` and `/invocations` endpoints
+and a fixed, read-only SigV4 Gateway transport. Local Ruff and the full 86-test suite pass.
+The ARM64-compatible Runtime ZIP was uploaded to a tagged project S3 bucket, and a separate
+least-privilege Runtime role was created. Managed Runtime
+`agentic_aws_network_ops_p5_runtime` is READY in PUBLIC/HTTP mode. One read-only Runtime
+invocation successfully traversed Runtime → Gateway → diagnostic Lambda and returned two
+tagged VPCs; sanitized evidence is in `docs/evidence/phase-5-runtime-smoke.json`.
+Runtime-role IAM simulation and S3 artifact verification also passed; evidence is in
+`docs/evidence/phase-5-runtime-iam-simulation.json`. The Runtime and S3 artifact are being
+retained temporarily for the portfolio demonstration window.
+The consolidated validation matrix is in `docs/architecture/phase-5-validation-matrix.md`,
+and the version-controlled Runtime system prompt is in
+`docs/architecture/phase-5-runtime-prompt.md`. Gateway schema hardening is complete: the
+live target is READY with exactly the nine contract-aligned tools. Phase 5 closure evidence
+is complete; no commit or push has been performed.
 
 Current working branch:
 
@@ -544,17 +576,82 @@ Any intentionally retained resources or artifacts must be explicitly documented 
 
 ## Exact Next Step
 
-The user authorized one atomic local Phase 4 implementation/evidence commit on
-2026-08-28. After that commit, request explicit authorization before beginning Phase 5.
-Do not push or begin Phase 5 before the applicable authorization.
+The user authorized Phase 5 implementation on 2026-08-28. P5-01 and P5-02 are complete
+locally: the common result envelope, nine strict diagnostic contracts, shared
+dependency-injected Boto3 logic, and thin Lambda adapter pass schema, Stubber, error,
+logging, lint, typing, security, and full unit tests without live AWS calls.
+
+Kiro completed the planned independent P5-01/P5-02 review on 2026-08-29. Its three
+confirmed findings were corrected locally: schema discovery now supports a stable Lambda
+deployment root or explicit override, in-progress Reachability Analyzer and Flow Logs
+evidence is labeled partial, and a supplied analysis ID is verified against its requested
+path. Focused timeout, throttling, transport-error, malformed-adapter, and query-filter
+negative tests were also added.
+
+P5-03 is complete locally and has completed a focused independent Kiro security
+review. Kiro identified two medium-severity hardening findings; both were corrected
+locally: AgentCore trust policies now require the source account and regional source ARN
+pattern, and security tests now assert complete allowed statement structure so broadened
+duplicate statements fail validation.
+The repository now contains separate Runtime, Gateway, and diagnostic trust/permission
+contracts. Runtime can invoke only the scoped Gateway, Gateway can invoke only the scoped
+diagnostic Lambda, and the diagnostic identity contains exactly the ten evidence actions
+required by the nine tools. Six offline IAM tests prove separation, region/log-group
+scoping, and absence of IAM, STS, Lambda invocation, remediation, wildcard-action, and
+infrastructure-mutation capability. `logs:StartQuery` is retained as the required Logs
+Insights read-query operation; `ec2:StartNetworkInsightsAnalysis` remains excluded as an
+AWS-classified Write action. The resulting 79-test suite passes with 86% coverage, along
+with Ruff, mypy, Bandit, JSON parsing, and diff checks.
+
+The resulting 79-test suite remains green after the hardening corrections. Live IAM role
+creation, attachment, effective-permission simulation, and AWS deployment remain pending
+and require separate authorization.
+
+P5-04 is now implemented and focused-reviewed locally. Typed Runtime, Gateway,
+native-client/SigV4, and diagnostic-Lambda boundaries were added with four saved event
+fixtures and three focused test modules. The complete offline suite passes 86 tests with
+Ruff, mypy, and diff checks. No model, approval, WRITE, credential, socket, AgentCore,
+Lambda deployment, or AWS path is reachable from this local composition.
+
+The local diagnostic Lambda packaging procedure is also complete. The reproducible
+artifact is written to ignored `.artifacts/diagnostic-lambda/`, includes the package,
+locked runtime dependencies, and complete root-level schemas, and has SHA-256
+`5c60ffc37b2272212ba5d47775f58288b1e5e86d45a9c9640c0e89effd0638d4`. An offline rebuild
+produced the identical checksum; the extracted fake-service smoke test passed. No upload
+or AWS call occurred.
+
+The first live Phase 5 IAM gate is complete for the diagnostic role. The tagged role
+`agentic-aws-network-ops-lab-diagnostic` was created in the approved Region with one
+`Phase5DiagnosticRead` inline policy. IAM simulation allowed the ten required evidence
+actions (with `logs:StartQuery` allowed only for the exact project log-group ARN) and
+denied representative infrastructure-write, Reachability-start, IAM, STS, Lambda
+invocation, and instance lifecycle actions. Sanitized evidence is recorded in
+`docs/evidence/phase-5-iam-simulation.json`. No Lambda, AgentCore, or network resource
+was created or changed.
+
+The diagnostic Lambda deployment gate is also complete. The tagged Python 3.13 x86_64
+function `agentic-aws-network-ops-phase5-diagnostic` is Active with the reproducible
+artifact, 256-MB memory, 30-second timeout, and the existing diagnostic role. A tagged
+seven-day log group and separate function-scoped logging policy were created. Sanitized
+deployment evidence is recorded in `docs/evidence/phase-5-lambda-deployment.json`.
+The approved read-only smoke invocation is now complete. The deployed function returned
+HTTP 200 with no function error for `describe_vpcs`, found two project-tagged VPCs, and
+emitted sanitized structured logs containing the correlation ID, tool, status, and evidence
+completeness. Invocation duration was approximately 1.89 seconds (2.721 seconds billed)
+at 256 MB. Sanitized evidence is recorded in `docs/evidence/phase-5-lambda-smoke.json`.
+
+Live IAM simulation and AgentCore/Gateway/Lambda deployment remain separate approval
+gates. The next governed work is deployment preflight review of the artifact, rendered
+policies, and operator permissions; it must stop before any AWS/IAM change until
+explicitly authorized.
 
 ---
 
 ## Not Authorized Yet
 
-Phases 2, 3, and 4 are complete. The healthy baseline is deployed; live, healthy-path,
+Phases 2, 3, and 4 are complete. Phase 5 local implementation is authorized. The healthy baseline is deployed; live, healthy-path,
 and intentionally blocked-path validation passed, and temporary evidence cleanup is
-complete. Phase 5 implementation, further apply/destroy, IAM changes, additional
+complete. Further apply/destroy, IAM changes, Phase 5 AWS deployment, additional
 analyses/path changes, failure injection, any additional commit, and push remain
 unauthorized.
 
@@ -562,10 +659,9 @@ The following implementation activities are not yet authorized:
 
 - Terraform apply/destroy
 - Terraform-managed AWS resource creation
-- Python application implementation
 - AgentCore deployment or configuration
-- MCP implementation or deployment
-- Lambda implementation or deployment
+- MCP deployment
+- Lambda deployment
 - API Gateway implementation or deployment
 - Creation, modification, or deletion of AWS project resources through the AWS CLI, AWS Console, SDKs, Terraform, Kiro, or other tooling
 - IAM policy/role changes for project implementation

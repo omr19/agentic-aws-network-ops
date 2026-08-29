@@ -35,14 +35,17 @@ applicable explicit authorization; prerequisites do not authorize them.
 
 ## Phase 5 — AgentCore and READ diagnostics
 
-- [ ] **P5-01** Define/test the common envelope and nine diagnostic schemas. **Req:**
+- [x] **P5-01** Define/test the common envelope and nine diagnostic schemas. **Req:**
   DIA-002–004, TST-002. **Verify:** positive/negative schema tests.
-- [ ] **P5-02** Implement shared READ logic and thin Lambda adapter. **Req:** DIA-001–004,
+- [x] **P5-02** Implement shared READ logic and thin Lambda adapter. **Req:** DIA-001–004,
   AGT-002, TST-001–002. **Verify:** Stubber tests without live calls.
-- [ ] **P5-03** Implement separated Runtime/Gateway/diagnostic IAM and prove diagnostic
+- [x] **P5-03** Implement separated Runtime/Gateway/diagnostic IAM and prove diagnostic
   zero-write capability. **Req:** SEC-001, SEC-007. **Verify:** policy/denial tests.
-- [ ] **P5-04** Implement single Runtime, Gateway READ integration, IAM/SigV4 client, and
-  local agent path. **Req:** SYS-001–002, AGT-001–003. **Verify:** local then authorized integration tests.
+- [x] **P5-04** Implement single Runtime, Gateway READ integration, IAM/SigV4 client, and
+  local agent path. **Req:** SYS-001–002, AGT-001–003. **Verify:** local then authorized
+  integration tests. Local deployment-agnostic Runtime/Gateway/diagnostic composition,
+  injected IAM/SigV4 seam, fixtures, and offline tests are implemented; deployed
+  AgentCore/Gateway integration remains pending.
 
 ## Phase 6 — Controlled failures
 

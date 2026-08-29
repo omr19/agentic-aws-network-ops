@@ -212,15 +212,15 @@ Check items off only after they are completed and validated. Every phase has an 
 
 Implement and document explicit input/output schemas for:
 
-- [ ] `describe_vpcs`
-- [ ] `describe_subnets`
-- [ ] `describe_route_tables`
-- [ ] `describe_security_groups`
-- [ ] `describe_network_acls`
-- [ ] `describe_vpc_endpoints`
-- [ ] `analyze_reachability`
-- [ ] `query_flow_logs`
-- [ ] `get_cloudwatch_metrics`
+- [x] `describe_vpcs`
+- [x] `describe_subnets`
+- [x] `describe_route_tables`
+- [x] `describe_security_groups`
+- [x] `describe_network_acls`
+- [x] `describe_vpc_endpoints`
+- [x] `analyze_reachability`
+- [x] `query_flow_logs`
+- [x] `get_cloudwatch_metrics`
 
 Optional enhancements that must not replace the core contracts:
 
@@ -229,26 +229,26 @@ Optional enhancements that must not replace the core contracts:
 
 ### 5.2 Tool Implementation & Security
 
-- [ ] Implement diagnostic tools using Python/Boto3 and Lambda or other approved execution environment where appropriate
-- [ ] Enforce read-only least-privilege IAM
-- [ ] Confirm diagnostic role contains no remediation/write permissions
-- [ ] Return structured agent-consumable results
-- [ ] Return actionable structured errors rather than raw stack traces
-- [ ] Add structured tool-call logging/tracing
-- [ ] Unit test tools with mocked AWS responses where appropriate
+- [x] Implement diagnostic tools using Python/Boto3 and Lambda or other approved execution environment where appropriate
+- [x] Enforce read-only least-privilege IAM
+- [x] Confirm diagnostic role contains no remediation/write permissions
+- [x] Return structured agent-consumable results
+- [x] Return actionable structured errors rather than raw stack traces
+- [x] Add structured tool-call logging/tracing
+- [x] Unit test tools with mocked AWS responses where appropriate
 
 ### 5.3 AgentCore Integration
 
-- [ ] Deploy/host agent using AgentCore Runtime according to Phase 2 design
-- [ ] Integrate MCP diagnostic tooling through AgentCore Gateway
-- [ ] Configure AgentCore Identity/IAM boundaries
+- [x] Deploy/host agent using AgentCore Runtime according to Phase 2 design
+- [x] Integrate MCP diagnostic tooling through AgentCore Gateway
+- [x] Configure AgentCore Identity/IAM boundaries
 - [ ] Version-control agent system prompts/configuration
-- [ ] Validate local MCP development/testing path
-- [ ] Validate deployed AgentCore Gateway path
-- [ ] Validate agent can select and invoke required diagnostic tools
-- [ ] Validate end-to-end read-only happy path
+- [x] Validate local MCP development/testing path
+- [x] Validate deployed AgentCore Gateway path
+- [x] Validate agent can select and invoke required diagnostic tools
+- [x] Validate end-to-end read-only happy path
 
-- [ ] **Phase 5 COMPLETE**
+- [x] **Phase 5 COMPLETE**
 
 ---
 
