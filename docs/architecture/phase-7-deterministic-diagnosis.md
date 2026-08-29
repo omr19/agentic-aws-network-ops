@@ -21,10 +21,10 @@ A temporary validation run was authorized locally and in AWS operational scope t
 
 ## Temporary Flow Logs validation attempt
 
-A bounded live-delivery attempt created one tagged one-day log group, one temporary provisioning role, one temporary Flow Logs delivery role, and two tagged VPC Flow Logs for the source and destination project VPCs. The two tagged EC2 instances were started and restored to `stopped`. `ssm:SendCommand` was denied, so no TCP/443 probe ran and no live Flow Log record was delivered or queried. Cleanup succeeded: both Flow Logs, the log group, and both temporary IAM roles were deleted; no unrelated resources were created or changed. Sanitized evidence is recorded in `docs/evidence/phase-7/flowlogs-validation.json`. CloudWatch Logs and VPC Flow Logs remain pending live delivery validation.
+A bounded live-delivery attempt created one tagged one-day log group, one temporary provisioning role, one temporary Flow Logs delivery role, and two tagged VPC Flow Logs for the source and destination project VPCs. The two tagged EC2 instances were started and restored to `stopped`. `ssm:SendCommand` was denied, so no TCP/443 probe ran and no live Flow Log record was delivered or queried. Cleanup succeeded: both Flow Logs, the log group, and both temporary IAM roles were deleted; no unrelated resources were created or changed. Sanitized evidence is recorded in `docs/evidence/phase-7/flowlogs-validation.json`. CloudWatch EC2 metrics are complete. Live Flow Logs/CloudWatch Logs traffic evidence remains a documented limitation; no live Flow Log record or Logs Insights query was obtained.
 
 
-The confirmed SSM-readiness check found that both tagged project EC2 instances have no IAM instance profile. They are therefore not SSM-managed or ready for `ssm:SendCommand`. The earlier Flow Logs attempt could not generate traffic because `ssm:SendCommand` was denied and the instances lacked instance-side SSM authorization. No instance profile, SSM endpoint, or additional IAM permission was added. Both instances remain stopped; the temporary Flow Logs, log group, and IAM roles were cleaned up. CloudWatch metrics remain complete, while CloudWatch Logs and VPC Flow Logs remain pending live delivery validation.
+The confirmed SSM-readiness check found that both tagged project EC2 instances have no IAM instance profile. They are therefore not SSM-managed or ready for `ssm:SendCommand`. The earlier Flow Logs attempt could not generate traffic because `ssm:SendCommand` was denied and the instances lacked instance-side SSM authorization. No instance profile, SSM endpoint, or additional IAM permission was added. Both instances remain stopped; the temporary Flow Logs, log group, and IAM roles were cleaned up. CloudWatch metrics remain complete. Live Flow Logs/CloudWatch Logs traffic evidence remains a documented limitation; no live Flow Log record or Logs Insights query was obtained.
 
 ## Future observability-role foundation
 
@@ -62,6 +62,6 @@ Limitations:
 - The workflow diagnoses only the four implemented AWS failure classes; it does not query AWS or infer facts absent from normalized input.
 - Reachability Analyzer is correlated but not treated as sufficient by itself for a root-cause claim when configuration evidence is incomplete.
 - Multiple blockers are reported as conflicting rather than ranked.
-- Flow Logs are currently disabled and CloudWatch metrics/log evidence is not yet used in diagnosis; both remain optional pending integrations rather than N/A.
+- Flow Logs are currently disabled and CloudWatch metrics/log evidence is not yet used in diagnosis; both remain optional integrations, with live delivery explicitly limited by the documented instance SSM-readiness boundary rather than treated as N/A.
 - Optional observability evidence is local normalized input only; this foundation does not enable Flow Logs or query CloudWatch.
 - A future adapter may expose this as a read-only contract, but adding it to the MCP/Gateway allowlist is outside this local foundation task.
