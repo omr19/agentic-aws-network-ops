@@ -19,6 +19,12 @@ with `Start`, but it starts a Logs Insights read query and does not modify netwo
 infrastructure. `ec2:StartNetworkInsightsAnalysis` is deliberately excluded because AWS
 classifies it as Write; the Phase 5 tool describes existing analyses only.
 
+The future-demo `phase7/observability-read-permissions.json` fixture is separate from
+Runtime and diagnostic policies. It permits only project-instance observation, Flow Logs
+discovery, Logs Insights discovery/query/results, and CloudWatch metric reads. Actual role
+creation or attachment requires a separate IAM approval gate; this local task does not
+broaden or modify any existing role.
+
 Local tests prove identity separation, exact allowed actions, resource scoping where AWS
 supports it, and absence of IAM, STS, remediation, Lambda invocation, and infrastructure
 mutation authority from the diagnostic identity. Live role creation, attachment, IAM

@@ -8,7 +8,7 @@ Phase 6 is complete. The Phase 7 local deterministic diagnosis foundation is imp
 
 ### Phase 7 observability validation limitation
 
-The explicitly authorized temporary validation started both tagged Phase 4 EC2 instances and restored both to `stopped`. No Flow Logs were created. No test traffic was generated. The current least-privilege role denied `ssm:DescribeInstanceInformation`, `cloudwatch:GetMetricData`, and `logs:DescribeLogGroups`, so the validation produced no live Flow Logs or CloudWatch evidence. The existing diagnostic and Runtime IAM roles must not be broadened to overcome this boundary. A separate temporary read-only observability role is a future enhancement. Sanitized evidence is recorded in `docs/evidence/phase-7/observability-validation-limitation.json`.
+The explicitly authorized temporary validation started both tagged Phase 4 EC2 instances and restored both to `stopped`. No Flow Logs were created. No test traffic was generated. The current least-privilege role denied `ssm:DescribeInstanceInformation`, `cloudwatch:GetMetricData`, and `logs:DescribeLogGroups`, so the validation produced no live Flow Logs or CloudWatch evidence. The existing diagnostic and Runtime IAM roles must not be broadened to overcome this boundary. A separate temporary read-only observability role is a future enhancement; its local unattached policy fixture is `iam/phase7/observability-read-permissions.json`, and actual role creation or attachment requires a separate IAM approval gate. Sanitized evidence is recorded in `docs/evidence/phase-7/observability-validation-limitation.json`.
 
 P5-01 and P5-02 are implemented, independently reviewed by Kiro, and validated locally,
 but not yet committed or pushed.
