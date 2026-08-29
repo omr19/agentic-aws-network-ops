@@ -24,3 +24,37 @@ output "flow_logs_configuration" {
     retention_days = var.flow_log_retention_days
   }
 }
+
+output "network_resource_ids" {
+  description = "Identifiers used for inventory and deterministic diagnostics."
+  value = {
+    destination_network_acl_id = module.destination_vpc.private_network_acl_id
+    destination_route_tables   = module.destination_vpc.private_route_table_ids
+    destination_subnets        = module.destination_vpc.private_subnet_ids
+    destination_vpc_id         = module.destination_vpc.vpc_id
+    peering_connection_id      = module.vpc_peering.vpc_peering_connection_id
+    source_network_acl_id      = module.source_vpc.private_network_acl_id
+    source_route_tables        = module.source_vpc.private_route_table_ids
+    source_subnets             = module.source_vpc.private_subnet_ids
+    source_vpc_id              = module.source_vpc.vpc_id
+  }
+}
+
+output "test_workload_ids" {
+  description = "Short-lived workload and ENI identifiers for verification."
+  value = {
+    destination_instance_id = module.destination_workload.instance_id
+    destination_eni_id      = module.destination_workload.network_interface_id
+    destination_private_ip  = module.destination_workload.private_ip
+    destination_sg_id       = module.destination_workload.security_group_id
+    source_instance_id      = module.source_workload.instance_id
+    source_eni_id           = module.source_workload.network_interface_id
+    source_private_ip       = module.source_workload.private_ip
+    source_sg_id            = module.source_workload.security_group_id
+  }
+}
+
+output "reachability_analyzer_path_id" {
+  description = "Network Insights Path used for Source-to-Destination TCP/443 analysis."
+  value       = aws_ec2_network_insights_path.source_to_destination_https.id
+}

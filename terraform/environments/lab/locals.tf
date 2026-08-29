@@ -22,8 +22,15 @@ locals {
     }
   }
 
+  availability_zones = [
+    "eu-west-1a",
+    "eu-west-1b",
+  ]
+
   healthy_path = {
     protocol         = "tcp"
     destination_port = 443
   }
+
+  name_prefix = "${var.project_name}-${var.environment}"
 }

@@ -1,0 +1,162 @@
+{
+  "schema_version": "1.0",
+  "evidence_classification": "sanitized_portfolio_evidence",
+  "validation_date_local": "2026-08-28",
+  "validation_date_utc": "2026-08-29",
+  "region": "eu-west-1",
+  "environment": "lab",
+  "project": "agentic-aws-network-ops",
+  "terraform": {
+    "version": "1.5.7",
+    "aws_provider_version": "6.62.0",
+    "plan": {
+      "add": 35,
+      "change": 0,
+      "destroy": 0
+    },
+    "apply": {
+      "added": 35,
+      "changed": 0,
+      "destroyed": 0
+    },
+    "post_apply_drift": {
+      "detailed_exit_code": 0,
+      "result": "no_changes"
+    }
+  },
+  "quality": {
+    "terraform_validate": "passed",
+    "tflint": "passed",
+    "checkov": {
+      "passed": 73,
+      "failed": 0,
+      "skipped": 4,
+      "skip_scope": "two short-lived EC2 endpoints; detailed monitoring and instance IAM role"
+    },
+    "pytest": {
+      "passed": 7,
+      "failed": 0
+    },
+    "ruff": "passed",
+    "mypy": "passed"
+  },
+  "resource_inventory": {
+    "terraform_managed_total": 35,
+    "vpcs": 2,
+    "private_subnets": 4,
+    "private_route_tables": 4,
+    "route_table_associations": 4,
+    "vpc_peering_connection_and_options": 2,
+    "peering_routes": 4,
+    "network_acls": 2,
+    "network_acl_rules": 4,
+    "restricted_default_security_groups": 2,
+    "workload_security_groups": 2,
+    "workload_security_group_rules": 2,
+    "private_ec2_endpoints": 2,
+    "managed_network_insights_paths": 1
+  },
+  "safety_assertions": {
+    "public_ip_addresses": 0,
+    "public_subnets": 0,
+    "internet_gateways": 0,
+    "nat_gateways": 0,
+    "vpc_endpoints": 0,
+    "transit_gateways": 0,
+    "load_balancers": 0,
+    "flow_logs_enabled": false,
+    "project_instance_iam_roles": 0,
+    "encrypted_root_volumes": 2,
+    "imdsv2_required_endpoints": 2
+  },
+  "endpoint_health": {
+    "source": {
+      "state": "running",
+      "system_check": "ok",
+      "instance_check": "ok",
+      "public_ip": false
+    },
+    "destination": {
+      "state": "running",
+      "system_check": "ok",
+      "instance_check": "ok",
+      "public_ip": false
+    },
+    "live_probe": "network-lab healthy tcp/443"
+  },
+  "reachability": {
+    "healthy": {
+      "protocol": "tcp",
+      "destination_port": 443,
+      "status": "succeeded",
+      "path_found": true
+    },
+    "blocked": {
+      "protocol": "tcp",
+      "destination_port": 80,
+      "status": "succeeded",
+      "path_found": false,
+      "explanations": [
+        {
+          "direction": "source_egress",
+          "code": "ENI_SG_RULES_MISMATCH"
+        },
+        {
+          "direction": "source_egress",
+          "code": "SUBNET_ACL_RESTRICTION"
+        },
+        {
+          "direction": "destination_ingress",
+          "code": "ENI_SG_RULES_MISMATCH"
+        },
+        {
+          "direction": "destination_ingress",
+          "code": "SUBNET_ACL_RESTRICTION"
+        }
+      ]
+    }
+  },
+  "iam_validation": {
+    "ec2_start_network_insights_analysis": "allowed",
+    "tiros_actions_before": "implicit_deny",
+    "tiros_actions_after": "allowed",
+    "approved_tiros_action_count": 5,
+    "service_linked_role_created": false,
+    "additional_managed_policy_attached": false
+  },
+  "tagging": {
+    "required": {
+      "Project": "agentic-aws-network-ops",
+      "Environment": "lab"
+    },
+    "terraform_managed_by": "terraform",
+    "validation_managed_by": "validation",
+    "temporary_purpose": "temporary-blocked-path"
+  },
+  "cost": {
+    "reachability_analysis_count": 2,
+    "reachability_analysis_expected_total_usd": 0.20,
+    "active_compute": "two t3.nano instances",
+    "active_storage": "two encrypted 8-GiB gp3 root volumes",
+    "exact_compute_storage_cost_available": false
+  },
+  "cleanup": {
+    "healthy_environment_active": true,
+    "healthy_analysis_retained_as_evidence": true,
+    "temporary_blocked_analysis_pending_deletion": false,
+    "temporary_blocked_path_pending_deletion": false,
+    "temporary_blocked_analysis_deleted": true,
+    "temporary_blocked_path_deleted": true,
+    "deletion_order": "temporary analysis, then temporary path",
+    "post_cleanup_drift": "no_changes",
+    "healthy_path_preserved": true,
+    "healthy_analysis_preserved": true
+  },
+  "sanitization": {
+    "account_ids_included": false,
+    "arns_included": false,
+    "resource_ids_included": false,
+    "credentials_included": false,
+    "terraform_state_included": false
+  }
+}

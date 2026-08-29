@@ -1,0 +1,36 @@
+#!/bin/bash
+set -euo pipefail
+
+cat >/usr/local/bin/network-lab-probe <<'SCRIPT'
+#!/bin/bash
+set -u
+while true; do
+  timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  if curl --connect-timeout 5 --max-time 10 --silent --show-error --insecure \
+    "https://${destination_ip}:${destination_port}/" >/dev/null; then
+    echo "$timestamp network-lab healthy tcp/${destination_port}" >/dev/console
+  else
+    echo "$timestamp network-lab unreachable tcp/${destination_port}" >/dev/console
+  fi
+  sleep 30
+done
+SCRIPT
+chmod 0755 /usr/local/bin/network-lab-probe
+
+cat >/etc/systemd/system/network-lab-source.service <<'UNIT'
+[Unit]
+Description=Network lab source connectivity probe
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/network-lab-probe
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+
+systemctl daemon-reload
+systemctl enable --now network-lab-source.service

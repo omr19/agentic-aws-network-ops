@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-**Phase 4 — AWS Network Lab (ready to begin)**
+**Phase 4 — AWS Network Lab is COMPLETE; Phase 5 is not yet authorized**
 
 Phase 1 — Business Requirements & Learning Objectives is **COMPLETE** and was formally reviewed and approved on 2026-08-28.
 
@@ -60,11 +60,50 @@ The ADR 023 quality toolchain is configured and locked. Local checks pass for Py
 Checkov, pre-commit configuration, and CI workflow syntax. GitHub Actions uses read-only
 repository permissions, immutable action SHAs, and no AWS credentials or deployment steps.
 
+Phase 4 Terraform implementation now defines the approved healthy two-VPC peering lab:
+two private VPCs, four private subnets across two Availability Zones, dedicated route
+tables, explicit bidirectional peering routes, role-specific NACL and security-group
+rules, two short-lived private `t3.nano` endpoints, and a TCP/443 Network Insights Path.
+The implementation creates no public subnet/IP, Internet Gateway, NAT Gateway, VPC
+endpoint, Transit Gateway, load balancer, or instance IAM role. Flow Logs remain
+conditional and disabled in the reviewed plan.
+
+The final tagged plan completed using the existing `rizwan-sts-role` profile with
+**35 to add, 0 to change, 0 to destroy** and was explicitly approved by the user.
+Terraform apply then completed successfully with **35 added, 0 changed, 0 destroyed**.
+No IAM configuration was created or changed.
+
+Both private `t3.nano` endpoints are running and pass EC2 system/instance checks. The
+Source endpoint recorded a successful live HTTPS probe to the Destination on TCP/443.
+A post-apply Terraform plan reports no changes. All taggable project resources,
+including both root EBS volumes, use the `Project`, `Environment`, and `ManagedBy` tags.
+
+The initial Reachability Analyzer execution was denied at the internal
+`tiros:CreateQuery` step. A focused read-only review proved the caller already allowed
+the required EC2 action but implicitly denied AWS's five documented Tiros actions. With
+explicit user authorization, only those five actions were added to the existing inline
+role policy; no other statement or role changed. IAM simulation then confirmed them.
+
+Exactly one tagged analysis ran against the Terraform-managed TCP/443 Network Insights
+Path. It completed with `Status=succeeded` and `PathFound=true`, independently confirming
+the healthy configured path. The analysis record remains as tagged project evidence and
+incurred the documented one-time $0.10 charge.
+
+With separate user authorization, a temporary tagged TCP/80 Network Insights Path and
+one analysis validated the intentionally blocked baseline. The analysis completed with
+`Status=succeeded` and `PathFound=false`. AWS identified Source and Destination security-
+group rule mismatches plus Source-egress and Destination-ingress default-deny NACL rules.
+No healthy infrastructure was modified. This second analysis adds another $0.10 charge.
+
+AWS initially refused deletion of the temporary path while its analysis record existed.
+After explicit user authorization, the temporary analysis was deleted first and its
+dependent path was deleted successfully. Independent lookups confirmed both are absent;
+the managed TCP/443 path and successful healthy analysis remain present.
+
 Read-only AWS region reconnaissance identified `eu-west-1` (Ireland) as a relatively clean candidate, and Phase 2 service-availability review subsequently confirmed it as the approved target region.
 
-No AWS resources were created, modified, or deleted during the reconnaissance.
-
-No Terraform infrastructure, Python application code, AgentCore resources, MCP tools, Lambda functions, API Gateway resources, or other project infrastructure have been created.
+No Python application, AgentCore, MCP, Lambda, API Gateway, Flow Log, NAT, endpoint, TGW,
+load-balancer, or project IAM resource has been deployed.
 
 Current working branch:
 
@@ -118,6 +157,10 @@ Current working branch:
 - Safe placeholder-only `terraform.tfvars.example` created and validated
 - Python 3.13 project metadata and package/tooling structure established
 - ADR 023 quality tooling, dependency lock, pre-commit hooks, and non-destructive CI configured
+- Phase 4 VPC, peering, workload, and Reachability Analyzer path Terraform implemented
+- Phase 4 non-destructive plan generated and structurally reviewed
+- Sanitized Phase 4 healthy/blocked-path evidence report and machine-readable JSON result
+  added and linked for portfolio and later test reuse
 
 ---
 
@@ -300,6 +343,52 @@ Read-only AWS CLI reconnaissance was performed using the existing `rizwan-sts-ro
 - Confirmed CI contains no Terraform plan/apply/destroy, AWS CLI use, AWS credential setup, or write permission
 - Confirmed the only staged file is `.terraform.lock.hcl`; all other reviewed changes remain unstaged pending atomic commit authorization
 
+### Phase 4 Terraform and Plan Validation
+
+- Terraform format and validation passed for the root and all three implemented modules
+- TFLint passed with the signed AWS ruleset
+- Checkov passed 73 checks with zero failures and four narrowly documented skips
+- Seven Python foundation tests, Ruff, and strict mypy checks passed
+- Confirmed the plan contains exactly 35 creates, zero changes, and zero destroys
+- Confirmed two VPCs, four private subnets, four route tables, four peering routes, two
+  NACLs, two restricted default security groups, two workload security groups, two
+  `t3.nano` instances, one peering connection, and one Network Insights Path
+- Confirmed no IGW, NAT, EIP, public IP, endpoint, TGW, load balancer, Flow Log, IAM role,
+  or IAM policy appears in the plan
+- Confirmed the saved plan is ignored by Git and no deployable Terraform state exists
+- AWS Pricing API lookup was denied by the current role; IAM was not broadened because
+  exact pricing lookup is not a deployment prerequisite
+
+### Phase 4 Deployment Validation
+
+- Terraform apply completed: 35 added, zero changed, zero destroyed
+- Terraform state tracks 35 managed resources plus the AMI data source
+- Post-apply refresh plan reports no changes
+- Both private EC2 endpoints are running with system and instance checks `ok`
+- Neither endpoint has a public IP address
+- Source console evidence records `network-lab healthy tcp/443`
+- Four project subnets, two VPCs, four route tables, two NACLs, four workload/default
+  security groups, one peering connection, two instances, and two encrypted root volumes
+  were independently inventoried by project tag
+- Both root volumes explicitly carry project, environment, managed-by, role, and name tags
+- Reachability Analyzer path creation succeeded
+- Read-only IAM inspection and simulation identified five missing Tiros actions
+- With explicit approval, added only `tiros:CreateQuery`, `tiros:ExtendQuery`,
+  `tiros:GetQueryAnswer`, `tiros:GetQueryExplanation`, and
+  `tiros:GetQueryExtensionAccounts` to the existing inline role policy
+- IAM simulation confirmed all five actions are allowed after the update
+- One tagged analysis succeeded with `PathFound=true`; one $0.10 analysis charge is expected
+- One temporary tagged TCP/80 analysis succeeded with `PathFound=false`
+- Captured deterministic blocking evidence for both workload security groups and both
+  relevant default-deny NACL directions
+- Temporary path deletion correctly stopped when AWS required prior analysis deletion
+- After explicit authorization, deleted the temporary analysis and dependent path
+- Confirmed both temporary objects are absent, the healthy evidence is preserved, both
+  endpoint checks remain `ok`, and Terraform still reports no drift
+- Final Phase 4 review passed Terraform format/validate, TFLint, Checkov (73 passed,
+  zero failed), seven pytest tests, Ruff, mypy, JSON/link validation, diff checking,
+  credential/account scanning, evidence sanitization, and 13-phase governance checks
+
 ---
 
 ## AWS Resources & Cost
@@ -308,23 +397,25 @@ Read-only AWS CLI reconnaissance was performed using the existing `rizwan-sts-ro
 
 Project-created AWS resources currently active:
 
-**None**
+**35 Terraform-managed Phase 4 resources plus one retained tagged healthy-path
+Reachability Analyzer analysis record in `eu-west-1`.**
 
-No AWS resources were created, modified, or deleted during Foundation or Phase 1 work.
-
-The AWS CLI activity performed during Phase 1 was limited to read-only reconnaissance of existing resources for regional evaluation.
+Active cost-bearing resources are two running `t3.nano` instances and two encrypted
+8-GiB gp3 root volumes. The remaining resources are the private VPC networking baseline,
+one managed Network Insights Path, and one retained successful healthy-path analysis
+record. All taggable resources use
+`Project=agentic-aws-network-ops` and `Environment=lab`.
 
 ### Project Infrastructure Cost
 
-Incremental AWS infrastructure cost from this project:
-
-**$0.00**
-
-No project infrastructure has been deployed.
+Incremental AWS infrastructure charges began when the two Phase 4 instances and volumes
+were created on 2026-08-28. Two Reachability Analyzer analyses add a documented $0.20
+total one-time charge. Exact billed compute/storage cost is not yet available.
 
 No AgentCore Runtime, Gateway, Identity, Observability, Memory, model, or other AgentCore project usage has occurred.
 
-No project Lambda, API Gateway, EC2, load balancer, NAT Gateway, Transit Gateway, VPC Flow Logs, CloudWatch monitoring infrastructure, or other billable project infrastructure has been deployed.
+No project Lambda, API Gateway, load balancer, NAT Gateway, Transit Gateway, VPC Flow
+Logs, CloudWatch monitoring infrastructure, or AgentCore component has been deployed.
 
 ### Cost Controls
 
@@ -333,6 +424,14 @@ Cost remains a project design constraint.
 Potentially persistent or higher-cost AWS resources must be explicitly evaluated before deployment according to the approved project requirements and architecture process.
 
 AWS Budget/cost alert configuration remains planned for Phase 9.
+
+The reviewed Phase 4 plan's billable components are limited to two running `t3.nano`
+instances, two 8-GiB gp3 root volumes, and any explicitly started Reachability Analyzer
+analysis (currently documented by AWS at $0.10 per analysis, $0.20 total for this run). VPCs, subnets, route
+tables, security groups, NACLs, and the peering connection itself do not introduce
+standing hourly charges. The two endpoints are deliberately placed in the same AZ, for
+which AWS documents peering data transfer as free. Exact compute/storage cost will be
+recorded from AWS billing evidence when available.
 
 ---
 
@@ -398,9 +497,8 @@ architecture and do not justify broader IAM permissions.
 
 ### Current Project Blockers
 
-**None identified.**
-
-There is currently no technical, AWS, repository, cost, or governance blocker preventing the project from continuing according to the approved phase sequence.
+**None identified for Phase 4.** Healthy and intentionally blocked validation, temporary
+evidence cleanup, state/drift review, cost recording, and documentation are complete.
 
 ### Phase 1 Completion Gate
 
@@ -425,19 +523,16 @@ Phase 2 — Architecture & Technical Design is **COMPLETE**.
 
 ### Project Resources
 
-No cleanup is currently required.
-
-No AWS resources have been created, modified, or deployed by this project.
-
-The read-only AWS region reconnaissance performed during Phase 1 did not create, modify, or delete any AWS resources.
+Cleanup is not currently requested. The 35 Terraform-managed Phase 4 resources remain
+active for validation and demonstration. They are recoverably removable with the
+planned, separately authorized Terraform destroy workflow. The tagged successful TCP/443
+analysis remains as validation evidence. The temporary TCP/80 analysis and path were
+deleted after evidence capture; deletion does not reverse the analysis charge.
 
 ### Local / Repository State
 
-No project-generated Terraform infrastructure or application runtime artifacts currently require cleanup.
-
-Terraform has been initialized locally for dependency/provider setup. Its ignored
-`.terraform/terraform.tfstate` is backend initialization metadata with zero resources;
-no deployable root state or Terraform-managed AWS resource exists.
+The ignored local `terraform.tfstate` is now the authoritative state for the 35 managed
+Phase 4 resources. The ignored saved plan remains local. Neither file is tracked by Git.
 
 ### Future Cleanup
 
@@ -449,21 +544,23 @@ Any intentionally retained resources or artifacts must be explicitly documented 
 
 ## Exact Next Step
 
-Begin Phase 4 by implementing the approved healthy two-VPC peering network in Terraform,
-then run non-destructive local checks and review the generated plan. Obtain separate
-explicit authorization before any `terraform apply` or other AWS-changing action.
+The user authorized one atomic local Phase 4 implementation/evidence commit on
+2026-08-28. After that commit, request explicit authorization before beginning Phase 5.
+Do not push or begin Phase 5 before the applicable authorization.
 
 ---
 
 ## Not Authorized Yet
 
-Phase 2 and Phase 3 are complete. Phase 4 Terraform implementation, planning, and AWS
-deployment have not started. Push remains unauthorized.
+Phases 2, 3, and 4 are complete. The healthy baseline is deployed; live, healthy-path,
+and intentionally blocked-path validation passed, and temporary evidence cleanup is
+complete. Phase 5 implementation, further apply/destroy, IAM changes, additional
+analyses/path changes, failure injection, any additional commit, and push remain
+unauthorized.
 
 The following implementation activities are not yet authorized:
 
-- Terraform resource/module implementation until Phase 4 work begins
-- Terraform plan/apply
+- Terraform apply/destroy
 - Terraform-managed AWS resource creation
 - Python application implementation
 - AgentCore deployment or configuration

@@ -183,24 +183,24 @@ Check items off only after they are completed and validated. Every phase has an 
 
 > Build and validate the healthy network baseline only. Intentional failures belong to Phase 6.
 
-- [ ] Provision approved VPC architecture through Terraform
-- [ ] Provision approved public/private subnets as required by Phase 2 design
-- [ ] Provision route tables and associations
-- [ ] Provision security groups
-- [ ] Provision NACLs
-- [ ] Provision VPC endpoints where justified
-- [ ] Provision DNS-related components where required
-- [ ] Provision VPC peering or Transit Gateway only if approved in Phase 2
-- [ ] Provision internet/NAT components only if approved and required by the defined traffic flows
-- [ ] Use only minimal/short-lived test endpoints required to validate connectivity
-- [ ] Validate expected healthy network paths
-- [ ] Validate expected intentionally blocked baseline paths
-- [ ] Validate relevant paths with VPC Reachability Analyzer
-- [ ] Confirm Terraform state matches deployed architecture
-- [ ] Confirm `terraform plan` shows no unintended drift
-- [ ] Record active AWS resources and incremental project cost
+- [x] Provision approved VPC architecture through Terraform
+- [x] Provision approved public/private subnets as required by Phase 2 design
+- [x] Provision route tables and associations
+- [x] Provision security groups
+- [x] Provision NACLs
+- [x] Provision VPC endpoints where justified
+- [x] Provision DNS-related components where required
+- [x] Provision VPC peering or Transit Gateway only if approved in Phase 2
+- [x] Provision internet/NAT components only if approved and required by the defined traffic flows
+- [x] Use only minimal/short-lived test endpoints required to validate connectivity
+- [x] Validate expected healthy network paths
+- [x] Validate expected intentionally blocked baseline paths
+- [x] Validate relevant paths with VPC Reachability Analyzer
+- [x] Confirm Terraform state matches deployed architecture
+- [x] Confirm `terraform plan` shows no unintended drift
+- [x] Record active AWS resources and incremental project cost
 
-- [ ] **Phase 4 COMPLETE**
+- [x] **Phase 4 COMPLETE**
 
 ---
 

@@ -1,0 +1,38 @@
+#!/bin/bash
+set -euo pipefail
+
+mkdir -p /opt/network-lab
+openssl req -x509 -newkey rsa:2048 -nodes -days 7 \
+  -subj "/CN=destination.network-lab.internal" \
+  -keyout /opt/network-lab/key.pem \
+  -out /opt/network-lab/cert.pem
+
+cat >/opt/network-lab/server.py <<'PYTHON'
+import http.server
+import ssl
+
+server = http.server.ThreadingHTTPServer(("0.0.0.0", ${destination_port}), http.server.SimpleHTTPRequestHandler)
+context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+context.load_cert_chain("/opt/network-lab/cert.pem", "/opt/network-lab/key.pem")
+server.socket = context.wrap_socket(server.socket, server_side=True)
+server.serve_forever()
+PYTHON
+
+cat >/etc/systemd/system/network-lab-destination.service <<'UNIT'
+[Unit]
+Description=Network lab HTTPS destination
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/network-lab
+ExecStart=/usr/bin/python3 /opt/network-lab/server.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+
+systemctl daemon-reload
+systemctl enable --now network-lab-destination.service

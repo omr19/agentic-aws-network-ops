@@ -26,11 +26,11 @@ applicable explicit authorization; prerequisites do not authorize them.
 
 ## Phase 4 — Healthy network lab
 
-- [ ] **P4-01** Implement Source/Destination VPC modules and approved private layout.
+- [x] **P4-01** Implement Source/Destination VPC modules and approved private layout.
   **Req:** NET-001, NET-003, CST-001. **Verify:** static tests and reviewed plan.
-- [ ] **P4-02** Implement peering, routes, SGs, NACLs, and TCP/443 workloads. **Req:**
+- [x] **P4-02** Implement peering, routes, SGs, NACLs, and TCP/443 workloads. **Req:**
   NET-002–005. **Verify:** plan has no public/NAT/endpoint resources.
-- [ ] **P4-03** After apply authorization, deploy and validate healthy connectivity and
+- [x] **P4-03** After apply authorization, deploy and validate healthy connectivity and
   Reachability Analyzer. **Req:** NET-002, DIA-001. **Verify:** evidence and inventory.
 
 ## Phase 5 — AgentCore and READ diagnostics
