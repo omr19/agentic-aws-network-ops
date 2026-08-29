@@ -1,0 +1,82 @@
+{
+  "phase": 6,
+  "scenario": "broken_route",
+  "region": "eu-west-1",
+  "sanitization": {
+    "account_id": "<redacted>",
+    "credentials_included": false
+  },
+  "terraform": {
+    "plan": {
+      "to_add": 0,
+      "to_change": 0,
+      "to_destroy": 2,
+      "destroyed_resources": [
+        "module.vpc_peering.aws_route.source_to_destination[0]",
+        "module.vpc_peering.aws_route.source_to_destination[1]"
+      ]
+    },
+    "apply": {
+      "added": 0,
+      "changed": 0,
+      "destroyed": 2
+    },
+    "injected_change": {
+      "resources": [
+        "module.vpc_peering.aws_route.source_to_destination[0]",
+        "module.vpc_peering.aws_route.source_to_destination[1]"
+      ],
+      "direction": "source_to_destination",
+      "destination_cidr": "10.20.0.0/16",
+      "operation": "destroyed"
+    }
+  },
+  "reachability_analyzer": {
+    "path_id": "nip-0b3a839ce75bb3a97",
+    "analysis_id": "nia-0afa1ed55ee3d3e48",
+    "status": "succeeded",
+    "path_found": false,
+    "explanation_codes": [
+      "NO_ROUTE_TO_DESTINATION"
+    ],
+    "approximate_cost_usd_per_analysis": 0.1,
+    "analysis_count": 2,
+    "approximate_total_cost_usd": 0.2
+  },
+  "restoration": {
+    "scenario": "healthy",
+    "plan": {
+      "to_add": 2,
+      "to_change": 0,
+      "to_destroy": 0
+    },
+    "apply": {
+      "added": 2,
+      "changed": 0,
+      "destroyed": 0
+    },
+    "restored_resources": [
+      "module.vpc_peering.aws_route.source_to_destination[0]",
+      "module.vpc_peering.aws_route.source_to_destination[1]"
+    ],
+    "final_healthy_verification": {
+      "source_route_tables": [
+        "rtb-0f1e30ea77719b740",
+        "rtb-032520fd18e9125d7"
+      ],
+      "destination_cidr": "10.20.0.0/16",
+      "peering_connection_id": "pcx-05b83a5ce62cc74a9",
+      "route_state": "active",
+      "routes_present_on_all_source_route_tables": true,
+      "analysis_id": "nia-094eade4bb9570b79",
+      "status": "succeeded",
+      "path_found": true,
+      "explanation_codes": []
+    }
+  },
+  "boundaries": {
+    "ec2_instances_started": false,
+    "iam_modified": false,
+    "other_scenarios_tested": false
+  }
+}

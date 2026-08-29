@@ -2,7 +2,9 @@
 
 ## Current Phase
 
-**Phase 5 — AgentCore + MCP Diagnostic Tooling is AUTHORIZED and IN PROGRESS**
+**Phase 6 — Network Failure Scenarios is AUTHORIZED and IN PROGRESS**
+
+Phase 6 evidence now records the controlled `broken_sg` and `broken_route` scenarios as completed and restored, with sanitized summaries tracked under `docs/evidence/phase-6/`. The `broken_nacl`, `broken_dns`, and `broken_peering` scenarios remain pending. Phase 6 remains in progress and its completion gate remains unchecked.
 
 P5-01 and P5-02 are implemented, independently reviewed by Kiro, and validated locally,
 but not yet committed or pushed.
@@ -576,10 +578,9 @@ Any intentionally retained resources or artifacts must be explicitly documented 
 
 ## Exact Next Step
 
-The user authorized Phase 5 implementation on 2026-08-28. P5-01 and P5-02 are complete
-locally: the common result envelope, nine strict diagnostic contracts, shared
-dependency-injected Boto3 logic, and thin Lambda adapter pass schema, Stubber, error,
-logging, lint, typing, security, and full unit tests without live AWS calls.
+The controlled `broken_sg` and `broken_route` Phase 6 tests are completed and restored, with tracked sanitized evidence under `docs/evidence/phase-6/`. The exact next step is to retain Phase 6 in progress while separately authorizing and implementing any remaining scenario work; `broken_nacl`, `broken_dns`, and `broken_peering` remain pending. No Phase 6 completion claim is made.
+
+The preceding Phase 5 implementation checkpoint is retained below for historical context.
 
 Kiro completed the planned independent P5-01/P5-02 review on 2026-08-29. Its three
 confirmed findings were corrected locally: schema discovery now supports a stable Lambda
@@ -649,21 +650,17 @@ explicitly authorized.
 
 ## Not Authorized Yet
 
-Phases 2, 3, and 4 are complete. Phase 5 local implementation is authorized. The healthy baseline is deployed; live, healthy-path,
-and intentionally blocked-path validation passed, and temporary evidence cleanup is
-complete. Further apply/destroy, IAM changes, Phase 5 AWS deployment, additional
-analyses/path changes, failure injection, any additional commit, and push remain
-unauthorized.
+Phases 2, 3, and 4 are complete. Phase 5 local implementation is complete locally. The controlled Phase 6 `broken_sg` and `broken_route` tests are completed and restored, and their sanitized evidence is tracked under `docs/evidence/phase-6/`. The `broken_nacl`, `broken_dns`, and `broken_peering` scenarios remain pending. Further apply/destroy, IAM changes, Phase 5 AWS deployment, additional analyses/path changes, pending scenario injection, any additional commit, and push remain unauthorized.
 
-The following implementation activities are not yet authorized:
+The following implementation activities remain unauthorized unless separately authorized for a pending scenario:
 
-- Terraform apply/destroy
-- Terraform-managed AWS resource creation
+- Terraform apply/destroy for any future scenario or resource change
+- Terraform-managed AWS resource creation for pending or future scenarios
 - AgentCore deployment or configuration
 - MCP deployment
 - Lambda deployment
 - API Gateway implementation or deployment
-- Creation, modification, or deletion of AWS project resources through the AWS CLI, AWS Console, SDKs, Terraform, Kiro, or other tooling
+- Creation, modification, or deletion of AWS project resources through the AWS CLI, AWS Console, SDKs, Terraform, Kiro, or other tooling for pending or future scenarios
 - IAM policy/role changes for project implementation
 - Broadening IAM permissions merely to complete optional reconnaissance
 - Implementation of Phase 2 architecture decisions before the applicable later implementation phase
@@ -671,7 +668,7 @@ The following implementation activities are not yet authorized:
 
 Read-only AWS inspection/reconnaissance may be performed when explicitly justified and authorized, provided it does not create, modify, or delete AWS resources.
 
-AWS implementation and provisioning must wait for the applicable architecture/design decisions and implementation-phase prerequisites defined in `PROJECT_CHECKLIST.md`.
+Future AWS implementation and provisioning must remain separately authorized for any pending scenario and must otherwise wait for the applicable architecture/design decisions and implementation-phase prerequisites defined in `PROJECT_CHECKLIST.md`.
 
 ---
 

@@ -259,8 +259,8 @@ Optional enhancements that must not replace the core contracts:
 
 Required candidates:
 
-- [ ] Broken security-group rule
-- [ ] Broken route-table entry
+- [x] Broken security-group rule
+- [x] Broken route-table entry
 - [ ] Broken NACL
 - [ ] Broken VPC endpoint configuration where endpoints are deployed
 - [ ] DNS-related failure where applicable
