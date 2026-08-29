@@ -263,7 +263,7 @@ Required candidates:
 - [x] Broken route-table entry
 - [x] Broken NACL
 - [ ] Broken VPC endpoint configuration where endpoints are deployed
-- [ ] DNS-related failure where applicable
+- [x] DNS-related failure where applicable (local deterministic fixture; no AWS DNS resource)
 - [ ] TGW/peering failure only if that component was selected in Phase 2
 
 For each implemented scenario:
