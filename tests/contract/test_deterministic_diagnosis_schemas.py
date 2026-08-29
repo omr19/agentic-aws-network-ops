@@ -39,3 +39,25 @@ def test_normalized_evidence_rejects_unknown_fields() -> None:
         assert "execute_write" in str(error)
     else:
         raise AssertionError("unknown evidence fields must be rejected")
+
+
+def test_normalized_evidence_accepts_optional_observability_inputs() -> None:
+    payload = {
+        "schema_version": "1.0.0",
+        "correlation_id": "corr-test-0001",
+        "observed_at": "2026-08-29T01:00:00Z",
+        "region": "eu-west-1",
+        "evidence_completeness": "complete",
+        "reachability": {"status": "succeeded", "path_found": False, "explanation_codes": []},
+        "flow_logs": {
+            "status": "available",
+            "observed_at": "2026-08-29T00:55:00Z",
+            "path_outcome": "rejected",
+        },
+        "cloudwatch": {
+            "status": "available",
+            "observed_at": "2026-08-29T00:55:00Z",
+            "network_error": True,
+        },
+    }
+    validate(EVIDENCE, payload)

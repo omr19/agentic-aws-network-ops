@@ -262,3 +262,86 @@ def test_tracked_phase6_failure_fixtures_repeatably_map_to_classes(
     assert first == second
     assert first["data"]["classification"] == expected_classification
     assert first["data"]["root_cause"]
+
+
+def observability() -> dict[str, Any]:
+    return {
+        "flow_logs": {
+            "status": "available",
+            "observed_at": "2026-08-29T00:55:00Z",
+            "path_outcome": "rejected",
+        },
+        "cloudwatch": {
+            "status": "available",
+            "observed_at": "2026-08-29T00:55:00Z",
+            "network_error": True,
+        },
+    }
+
+
+def test_missing_observability_is_a_limitation_not_a_failure() -> None:
+    result = diagnose(evidence(reachability=reachability(True)))
+    assert result["status"] == "no_finding"
+    assert result["data"]["classification"] == "healthy"
+    assert result["data"]["root_cause"] is None
+    assert any("VPC Flow Logs" in item for item in result["limitations"])
+    assert any("CloudWatch" in item for item in result["limitations"])
+
+
+def test_available_observability_is_correlated_as_facts() -> None:
+    result = diagnose(
+        evidence(
+            reachability=reachability(False, "succeeded", "NO_ROUTE_TO_DESTINATION"),
+            configuration={
+                "routes": {
+                    "source_to_destination_present": False,
+                    "destination_to_source_present": True,
+                }
+            },
+            **observability(),
+        )
+    )
+    assert result["data"]["root_cause"] == "missing_source_to_destination_peering_route"
+    assert any("VPC Flow Logs" in item for item in result["data"]["observed_facts"])
+    assert any("CloudWatch" in item for item in result["data"]["observed_facts"])
+    assert not set(result["data"]["recommendations"]) & set(result["data"]["observed_facts"])
+
+
+def test_stale_observability_is_rejected() -> None:
+    stale = observability()
+    stale["flow_logs"]["observed_at"] = "2026-08-28T23:00:00Z"
+    result = diagnose(evidence(reachability=reachability(False), **stale))
+    assert result["status"] == "invalid_request"
+    assert result["data"]["root_cause"] is None
+    assert result["errors"][0]["code"] == "STALE_OBSERVABILITY_EVIDENCE"
+
+
+def test_conflicting_observability_is_rejected() -> None:
+    conflicting = observability()
+    conflicting["flow_logs"]["path_outcome"] = "accepted"
+    result = diagnose(evidence(reachability=reachability(False), **conflicting))
+    assert result["status"] == "invalid_request"
+    assert result["data"]["root_cause"] is None
+    assert result["errors"][0]["code"] == "CONFLICTING_EVIDENCE"
+
+
+def test_unsupported_observability_status_is_rejected() -> None:
+    unsupported = observability()
+    unsupported["cloudwatch"]["status"] = "queryable"
+    result = diagnose(evidence(reachability=reachability(True), **unsupported))
+    assert result["status"] == "invalid_request"
+    assert result["errors"][0]["code"] == "INVALID_NORMALIZED_EVIDENCE"
+
+
+def test_observability_repeatability_is_identical() -> None:
+    input_evidence = evidence(
+        reachability=reachability(False, "succeeded", "NO_ROUTE_TO_DESTINATION"),
+        configuration={
+            "routes": {
+                "source_to_destination_present": False,
+                "destination_to_source_present": True,
+            }
+        },
+        **observability(),
+    )
+    assert diagnose(input_evidence) == diagnose(input_evidence)

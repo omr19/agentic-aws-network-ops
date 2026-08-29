@@ -19,6 +19,26 @@
       },
       "additionalProperties": false
     },
+    "flow_logs": {
+      "type": "object",
+      "required": ["status", "observed_at", "path_outcome"],
+      "properties": {
+        "status": { "enum": ["available", "disabled", "unavailable"] },
+        "observed_at": { "type": "string", "format": "date-time" },
+        "path_outcome": { "enum": ["accepted", "rejected", "unknown"] }
+      },
+      "additionalProperties": false
+    },
+    "cloudwatch": {
+      "type": "object",
+      "required": ["status", "observed_at", "network_error"],
+      "properties": {
+        "status": { "enum": ["available", "disabled", "unavailable"] },
+        "observed_at": { "type": "string", "format": "date-time" },
+        "network_error": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
     "configuration": {
       "type": "object",
       "properties": {

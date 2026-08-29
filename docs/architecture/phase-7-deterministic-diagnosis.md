@@ -5,16 +5,19 @@ This local-only foundation correlates normalized READ evidence; it does not call
 ## Workflow
 
 1. Accept a normalized evidence object using `schemas/diagnostic/normalized-evidence.schema.json`.
-2. Validate the common correlation, region, timestamp, completeness, and Reachability Analyzer fields.
-3. Preserve Reachability Analyzer and configuration/API observations as facts.
-4. Correlate a completed reachability result with configuration facts using a closed set of deterministic signatures.
-5. Return a diagnosis result using the existing result-envelope shape, with diagnosis data separated into `observed_facts`, `root_cause`, and advisory `recommendations`.
-6. Return no-finding/healthy when a completed Reachability Analyzer result finds a path and no blocker is observed.
-7. Return no root-cause claim for incomplete, unsupported, or conflicting evidence.
+2. Validate the common correlation, region, timestamp, completeness, Reachability Analyzer, and optional observability fields.
+3. Preserve Reachability Analyzer, configuration/API, Flow Logs, and CloudWatch observations as facts.
+4. Correlate a completed reachability result with configuration and optional observability facts using a closed set of deterministic signatures.
+5. Reject unsupported observability shapes, evidence older than 15 minutes, and explicit signal conflicts.
+6. Return a diagnosis result using the existing result-envelope shape, with diagnosis data separated into `observed_facts`, stable machine-readable `root_cause`, and advisory `recommendations`.
+7. Return no-finding/healthy when a completed Reachability Analyzer result finds a path and no blocker is observed.
 
 The result contract is defined in `schemas/diagnostic/diagnosis-result.schema.json`. Recommendations are descriptive only; this module has no AWS client, Terraform, IAM, or write-tool dependency.
 
-## Supported failure classes
+## Optional observability evidence
+
+`flow_logs` and `cloudwatch` are optional top-level normalized inputs. Their absence adds a limitation and does not change a healthy or supported diagnosis into a failure. A supplied source must use the closed schema, carry an observation timestamp no more than 15 minutes older than the diagnosis, and use a supported signal. Flow Logs use `path_outcome` (`accepted`, `rejected`, or `unknown`); CloudWatch uses `network_error` (`true` or `false`). Signals that contradict Reachability Analyzer are rejected as `CONFLICTING_EVIDENCE`; stale signals are rejected as `STALE_OBSERVABILITY_EVIDENCE`. No AWS query or log/metric retrieval occurs in this module.
+
 
 | Classification | Required deterministic evidence | Stable root-cause identifier | Human-readable explanation |
 |---|---|---|---|
@@ -37,12 +40,13 @@ Pending, failed, partial, or missing configuration evidence returns `status=no_f
 
 ## Tests and limitations
 
-`tests/unit/test_deterministic_diagnosis.py` covers healthy no-finding, all four implemented AWS failure classes, tracked Phase 6 SG/route/NACL/peering fixtures, incomplete evidence, conflicting evidence, unsupported claims, and repeatability. Schema tests cover closed-world normalized input.
+`tests/unit/test_deterministic_diagnosis.py` covers healthy no-finding, all four implemented AWS failure classes, tracked Phase 6 SG/route/NACL/peering fixtures, optional Flow Logs and CloudWatch correlation, missing observability limitations, stale/conflicting/unsupported observability evidence, incomplete evidence, conflicting evidence, unsupported claims, and repeatability. Schema tests cover closed-world normalized input.
 
 Limitations:
 
 - The workflow diagnoses only the four implemented AWS failure classes; it does not query AWS or infer facts absent from normalized input.
 - Reachability Analyzer is correlated but not treated as sufficient by itself for a root-cause claim when configuration evidence is incomplete.
 - Multiple blockers are reported as conflicting rather than ranked.
-- Flow Logs and CloudWatch metrics are not yet required inputs for this foundation and remain separate Phase 7 checklist work.
+- Flow Logs are currently disabled and CloudWatch metrics/log evidence is not yet used in diagnosis; both remain optional pending integrations rather than N/A.
+- Optional observability evidence is local normalized input only; this foundation does not enable Flow Logs or query CloudWatch.
 - A future adapter may expose this as a read-only contract, but adding it to the MCP/Gateway allowlist is outside this local foundation task.

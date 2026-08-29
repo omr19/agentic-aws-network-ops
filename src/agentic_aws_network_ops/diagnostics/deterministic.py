@@ -8,6 +8,7 @@ facts and returns observed facts separately from bounded recommendations.
 from __future__ import annotations
 
 from collections.abc import Mapping
+from datetime import datetime, timedelta
 from typing import Any, Final
 
 TOOL_NAME: Final = "deterministic_diagnosis"
@@ -31,6 +32,75 @@ _FAILURES: Final = {
         "Restore both peering route directions and re-enable cross-VPC DNS resolution.",
     ),
 }
+
+_OBSERVABILITY_MAX_AGE = timedelta(minutes=15)
+
+
+def _observability(
+    evidence: Mapping[str, object],
+    *,
+    path_found: bool,
+    facts: list[str],
+) -> tuple[list[str], list[str], dict[str, str] | None]:
+    limitations: list[str] = []
+    conflicts: list[str] = []
+    observed_at = _required_string(evidence, "observed_at")
+    try:
+        diagnosis_time = datetime.fromisoformat(observed_at.replace("Z", "+00:00"))
+    except ValueError as error:
+        raise ValueError("observed_at must be an ISO-8601 timestamp") from error
+
+    sources = (
+        ("flow_logs", "VPC Flow Logs", "path_outcome"),
+        ("cloudwatch", "CloudWatch", "network_error"),
+    )
+    for field, label, signal_field in sources:
+        raw = evidence.get(field)
+        if raw is None:
+            limitations.append(
+                f"{label} evidence was not supplied; observability correlation is limited."
+            )
+            continue
+        source = _mapping(raw, field)
+        status = _required_string(source, "status")
+        if status not in {"available", "disabled", "unavailable"}:
+            raise ValueError(f"{field}.status is unsupported")
+        captured = _required_string(source, "observed_at")
+        try:
+            captured_time = datetime.fromisoformat(captured.replace("Z", "+00:00"))
+        except ValueError as error:
+            raise ValueError(f"{field}.observed_at must be an ISO-8601 timestamp") from error
+        if (
+            captured_time > diagnosis_time
+            or diagnosis_time - captured_time > _OBSERVABILITY_MAX_AGE
+        ):
+            return (
+                limitations,
+                conflicts,
+                {
+                    "code": "STALE_OBSERVABILITY_EVIDENCE",
+                    "message": (
+                        f"{label} evidence is outside the allowed 15-minute observation window."
+                    ),
+                },
+            )
+        if status != "available":
+            limitations.append(
+                f"{label} evidence status={status}; it is not used for diagnosis correlation."
+            )
+            continue
+        signal = source.get(signal_field)
+        if field == "flow_logs" and signal not in {"accepted", "rejected", "unknown"}:
+            raise ValueError("flow_logs.path_outcome must be accepted, rejected, or unknown")
+        if field == "cloudwatch" and not isinstance(signal, bool):
+            raise ValueError("cloudwatch.network_error must be boolean")
+        facts.append(f"{label} observed_at={captured}; {signal_field}={signal}")
+        if field == "flow_logs" and signal != "unknown":
+            if (signal == "accepted") != path_found:
+                conflicts.append("VPC Flow Logs path outcome conflicts with Reachability Analyzer")
+        if field == "cloudwatch" and (signal is True) == path_found:
+            conflicts.append("CloudWatch network-error signal conflicts with Reachability Analyzer")
+    return limitations, conflicts, None
 
 
 def _mapping(value: object, field: str) -> Mapping[str, object]:
@@ -160,6 +230,43 @@ def diagnose(evidence: Mapping[str, object]) -> dict[str, Any]:
             ],
         )
 
+    try:
+        observability_limitations, observability_conflicts, observability_error = _observability(
+            evidence, path_found=path_found, facts=facts
+        )
+    except (TypeError, ValueError) as error:
+        return _invalid(str(error), evidence)
+    if observability_error is not None:
+        return _base_result(
+            evidence,
+            status="invalid_request",
+            completeness="complete",
+            facts=facts,
+            classification="indeterminate",
+            root_cause=None,
+            recommendations=[],
+            limitations=observability_limitations,
+            errors=[{**observability_error, "retryable": False}],
+        )
+    if observability_conflicts:
+        return _base_result(
+            evidence,
+            status="invalid_request",
+            completeness="complete",
+            facts=facts,
+            classification="indeterminate",
+            root_cause=None,
+            recommendations=[],
+            limitations=observability_limitations,
+            errors=[
+                {
+                    "code": "CONFLICTING_EVIDENCE",
+                    "message": "; ".join(observability_conflicts),
+                    "retryable": False,
+                }
+            ],
+        )
+
     configuration = _mapping(evidence.get("configuration", {}), "configuration")
     blockers: list[tuple[str, str]] = []
 
@@ -263,7 +370,8 @@ def diagnose(evidence: Mapping[str, object]) -> dict[str, Any]:
                 limitations=[
                     "Reachability Analyzer found a path while configuration "
                     "evidence claims a blocker."
-                ],
+                ]
+                + observability_limitations,
                 errors=[
                     {
                         "code": "CONFLICTING_EVIDENCE",
@@ -282,7 +390,7 @@ def diagnose(evidence: Mapping[str, object]) -> dict[str, Any]:
             classification="healthy",
             root_cause=None,
             recommendations=[],
-            limitations=[],
+            limitations=observability_limitations,
             errors=[],
         )
 
@@ -345,6 +453,6 @@ def diagnose(evidence: Mapping[str, object]) -> dict[str, Any]:
         classification=classification,
         root_cause=root_cause,
         recommendations=[recommendation],
-        limitations=[],
+        limitations=observability_limitations,
         errors=[],
     )
