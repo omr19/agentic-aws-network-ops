@@ -1,0 +1,18 @@
+{
+  "$id": "https://agentic-aws-network-ops.example/schemas/remediation/proposal.schema.json",
+  "title": "Human-readable remediation proposal",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "proposal_id", "approval_id", "correlation_id", "policy_session_id", "scenario_id", "action", "region", "resource", "operation", "parameters", "evidence", "expected_result", "request_hash", "proposed_at"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "proposal_id": { "type": "string", "format": "uuid" }, "approval_id": { "type": "string", "format": "uuid" }, "correlation_id": { "type": "string", "format": "uuid" }, "policy_session_id": { "type": "string", "format": "uuid" },
+    "scenario_id": { "enum": ["security_group_rule", "route_table_entry", "nacl_rule", "peering_routes_dns"] },
+    "action": { "enum": ["restore_security_group_ingress", "restore_vpc_peering_route", "restore_network_acl_entry"] },
+    "region": { "type": "string", "pattern": "^[a-z]{2}(?:-gov)?-[a-z]+-\\d$" }, "resource": { "type": "string", "minLength": 1 },
+    "operation": { "type": "string", "enum": ["AuthorizeSecurityGroupIngress", "CreateRoute", "ReplaceRoute", "ReplaceNetworkAclEntry"] },
+    "parameters": { "type": "object", "additionalProperties": false, "minProperties": 1 },
+    "evidence": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["fact"], "properties": { "fact": { "type": "string", "minLength": 1 } } } },
+    "expected_result": { "type": "string", "minLength": 1 }, "request_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }, "proposed_at": { "type": "string", "format": "date-time" }
+  }
+}

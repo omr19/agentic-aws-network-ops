@@ -1,0 +1,10 @@
+{
+  "$id": "https://agentic-aws-network-ops.example/schemas/remediation/execution-result.schema.json",
+  "title": "Remediation execution result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "execution_id", "correlation_id", "approval_id", "status", "write_performed", "terraform_drift", "reconciliation_required"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" }, "execution_id": { "type": "string", "format": "uuid" }, "correlation_id": { "type": "string", "format": "uuid" }, "approval_id": { "type": "string", "format": "uuid" }, "status": { "enum": ["completed", "failed", "already_healthy"] }, "write_performed": { "type": "boolean" }, "terraform_drift": { "type": "boolean" }, "reconciliation_required": { "type": "boolean" }, "message": { "type": "string" }
+  }
+}
