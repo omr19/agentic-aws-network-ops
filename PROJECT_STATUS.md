@@ -13,6 +13,10 @@ The explicitly authorized temporary validation started both tagged Phase 4 EC2 i
 ### Phase 7 observability role validation
 
 A temporary, separately scoped observability role was created, used, and deleted after validation. CloudWatch EC2 metric listing and `GetMetricData` succeeded. No Flow Logs or CloudWatch log groups exist, and both tagged EC2 instances remain stopped. Existing Runtime and diagnostic roles were unchanged. Sanitized evidence: [`docs/evidence/phase-7/observability-role-validation.json`](docs/evidence/phase-7/observability-role-validation.json). CloudWatch Logs and VPC Flow Logs remain pending live delivery validation; creating a delivery log group or Flow Logs delivery role requires separate approval.
+### Phase 7 temporary Flow Logs validation attempt
+
+After explicit approval, one tagged one-day CloudWatch log group, one temporary log-group provisioning role, one temporary Flow Logs delivery role, and two tagged VPC Flow Logs were created for the source and destination project VPCs. The two tagged EC2 instances were started and then restored to `stopped`. `ssm:SendCommand` was denied, so no TCP/443 probe ran and no live Flow Log record was delivered or queried. Cleanup succeeded: both Flow Logs, the log group, and both temporary IAM roles were deleted; no other resources were created or changed. Sanitized evidence: [`docs/evidence/phase-7/flowlogs-validation.json`](docs/evidence/phase-7/flowlogs-validation.json). CloudWatch Logs and VPC Flow Logs remain pending live delivery validation.
+
 P5-01 and P5-02 are implemented, independently reviewed by Kiro, and validated locally,
 but not yet committed or pushed.
 The diagnostic Lambda and its execution role/log group are deployed. An AgentCore MCP

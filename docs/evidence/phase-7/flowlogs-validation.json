@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0.0",
+  "evidence_type": "phase_7_temporary_flow_logs_validation",
+  "region": "eu-west-1",
+  "validation_status": "cleaned_up_without_live_flow_log_record",
+  "temporary_resources": {
+    "log_group": {
+      "name": "/aws/vpc/flowlogs/agentic-aws-network-ops/phase7-20260901T000000Z",
+      "retention_days": 1,
+      "created": true,
+      "deleted": true,
+      "delete_call_succeeded": true,
+      "tags": {
+        "Project": "agentic-aws-network-ops",
+        "Environment": "lab",
+        "ManagedBy": "manual",
+        "Purpose": "phase7-flowlogs-validation",
+        "Temporary": "true"
+      }
+    },
+    "delivery_role": {
+      "name": "agentic-aws-network-ops-phase7-flowlogs-delivery-temp",
+      "trusted_service": "vpc-flow-logs.amazonaws.com",
+      "permissions": ["logs:CreateLogStream", "logs:PutLogEvents"],
+      "created": true,
+      "deleted": true
+    },
+    "log_group_provisioner_role": {
+      "name": "agentic-aws-network-ops-phase7-loggroup-provisioner-temp",
+      "created": true,
+      "deleted": true
+    },
+    "flow_logs": [
+      {"id": "fl-0341eb94e55234e54", "vpc": "source", "created": true, "deleted": true},
+      {"id": "fl-05e11c5f377cecd23", "vpc": "destination", "created": true, "deleted": true}
+    ]
+  },
+  "traffic": {
+    "instances_targeted": ["source", "destination"],
+    "instances_started": true,
+    "instances_stopped_after_validation": true,
+    "tcp_443_probe_sent": false,
+    "reason": "ssm:SendCommand denied by the current operator role"
+  },
+  "evidence": {
+    "flow_log_record_delivered": false,
+    "logs_insights_query": false,
+    "reason": "No test traffic was generated; no delivered record was available to query"
+  },
+  "cleanup": {
+    "source_instance_stopped": true,
+    "destination_instance_stopped": true,
+    "flow_logs_absent_after_cleanup": true,
+    "temporary_roles_absent_after_cleanup": true,
+    "log_group_delete_call_succeeded": true,
+    "direct_log_group_verification": "operator lacks logs:DescribeLogGroups"
+  },
+  "existing_roles_unchanged": true,
+  "additional_resources_created": false,
+  "terraform_changed": false,
+  "estimated_incremental_charge": "No delivered records or persistent temporary resources remained; exact billing not available locally.",
+  "provenance": "Sanitized local record; account identifiers, credentials, raw logs, and raw metric data omitted."
+}
