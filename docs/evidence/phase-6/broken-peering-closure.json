@@ -1,0 +1,93 @@
+{
+  "phase": 6,
+  "scenario": "broken_peering",
+  "region": "eu-west-1",
+  "sanitization": {
+    "account_id": "<redacted>",
+    "credentials_included": false
+  },
+  "provenance": {
+    "broken_state_artifact": ".artifacts/phase6-broken-peering/broken-peering-evidence.json",
+    "healthy_restore_artifact": "not_present_as_a_separate_ignored_file",
+    "restore_data_source": "previously captured tracked-ready broken-peering summary and final verification record"
+  },
+  "broken_state": {
+    "terraform_plan": {
+      "to_add": 0,
+      "to_change": 1,
+      "to_destroy": 4,
+      "destroyed_resources": [
+        "module.vpc_peering.aws_route.source_to_destination[0]",
+        "module.vpc_peering.aws_route.source_to_destination[1]",
+        "module.vpc_peering.aws_route.destination_to_source[0]",
+        "module.vpc_peering.aws_route.destination_to_source[1]"
+      ],
+      "changed_resource": "module.vpc_peering.aws_vpc_peering_connection_options.this",
+      "dns_option_change": "true -> false"
+    },
+    "terraform_apply": {
+      "added": 0,
+      "changed": 1,
+      "destroyed": 4
+    },
+    "peering_connection_id": "pcx-05b83a5ce62cc74a9",
+    "peering_connection_status": "active",
+    "source_to_destination_routes_present": false,
+    "destination_to_source_routes_present": false,
+    "requester_dns_resolution": false,
+    "accepter_dns_resolution": false,
+    "reachability_analysis": {
+      "path_id": "nip-0b3a839ce75bb3a97",
+      "analysis_id": "nia-0b5e03873a017a35b",
+      "status": "succeeded",
+      "path_found": false,
+      "explanation_codes": [
+        "NO_ROUTE_TO_DESTINATION"
+      ]
+    }
+  },
+  "healthy_restore": {
+    "terraform_plan": {
+      "to_add": 4,
+      "to_change": 1,
+      "to_destroy": 0,
+      "created_resources": [
+        "module.vpc_peering.aws_route.source_to_destination[0]",
+        "module.vpc_peering.aws_route.source_to_destination[1]",
+        "module.vpc_peering.aws_route.destination_to_source[0]",
+        "module.vpc_peering.aws_route.destination_to_source[1]"
+      ],
+      "changed_resource": "module.vpc_peering.aws_vpc_peering_connection_options.this",
+      "dns_option_change": "false -> true"
+    },
+    "terraform_apply": {
+      "added": 4,
+      "changed": 1,
+      "destroyed": 0
+    },
+    "routes_recreated": true,
+    "dns_resolution_reenabled": true,
+    "final_terraform_plan": "No changes. Your infrastructure matches the configuration.",
+    "healthy_verification": {
+      "peering_connection_id": "pcx-05b83a5ce62cc74a9",
+      "peering_connection_status": "active",
+      "requester_dns_resolution": true,
+      "accepter_dns_resolution": true,
+      "analysis_id": "nia-0fb430275079c0202",
+      "status": "succeeded",
+      "path_found": true,
+      "explanation_codes": []
+    }
+  },
+  "cost": {
+    "analysis_count": 2,
+    "approximate_cost_usd_per_analysis": 0.1,
+    "approximate_total_cost_usd": 0.2
+  },
+  "boundaries": {
+    "ec2_instances_started": false,
+    "iam_modified": false,
+    "other_scenarios_tested": false,
+    "committed_or_pushed": false
+  }
+}

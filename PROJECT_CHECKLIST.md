@@ -254,30 +254,30 @@ Optional enhancements that must not replace the core contracts:
 
 ## Phase 6 — Network Failure Scenarios
 
-- [ ] Define selectable intentionally broken scenarios
-- [ ] Implement Terraform `scenario` variable or equivalent controlled mechanism where practical
+- [x] Define selectable intentionally broken scenarios
+- [x] Implement Terraform `scenario` variable or equivalent controlled mechanism where practical
 
 Required candidates:
 
 - [x] Broken security-group rule
 - [x] Broken route-table entry
 - [x] Broken NACL
-- [ ] Broken VPC endpoint configuration where endpoints are deployed
+- [x] Broken VPC endpoint configuration — N/A (no project VPC endpoints deployed)
 - [x] DNS-related failure where applicable (local deterministic fixture; no AWS DNS resource)
-- [ ] TGW/peering failure only if that component was selected in Phase 2
+- [x] VPC peering failure (TGW remains out of scope)
 
 For each implemented scenario:
 
-- [ ] Document expected symptom
-- [ ] Document deterministic root cause
-- [ ] Document expected diagnostic evidence
-- [ ] Document correct remediation
-- [ ] Verify scenario can be injected cleanly
-- [ ] Verify scenario produces expected failure
-- [ ] Verify scenario can be reversed cleanly
-- [ ] Confirm healthy baseline can be restored
+- [x] Document expected symptom
+- [x] Document deterministic root cause
+- [x] Document expected diagnostic evidence
+- [x] Document correct remediation
+- [x] Verify scenario can be injected cleanly
+- [x] Verify scenario produces expected failure
+- [x] Verify scenario can be reversed cleanly
+- [x] Confirm healthy baseline can be restored
 
-- [ ] **Phase 6 COMPLETE**
+- [x] **Phase 6 COMPLETE**
 
 ---
 

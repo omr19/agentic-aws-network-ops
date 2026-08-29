@@ -2,9 +2,9 @@
 
 ## Current Phase
 
-**Phase 6 — Network Failure Scenarios is AUTHORIZED and IN PROGRESS**
+**Phase 6 — Network Failure Scenarios is COMPLETE**
 
-Phase 6 evidence now records the controlled `broken_sg`, `broken_route`, and `broken_nacl` scenarios as completed and restored, plus the local-only `broken_dns` fixture. Sanitized summaries are tracked under `docs/evidence/phase-6/`. Only `broken_peering` remains pending. Phase 6 remains in progress and its completion gate remains unchecked.
+Phase 6 evidence records the completed and restored `broken_sg`, `broken_route`, `broken_nacl`, and `broken_peering` scenarios, plus the local-only `broken_dns` fixture. Sanitized summaries are tracked under `docs/evidence/phase-6/`. The VPC endpoint candidate is documented as N/A because no project VPC endpoints are deployed; Transit Gateway remains out of scope. All Phase 6 injection, deterministic diagnosis, remediation, reversibility, and healthy-baseline gates are satisfied.
 
 P5-01 and P5-02 are implemented, independently reviewed by Kiro, and validated locally,
 but not yet committed or pushed.
@@ -578,7 +578,7 @@ Any intentionally retained resources or artifacts must be explicitly documented 
 
 ## Exact Next Step
 
-The controlled `broken_sg`, `broken_route`, and `broken_nacl` Phase 6 tests are completed and restored, and the `broken_dns` case is validated as a local-only deterministic fixture. Tracked sanitized evidence is under `docs/evidence/phase-6/`. Only `broken_peering` remains pending. No Phase 6 completion claim is made.
+Phase 6 is complete: the controlled `broken_sg`, `broken_route`, `broken_nacl`, and `broken_peering` tests were completed and restored; `broken_dns` was validated as a local-only deterministic fixture; and the VPC endpoint candidate was recorded as N/A. Tracked sanitized evidence is under `docs/evidence/phase-6/`. The next governed phase is Phase 7, which remains separately subject to its own authorization and completion gates.
 
 The preceding Phase 5 implementation checkpoint is retained below for historical context.
 
@@ -650,7 +650,7 @@ explicitly authorized.
 
 ## Not Authorized Yet
 
-Phases 2, 3, and 4 are complete. Phase 5 local implementation is complete locally. The controlled Phase 6 `broken_sg`, `broken_route`, and `broken_nacl` tests are completed and restored, and `broken_dns` is validated locally without AWS resources. Their sanitized evidence is tracked under `docs/evidence/phase-6/`. Only `broken_peering` remains pending. Further apply/destroy, IAM changes, Phase 5 AWS deployment, additional analyses/path changes, pending scenario injection, any additional commit, and push remain unauthorized.
+Phases 2, 3, and 4 are complete. Phase 5 local implementation is complete locally. Phase 6 is complete: `broken_sg`, `broken_route`, `broken_nacl`, and `broken_peering` were completed and restored; `broken_dns` was validated locally without AWS resources; the VPC endpoint candidate is N/A; and Transit Gateway remains out of scope. Their sanitized evidence is tracked under `docs/evidence/phase-6/`. Further Phase 6 apply/destroy, IAM changes, additional analyses/path changes, any additional commit, and push remain unauthorized.
 
 The following implementation activities remain unauthorized unless separately authorized for a pending scenario:
 

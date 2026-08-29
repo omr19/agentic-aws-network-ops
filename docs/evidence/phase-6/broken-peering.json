@@ -1,0 +1,110 @@
+{
+  "phase": 6,
+  "scenario": "broken_peering",
+  "region": "eu-west-1",
+  "sanitization": {
+    "account_id": "<redacted>",
+    "credentials_included": false
+  },
+  "terraform": {
+    "broken_plan": {
+      "to_add": 0,
+      "to_change": 1,
+      "to_destroy": 4,
+      "destroyed_resources": [
+        "module.vpc_peering.aws_route.source_to_destination[0]",
+        "module.vpc_peering.aws_route.source_to_destination[1]",
+        "module.vpc_peering.aws_route.destination_to_source[0]",
+        "module.vpc_peering.aws_route.destination_to_source[1]"
+      ],
+      "changed_resource": "module.vpc_peering.aws_vpc_peering_connection_options.this",
+      "dns_resolution_change": "true -> false"
+    },
+    "broken_apply": {
+      "added": 0,
+      "changed": 1,
+      "destroyed": 4
+    },
+    "restore_plan": {
+      "to_add": 4,
+      "to_change": 1,
+      "to_destroy": 0,
+      "created_resources": [
+        "module.vpc_peering.aws_route.source_to_destination[0]",
+        "module.vpc_peering.aws_route.source_to_destination[1]",
+        "module.vpc_peering.aws_route.destination_to_source[0]",
+        "module.vpc_peering.aws_route.destination_to_source[1]"
+      ],
+      "changed_resource": "module.vpc_peering.aws_vpc_peering_connection_options.this",
+      "dns_resolution_change": "false -> true"
+    },
+    "restore_apply": {
+      "added": 4,
+      "changed": 1,
+      "destroyed": 0
+    },
+    "final_terraform_plan": "No changes. Your infrastructure matches the configuration."
+  },
+  "observed_broken_state": {
+    "peering_connection_id": "pcx-05b83a5ce62cc74a9",
+    "peering_status": "active",
+    "source_to_destination_routes_present": false,
+    "destination_to_source_routes_present": false,
+    "requester_dns_resolution": false,
+    "accepter_dns_resolution": false
+  },
+  "broken_analysis": {
+    "path_id": "nip-0b3a839ce75bb3a97",
+    "analysis_id": "nia-0b5e03873a017a35b",
+    "status": "succeeded",
+    "path_found": false,
+    "explanation_codes": [
+      "NO_ROUTE_TO_DESTINATION"
+    ]
+  },
+  "final_healthy_verification": {
+    "source_route_tables": [
+      {
+        "route_table_id": "rtb-0f1e30ea77719b740",
+        "destination_cidr": "10.20.0.0/16",
+        "state": "active"
+      },
+      {
+        "route_table_id": "rtb-032520fd18e9125d7",
+        "destination_cidr": "10.20.0.0/16",
+        "state": "active"
+      }
+    ],
+    "destination_route_tables": [
+      {
+        "route_table_id": "rtb-05105982ccee2a69d",
+        "destination_cidr": "10.10.0.0/16",
+        "state": "active"
+      },
+      {
+        "route_table_id": "rtb-0af09ea83c79d902a",
+        "destination_cidr": "10.10.0.0/16",
+        "state": "active"
+      }
+    ],
+    "peering_connection_id": "pcx-05b83a5ce62cc74a9",
+    "peering_status": "active",
+    "requester_dns_resolution": true,
+    "accepter_dns_resolution": true,
+    "analysis_id": "nia-0fb430275079c0202",
+    "status": "succeeded",
+    "path_found": true,
+    "explanation_codes": []
+  },
+  "boundaries": {
+    "ec2_instances_started": false,
+    "iam_modified": false,
+    "other_scenarios_tested": false,
+    "committed_or_pushed": false
+  },
+  "cost": {
+    "analysis_count": 2,
+    "approximate_cost_usd_per_analysis": 0.1,
+    "approximate_total_cost_usd": 0.2
+  }
+}
