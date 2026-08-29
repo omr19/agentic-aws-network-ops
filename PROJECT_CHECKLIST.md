@@ -287,8 +287,8 @@ For each implemented scenario:
 - [x] Use deterministic AWS evidence as the factual basis of diagnosis
 - [x] Use VPC Reachability Analyzer where applicable
 - [x] Use AWS configuration/API evidence where applicable
-- [ ] Use VPC Flow Logs where applicable
-- [ ] Use CloudWatch metrics/logs where applicable
+- [x] CloudWatch metrics validated
+- [ ] CloudWatch Logs and VPC Flow Logs — pending live delivery validation
 - [x] Correlate evidence across multiple tools/services where useful
 - [x] Require the agent to distinguish observed evidence from recommendation
 - [x] Prevent unsupported/hallucinated root-cause claims
