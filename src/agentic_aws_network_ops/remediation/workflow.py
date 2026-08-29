@@ -232,6 +232,8 @@ def record_approval(
         "approved_at": approved_at.isoformat().replace("+00:00", "Z"),
         "expires_at": (approved_at + APPROVAL_TTL).isoformat().replace("+00:00", "Z"),
         "consumed": False,
+        "execution_id": None,
+        "execution_status": "PENDING",
     }
     store.save(approval)
     return approval
@@ -331,4 +333,5 @@ class InMemoryApprovalStore:
             return False
         approval["consumed"] = True
         approval["execution_id"] = execution_id
+        approval["execution_status"] = "EXECUTING"
         return True

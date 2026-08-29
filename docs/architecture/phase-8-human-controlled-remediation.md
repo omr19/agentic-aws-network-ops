@@ -42,3 +42,9 @@ Denial, absent approval, expiration, changed hash, wrong correlation/session, an
 - `tests/unit/test_phase8_remediation_workflow.py`, `tests/contract/test_phase8_remediation_schemas.py`, and `tests/security/test_phase8_remediation_security.py` — offline enforcement tests.
 
 This foundation is not a production persistence or AWS authorization implementation. Any future deployment requires separate architecture, IAM, resource, and approval gates.
+
+## Local approval-service foundation
+
+The separate `src/agentic_aws_network_ops/approval/` package now provides a local-only `ApprovalService` and `ApprovalRepository` protocol. The service accepts only closed-world structured `approve` or `deny` operations, validates all ADR 021 binding fields and an authorized approver principal, records five-minute expiry and execution fields, and never invokes remediation execution. `InMemoryApprovalRepository` is a thread-safe test fake that models atomic `APPROVED` consumption, same-execution idempotent replay, different-execution rejection, and execution-result persistence. A future DynamoDB adapter must preserve these repository semantics; no AWS persistence or Approval Lambda exists in this foundation.
+
+Focused tests are in `tests/unit/test_phase8_approval_service.py` and `tests/security/test_phase8_approval_security.py`. They reject natural-language input, unauthorized identities, changed bindings, expiry, duplicate approvals, and replay while verifying explicit approval/denial persistence and atomic consumption.
