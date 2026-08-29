@@ -283,19 +283,19 @@ For each implemented scenario:
 
 ## Phase 7 — Intelligent Deterministic Diagnosis
 
-- [ ] Define diagnostic workflow for each implemented failure class
-- [ ] Use deterministic AWS evidence as the factual basis of diagnosis
-- [ ] Use VPC Reachability Analyzer where applicable
-- [ ] Use AWS configuration/API evidence where applicable
+- [x] Define diagnostic workflow for each implemented failure class
+- [x] Use deterministic AWS evidence as the factual basis of diagnosis
+- [x] Use VPC Reachability Analyzer where applicable
+- [x] Use AWS configuration/API evidence where applicable
 - [ ] Use VPC Flow Logs where applicable
 - [ ] Use CloudWatch metrics/logs where applicable
-- [ ] Correlate evidence across multiple tools/services where useful
-- [ ] Require the agent to distinguish observed evidence from recommendation
-- [ ] Prevent unsupported/hallucinated root-cause claims
-- [ ] Test healthy infrastructure for false-positive diagnoses
-- [ ] Test each defined failure scenario against expected root cause
-- [ ] Repeat representative scenarios to assess consistency
-- [ ] Document limitations and ambiguous cases
+- [x] Correlate evidence across multiple tools/services where useful
+- [x] Require the agent to distinguish observed evidence from recommendation
+- [x] Prevent unsupported/hallucinated root-cause claims
+- [x] Test healthy infrastructure for false-positive diagnoses
+- [x] Test each defined failure scenario against expected root cause
+- [x] Repeat representative scenarios to assess consistency
+- [x] Document limitations and ambiguous cases
 
 - [ ] **Phase 7 COMPLETE**
 

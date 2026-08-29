@@ -2,9 +2,9 @@
 
 ## Current Phase
 
-**Phase 6 — Network Failure Scenarios is COMPLETE**
+**Phase 7 — Intelligent Deterministic Diagnosis is AUTHORIZED and IN PROGRESS**
 
-Phase 6 evidence records the completed and restored `broken_sg`, `broken_route`, `broken_nacl`, and `broken_peering` scenarios, plus the local-only `broken_dns` fixture. Sanitized summaries are tracked under `docs/evidence/phase-6/`. The VPC endpoint candidate is documented as N/A because no project VPC endpoints are deployed; Transit Gateway remains out of scope. All Phase 6 injection, deterministic diagnosis, remediation, reversibility, and healthy-baseline gates are satisfied.
+Phase 6 is complete. The Phase 7 local deterministic diagnosis foundation is implemented for healthy evidence and the four implemented failure classes, with normalized evidence/result schemas, fact-versus-recommendation separation, incomplete/conflicting evidence rejection, tracked Phase 6 fixture tests, and documented limitations. Flow Logs and CloudWatch metrics integration remain pending; Phase 7 completion remains unchecked.
 
 P5-01 and P5-02 are implemented, independently reviewed by Kiro, and validated locally,
 but not yet committed or pushed.
@@ -578,7 +578,7 @@ Any intentionally retained resources or artifacts must be explicitly documented 
 
 ## Exact Next Step
 
-Phase 6 is complete: the controlled `broken_sg`, `broken_route`, `broken_nacl`, and `broken_peering` tests were completed and restored; `broken_dns` was validated as a local-only deterministic fixture; and the VPC endpoint candidate was recorded as N/A. Tracked sanitized evidence is under `docs/evidence/phase-6/`. The next governed phase is Phase 7, which remains separately subject to its own authorization and completion gates.
+Phase 6 is complete. The Phase 7 local deterministic diagnosis foundation is implemented and validated for healthy evidence and the four implemented failure classes. The next governed work is to add and validate the remaining Flow Logs and CloudWatch evidence integrations; Phase 7 remains in progress and its completion gate is unchecked.
 
 The preceding Phase 5 implementation checkpoint is retained below for historical context.
 
@@ -650,9 +650,9 @@ explicitly authorized.
 
 ## Not Authorized Yet
 
-Phases 2, 3, and 4 are complete. Phase 5 local implementation is complete locally. Phase 6 is complete: `broken_sg`, `broken_route`, `broken_nacl`, and `broken_peering` were completed and restored; `broken_dns` was validated locally without AWS resources; the VPC endpoint candidate is N/A; and Transit Gateway remains out of scope. Their sanitized evidence is tracked under `docs/evidence/phase-6/`. Further Phase 6 apply/destroy, IAM changes, additional analyses/path changes, any additional commit, and push remain unauthorized.
+Phases 2, 3, and 4 are complete. Phase 5 local implementation is complete locally. Phase 6 is complete. Phase 7 local deterministic diagnosis foundation work is authorized and in progress; AWS deployment, IAM changes, Terraform, and additional AWS evidence collection remain unauthorized. Phase 7 completion remains unchecked.
 
-The following implementation activities remain unauthorized unless separately authorized for a pending scenario:
+The following implementation activities remain unauthorized unless separately authorized for a later approved task:
 
 - Terraform apply/destroy for any future scenario or resource change
 - Terraform-managed AWS resource creation for pending or future scenarios

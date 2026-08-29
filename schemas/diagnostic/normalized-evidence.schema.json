@@ -1,0 +1,66 @@
+{
+  "$id": "https://agentic-aws-network-ops.example/schemas/diagnostic/normalized-evidence.schema.json",
+  "title": "Normalized deterministic diagnosis evidence",
+  "type": "object",
+  "required": ["schema_version", "correlation_id", "observed_at", "region", "evidence_completeness", "reachability"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "correlation_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$" },
+    "observed_at": { "type": "string", "format": "date-time" },
+    "region": { "type": "string", "pattern": "^[a-z]{2}(?:-gov)?-[a-z]+-\\d$" },
+    "evidence_completeness": { "enum": ["complete", "partial"] },
+    "reachability": {
+      "type": "object",
+      "required": ["status", "path_found", "explanation_codes"],
+      "properties": {
+        "status": { "enum": ["pending", "running", "succeeded", "failed", "unknown"] },
+        "path_found": { "type": ["boolean", "null"] },
+        "explanation_codes": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
+      },
+      "additionalProperties": false
+    },
+    "configuration": {
+      "type": "object",
+      "properties": {
+        "security_group": {
+          "type": "object",
+          "required": ["expected_source_cidr", "observed_source_cidr"],
+          "properties": { "expected_source_cidr": { "type": "string" }, "observed_source_cidr": { "type": "string" } },
+          "additionalProperties": false
+        },
+        "routes": {
+          "type": "object",
+          "required": ["source_to_destination_present", "destination_to_source_present"],
+          "properties": { "source_to_destination_present": { "type": "boolean" }, "destination_to_source_present": { "type": "boolean" } },
+          "additionalProperties": false
+        },
+        "nacl": {
+          "type": "object",
+          "required": ["deny_rule_present"],
+          "properties": { "deny_rule_present": { "type": "boolean" }, "deny_rule_number": { "type": "integer", "minimum": 1 } },
+          "additionalProperties": false
+        },
+        "peering": {
+          "type": "object",
+          "required": ["connection_status", "source_to_destination_present", "destination_to_source_present", "requester_dns_resolution", "accepter_dns_resolution"],
+          "properties": {
+            "connection_status": { "type": "string", "minLength": 1 },
+            "source_to_destination_present": { "type": "boolean" },
+            "destination_to_source_present": { "type": "boolean" },
+            "requester_dns_resolution": { "type": "boolean" },
+            "accepter_dns_resolution": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        },
+        "dns_fixture": {
+          "type": "object",
+          "required": ["local_only", "broken"],
+          "properties": { "local_only": { "type": "boolean" }, "broken": { "type": "boolean" } },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
