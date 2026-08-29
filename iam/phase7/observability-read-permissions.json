@@ -20,8 +20,7 @@
       "Action": "logs:DescribeLogGroups",
       "Resource": "*",
       "Condition": {
-        "StringEquals": { "aws:RequestedRegion": "${region}" },
-        "StringLike": { "logs:LogGroupName": "/aws/vpc/flowlogs/${project_tag}/*" }
+        "StringEquals": { "aws:RequestedRegion": "${region}" }
       }
     },
     {

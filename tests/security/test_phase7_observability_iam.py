@@ -85,9 +85,7 @@ def test_observability_policy_scopes_region_and_supported_log_resources() -> Non
         statement for statement in statements if statement["Sid"] == "DiscoverProjectLogGroups"
     )
     assert discovery["Resource"] == "*"
-    assert discovery["Condition"]["StringLike"] == {
-        "logs:LogGroupName": "/aws/vpc/flowlogs/${project_tag}/*"
-    }
+    assert discovery["Condition"] == {"StringEquals": {"aws:RequestedRegion": "${region}"}}
     query = next(
         statement
         for statement in statements

@@ -21,9 +21,12 @@ classifies it as Write; the Phase 5 tool describes existing analyses only.
 
 The future-demo `phase7/observability-read-permissions.json` fixture is separate from
 Runtime and diagnostic policies. It permits only project-instance observation, Flow Logs
-discovery, Logs Insights discovery/query/results, and CloudWatch metric reads. Actual role
-creation or attachment requires a separate IAM approval gate; this local task does not
-broaden or modify any existing role.
+discovery, Logs Insights discovery/query/results, and CloudWatch metric reads. Logs-group
+discovery intentionally uses `Resource: "*"` with only the approved region condition because
+`logs:DescribeLogGroups` does not support the log-group condition used by the API.
+`logs:StartQuery` remains scoped to the project log-group ARN and `logs:GetQueryResults`
+remains read-only. Actual role creation or attachment requires a separate IAM approval gate;
+this local task does not broaden or modify any existing role.
 
 Local tests prove identity separation, exact allowed actions, resource scoping where AWS
 supports it, and absence of IAM, STS, remediation, Lambda invocation, and infrastructure
