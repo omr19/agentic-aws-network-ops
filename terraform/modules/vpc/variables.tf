@@ -61,6 +61,16 @@ variable "flow_log_retention_days" {
   default     = 7
 }
 
+variable "enable_deny_nacl" {
+  description = <<-EOT
+    Phase 6 broken_nacl toggle. When true, adds a higher-priority deterministic deny
+    rule on the destination ingress path without removing the healthy allow rule.
+    Defaults to false (healthy baseline).
+  EOT
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "Additional ownership and cost-allocation tags."
   type        = map(string)

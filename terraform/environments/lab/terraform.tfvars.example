@@ -8,3 +8,9 @@ environment  = "lab"
 # Enable only during an explicitly controlled diagnostic or demo session.
 enable_flow_logs       = false
 flow_log_retention_days = 7
+
+# Phase 6 controlled scenario. Keep this at "healthy" unless running a controlled
+# failure/diagnosis exercise. Allowed: healthy, broken_sg, broken_route, broken_nacl,
+# broken_dns, broken_peering. Injecting a scenario still requires a separately
+# authorized terraform apply.
+scenario = "healthy"

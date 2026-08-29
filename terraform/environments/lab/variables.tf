@@ -47,3 +47,35 @@ variable "flow_log_retention_days" {
     error_message = "The approved VPC Flow Logs retention is seven days."
   }
 }
+
+variable "scenario" {
+  description = <<-EOT
+    Phase 6 controlled network scenario. `healthy` is the approved baseline (default).
+    Each `broken_*` value injects exactly one deterministic failure and MUTATES AWS
+    configuration on `terraform apply`, requiring a separately authorized apply gate:
+      - broken_sg: changes the destination security-group ingress CIDR.
+      - broken_route / broken_peering: set the peering route count to 0, which
+        deletes the Terraform-managed peering route resources (recreated on restore);
+        the VPC peering connection itself is retained.
+      - broken_nacl: creates a temporary higher-priority NACL deny rule (the healthy
+        allow rule is retained).
+      - broken_peering: also disables cross-VPC DNS resolution on the peering options.
+    broken_dns is a local-only fixture flag (no AWS resource, no mutation). Restoring
+    `healthy` recreates the baseline. VPC-endpoint failures are not applicable (no
+    project VPC endpoints are deployed) and Transit Gateway is out of scope.
+  EOT
+  type        = string
+  default     = "healthy"
+
+  validation {
+    condition = contains([
+      "healthy",
+      "broken_sg",
+      "broken_route",
+      "broken_nacl",
+      "broken_dns",
+      "broken_peering",
+    ], var.scenario)
+    error_message = "scenario must be one of: healthy, broken_sg, broken_route, broken_nacl, broken_dns, broken_peering."
+  }
+}

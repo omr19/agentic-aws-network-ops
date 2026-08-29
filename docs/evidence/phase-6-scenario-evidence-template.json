@@ -1,0 +1,62 @@
+{
+  "_comment": "Phase 6 scenario evidence template. Copy per controlled run and fill fields. Do not include credentials, account IDs, secrets, or raw provider errors. Injecting a scenario against AWS requires a separately authorized terraform apply during a controlled session.",
+  "run": {
+    "scenario": "healthy | broken_sg | broken_route | broken_nacl | broken_dns | broken_peering",
+    "date_utc": "YYYY-MM-DDThh:mm:ssZ",
+    "operator": "<name-or-handle>",
+    "correlation_id": "<correlation-id>",
+    "terraform_apply_authorized": false,
+    "aws_mutation_approval_gate_satisfied": false,
+    "aws_contacted": false
+  },
+  "inject": {
+    "expected_signature": {
+      "sg_source_cidr": "",
+      "enable_source_route": null,
+      "enable_destination_route": null,
+      "enable_deny_nacl": null,
+      "enable_peering_dns": null,
+      "dns_fixture_broken": null
+    },
+    "observed_signature": {
+      "sg_source_cidr": "",
+      "enable_source_route": null,
+      "enable_destination_route": null,
+      "enable_deny_nacl": null,
+      "enable_peering_dns": null,
+      "dns_fixture_broken": null
+    },
+    "deviation_count": 0,
+    "expected_deviation_count": 0
+  },
+  "diagnose": {
+    "expected_root_cause": "",
+    "observed_root_cause": "",
+    "primary_evidence_source": "",
+    "reachability_analyzer": {
+      "path_found": null,
+      "analysis_id": ""
+    },
+    "notes": "Evidence must be observed, not inferred. Report a limitation rather than an invented cause when evidence is incomplete."
+  },
+  "restore": {
+    "restored_scenario": "healthy",
+    "restored_to_baseline": null
+  },
+  "verify": {
+    "healthy_signature_confirmed": null,
+    "reachability_path_found_after_restore": null,
+    "peering_connection_retained": null,
+    "route_resources_recreated_on_restore": null,
+    "deny_nacl_rule_removed_on_restore": null,
+    "iam_unchanged": true
+  },
+  "scope": {
+    "vpc_endpoints": "not_applicable_no_project_endpoints",
+    "transit_gateway": "out_of_scope"
+  },
+  "result": {
+    "passed": null,
+    "unresolved_issues": []
+  }
+}

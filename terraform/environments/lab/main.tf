@@ -57,6 +57,7 @@ module "destination_vpc" {
   private_subnet_cidrs    = local.network_topology.destination.private_subnet_cidrs
   vpc_cidr                = local.network_topology.destination.vpc_cidr
   workload_role           = "destination"
+  enable_deny_nacl        = local.active_scenario.enable_deny_nacl
   tags = {
     Component = "destination-network"
   }
@@ -72,6 +73,9 @@ module "vpc_peering" {
   source_route_table_ids      = module.source_vpc.private_route_table_ids
   source_vpc_cidr             = local.network_topology.source.vpc_cidr
   source_vpc_id               = module.source_vpc.vpc_id
+  enable_source_route         = local.active_scenario.enable_source_route
+  enable_destination_route    = local.active_scenario.enable_destination_route
+  enable_dns_resolution       = local.active_scenario.enable_peering_dns
   tags = {
     Component = "vpc-peering"
   }
@@ -80,12 +84,13 @@ module "vpc_peering" {
 module "destination_workload" {
   source = "../../modules/test_workload"
 
-  ami_id           = data.aws_ami.amazon_linux_2023.id
-  destination_port = local.healthy_path.destination_port
-  name             = "${local.name_prefix}-destination"
-  peer_vpc_cidr    = local.network_topology.source.vpc_cidr
-  role             = "destination"
-  subnet_id        = module.destination_vpc.private_subnet_ids[0]
+  ami_id                  = data.aws_ami.amazon_linux_2023.id
+  destination_port        = local.healthy_path.destination_port
+  name                    = "${local.name_prefix}-destination"
+  peer_vpc_cidr           = local.network_topology.source.vpc_cidr
+  role                    = "destination"
+  subnet_id               = module.destination_vpc.private_subnet_ids[0]
+  application_source_cidr = local.active_scenario.sg_source_cidr
   user_data = templatefile("${path.module}/../../modules/test_workload/templates/destination.sh.tftpl", {
     destination_port = local.healthy_path.destination_port
   })

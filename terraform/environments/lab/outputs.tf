@@ -58,3 +58,18 @@ output "reachability_analyzer_path_id" {
   description = "Network Insights Path used for Source-to-Destination TCP/443 analysis."
   value       = aws_ec2_network_insights_path.source_to_destination_https.id
 }
+
+output "active_scenario" {
+  description = "Phase 6 controlled scenario and its deterministic injection signature."
+  value = {
+    scenario                 = var.scenario
+    sg_source_cidr           = local.active_scenario.sg_source_cidr
+    enable_source_route      = local.active_scenario.enable_source_route
+    enable_destination_route = local.active_scenario.enable_destination_route
+    enable_deny_nacl         = local.active_scenario.enable_deny_nacl
+    enable_peering_dns       = local.active_scenario.enable_peering_dns
+    dns_fixture_broken       = local.active_scenario.dns_fixture_broken
+    vpc_endpoints            = "not_applicable_no_project_endpoints"
+    transit_gateway          = "out_of_scope"
+  }
+}

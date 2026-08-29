@@ -13,7 +13,7 @@ resource "aws_security_group" "this" {
 resource "aws_vpc_security_group_ingress_rule" "destination_https" {
   count = var.role == "destination" ? 1 : 0
 
-  cidr_ipv4         = var.peer_vpc_cidr
+  cidr_ipv4         = coalesce(var.application_source_cidr, var.peer_vpc_cidr)
   description       = "HTTPS from the approved Source VPC"
   from_port         = var.destination_port
   ip_protocol       = "tcp"

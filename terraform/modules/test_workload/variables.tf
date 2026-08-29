@@ -28,6 +28,16 @@ variable "peer_vpc_cidr" {
   type        = string
 }
 
+variable "application_source_cidr" {
+  description = <<-EOT
+    CIDR allowed by the destination TCP/443 ingress rule. Defaults to the peer VPC
+    CIDR (healthy baseline). Phase 6 broken_sg overrides this with an unroutable CIDR
+    to deterministically block the application path without deleting the rule.
+  EOT
+  type        = string
+  default     = null
+}
+
 variable "ami_id" {
   description = "Approved Amazon Linux 2023 x86_64 AMI identifier."
   type        = string

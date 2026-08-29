@@ -119,6 +119,19 @@ resource "aws_network_acl_rule" "destination_return_egress" {
   to_port        = 65535
 }
 
+resource "aws_network_acl_rule" "destination_scenario_deny_ingress" {
+  count = var.workload_role == "destination" && var.enable_deny_nacl ? 1 : 0
+
+  network_acl_id = aws_network_acl.private.id
+  rule_number    = 90
+  egress         = false
+  protocol       = "tcp"
+  rule_action    = "deny"
+  cidr_block     = var.peer_vpc_cidr
+  from_port      = var.destination_port
+  to_port        = var.destination_port
+}
+
 resource "aws_cloudwatch_log_group" "flow_logs" {
   count = var.enable_flow_logs ? 1 : 0
 
