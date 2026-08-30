@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-**Phase 8 — Human-Controlled Remediation local foundation is implemented; live validation remains pending**
+**Phase 8 — Human-Controlled Remediation local foundation and Lambda deployment boundary are implemented; live approval/remediation validation remains pending**
 
 Phase 6 is complete. The Phase 7 local deterministic diagnosis foundation is implemented for healthy evidence and the four implemented failure classes, with normalized evidence/result schemas, fact-versus-recommendation separation, incomplete/conflicting evidence rejection, tracked Phase 6 fixture tests, and documented limitations. CloudWatch EC2 metrics validation is complete. Live Flow Logs/CloudWatch Logs traffic evidence remains a documented limitation because the project EC2 instances have no IAM instance profile or SSM readiness; no live Flow Log record or Logs Insights query was obtained. Phase 7 is complete for all feasible deterministic diagnosis and observability work.
 
@@ -12,18 +12,31 @@ The Phase 8 local deployment-readiness foundation is implemented and checkpointe
 `0f4e1a1` (`Add Phase 8 deployment readiness foundation`). It includes separate approval and
 remediation Lambda interfaces, event schemas, least-privilege IAM policy fixtures, an opt-in
 tagged Terraform readiness module, live-remediation evidence templates, and contract/security
-tests. The readiness module is disabled by default, so this commit created no AWS resources.
-The full local suite passed (204 tests), JSON/schema validation passed, Ruff/mypy passed, and
-Terraform formatting/validation passed. Live Lambda/DynamoDB/IAM deployment, AgentCore
-integration, and remediation execution/verification remain separate AWS approval gates.
+tests. The readiness module is disabled by default, so this foundation commit created no AWS
+resources. The subsequent live Lambda boundary deployment is recorded below; AgentCore
+integration and remediation execution/verification remain separate AWS approval gates.
 
 The deployed Phase 8 approval and remediation roles passed read-only IAM simulation. Approval
 table operations and the four allowlisted EC2 remediation actions were allowed only in their
 scoped contexts; destructive, escalation, and unrelated-resource actions were denied. Sanitized
 evidence is recorded in
 [`docs/evidence/phase-8/iam-policy-simulation.json`](docs/evidence/phase-8/iam-policy-simulation.json).
-No remediation was executed, and Phase 8 remains incomplete pending Lambda deployment and live
-approval/remediation verification.
+No remediation was executed, and Phase 8 remains incomplete pending live approval/remediation
+verification.
+
+### Phase 8 Lambda deployment boundary validation
+
+The exact saved Phase 8 Lambda boundary plan was applied in `eu-west-1` with **6 added, 0
+changed, 0 destroyed**. The apply created the approval Lambda, remediation Lambda, two
+seven-day CloudWatch log groups, and two scoped Lambda logging policies. Both functions were
+verified read-only with Python 3.13, ARM64 architecture, 256 MB memory, 30-second timeout,
+required tags, and non-secret environment variables. The logging policies were verified to
+allow only `logs:CreateLogStream` and `logs:PutLogEvents` for the corresponding log group in
+`eu-west-1`. The post-apply Terraform plan reported **no changes**.
+
+No Lambda invocation, AgentCore remediation integration, EC2 start, or remediation execution
+occurred. Sanitized evidence is recorded in
+[`docs/evidence/phase-8/lambda-deployment.json`](docs/evidence/phase-8/lambda-deployment.json).
 
 ### Phase 7 observability validation limitation
 

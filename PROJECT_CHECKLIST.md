@@ -312,6 +312,7 @@ For each implemented scenario:
 - [x] Create separate least-privilege write IAM role/policy
 - [x] Restrict write permissions to specific approved corrective actions
 - [x] Document authorization boundary and blast radius for every write tool
+- [x] Deploy and read-only verify the Phase 8 approval/remediation Lambda boundary, seven-day log groups, and scoped logging policies
 
 ### 8.2 Human Approval
 
