@@ -502,6 +502,8 @@ Deferred by approved scope:
 
 ## Phase 12 — Public GitHub Packaging & Documentation
 
+> **IN PROGRESS — local controlled-sharing preparation.** The GitHub repository intentionally remains private for this portfolio project. README and technical documentation are being prepared for controlled sharing; sanitization, secret scanning, diagrams, deployment/teardown instructions, and external-reader review remain required. Public repository publication is deferred and is not required for Phase 12 completion. Sanitized screenshots, a demo video, LinkedIn, and a portfolio case study may showcase the project without making the repository public.
+
 ### 12.1 README & Technical Documentation
 
 - [ ] Write polished README
@@ -526,6 +528,10 @@ Deferred by approved scope:
 - [ ] Document important design decisions and lessons learned
 - [ ] Include `terraform.tfvars.example`
 - [ ] Include sanitized sample outputs where useful
+- [x] Record screenshot strategy: raw AWS screenshots remain outside the repository in the private desktop folder; screenshots are optional private/demo evidence, not required repository deliverables
+  - Do not copy or commit raw or sanitized screenshots at this time
+  - Sanitized screenshots may be added later only when they provide clear value for an interview, demo, or controlled portfolio review
+  - Repository reproducibility relies on Terraform source, sanitized JSON evidence, Markdown documentation, tests, and future editable architecture diagrams
 - [ ] Add appropriate license
 
 ### 12.2 Professional Architecture Diagrams
@@ -551,7 +557,8 @@ Each diagram requires an editable source file plus PNG/SVG export. Use professio
 - [ ] Verify documentation links
 - [ ] Verify setup/teardown instructions
 - [ ] Review repository as an external reader
-- [ ] Make repository public only after sanitization/readiness review passes
+- [x] Confirm the GitHub repository remains private intentionally for controlled portfolio sharing
+- [ ] Publish the repository publicly — **Deferred; not required for Phase 12 completion**
 
 - [ ] **Phase 12 COMPLETE**
 
