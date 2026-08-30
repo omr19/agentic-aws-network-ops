@@ -502,32 +502,32 @@ Deferred by approved scope:
 
 ## Phase 12 — Public GitHub Packaging & Documentation
 
-> **IN PROGRESS — local controlled-sharing preparation.** The GitHub repository intentionally remains private for this portfolio project. README and technical documentation are being prepared for controlled sharing; sanitization, secret scanning, diagrams, deployment/teardown instructions, and external-reader review remain required. Public repository publication is deferred and is not required for Phase 12 completion. Sanitized screenshots, a demo video, LinkedIn, and a portfolio case study may showcase the project without making the repository public.
+> **IN PROGRESS — controlled private sharing.** README and technical documentation, the five editable architecture diagrams and SVG exports, diagram flow summaries, deployment/teardown guidance, and the private screenshot strategy are documented under bounded scope. Full Git-history secret scanning, the license decision, and final external-reader review remain open. Public repository publication and unsupported live-production claims remain deferred.
 
 ### 12.1 README & Technical Documentation
 
-- [ ] Write polished README
-- [ ] Document business use case
-- [ ] Document intended audience
-- [ ] Document learning objectives
-- [ ] Add "Why Agentic AI?" explanation
-- [ ] Document architecture
-- [ ] Document AgentCore components and responsibilities
-- [ ] Document MCP contracts and integration
-- [ ] Document deterministic diagnosis approach
-- [ ] Document Observe/Diagnose/Remediate workflow
-- [ ] Document security/IAM design
-- [ ] Document observability
-- [ ] Document failure scenarios
-- [ ] Document testing
-- [ ] Document cost
-- [ ] Document deployment
-- [ ] Document demo workflow
-- [ ] Document teardown
-- [ ] Document limitations
-- [ ] Document important design decisions and lessons learned
-- [ ] Include `terraform.tfvars.example`
-- [ ] Include sanitized sample outputs where useful
+- [x] Write polished README
+- [x] Document business use case
+- [x] Document intended audience
+- [x] Document learning objectives
+- [x] Add "Why Agentic AI?" explanation
+- [x] Document architecture
+- [x] Document AgentCore components and responsibilities
+- [x] Document MCP contracts and integration
+- [x] Document deterministic diagnosis approach
+- [x] Document Observe/Diagnose/Remediate workflow
+- [x] Document security/IAM design
+- [x] Document observability
+- [x] Document failure scenarios
+- [x] Document testing
+- [x] Document cost
+- [x] Document deployment
+- [x] Document demo workflow
+- [x] Document teardown
+- [x] Document limitations
+- [x] Document important design decisions and lessons learned
+- [x] Include `terraform.tfvars.example`
+- [x] Include sanitized sample outputs where useful
 - [x] Record screenshot strategy: raw AWS screenshots remain outside the repository in the private desktop folder; screenshots are optional private/demo evidence, not required repository deliverables
   - Do not copy or commit raw or sanitized screenshots at this time
   - Sanitized screenshots may be added later only when they provide clear value for an interview, demo, or controlled portfolio review
@@ -538,29 +538,29 @@ Deferred by approved scope:
 
 Each diagram requires an editable source file plus PNG/SVG export. Use professional diagramming and official AWS architecture icons where applicable. Diagrams must show appropriate trust/security boundaries and remain synchronized with the implemented architecture.
 
-- [ ] **Diagram 1 — High-level end-to-end solution architecture**
-- [ ] **Diagram 2 — AWS network topology / VPC view**
-- [ ] **Diagram 3 — AgentCore + MCP tool-call sequence / flow**
-- [ ] **Diagram 4 — Observability / monitoring data-flow**
-- [ ] **Diagram 5 — Observe → Diagnose → Remediate security / approval flow**
-- [ ] Store editable diagram sources in `docs/diagrams/`
-- [ ] Store PNG/SVG exports in `docs/diagrams/`
-- [ ] Review diagrams against deployed Terraform and final implementation
+- [x] **Diagram 1 — High-level end-to-end solution architecture**
+- [x] **Diagram 2 — AWS network topology / VPC view**
+- [x] **Diagram 3 — AgentCore + MCP tool-call sequence / flow**
+- [x] **Diagram 4 — Observability / monitoring data-flow**
+- [x] **Diagram 5 — Observe → Diagnose → Remediate security / approval flow**
+- [x] Store editable diagram sources in `docs/diagrams/`
+- [x] Store PNG/SVG exports in `docs/diagrams/`
+- [x] Review diagrams against the approved architecture and final implementation
 
 ### 12.3 Repository Sanitization & Public Readiness
 
 - [ ] Scan full Git history for secrets
 - [ ] Confirm no raw credentials/secrets in repository history
-- [ ] Confirm example variable files contain placeholders only
-- [ ] Sanitize account IDs and environment-specific identifiers from public-facing artifacts where appropriate
-- [ ] Verify no Terraform state is committed
-- [ ] Verify documentation links
-- [ ] Verify setup/teardown instructions
+- [x] Confirm example variable files contain placeholders only
+- [x] Sanitize account IDs and environment-specific identifiers from public-facing artifacts where appropriate
+- [x] Verify no Terraform state is committed
+- [x] Verify documentation links
+- [x] Verify setup/teardown instructions
 - [ ] Review repository as an external reader
 - [x] Confirm the GitHub repository remains private intentionally for controlled portfolio sharing
 - [ ] Publish the repository publicly — **Deferred; not required for Phase 12 completion**
 
-- [ ] **Phase 12 COMPLETE**
+- [ ] **Phase 12 COMPLETE** — pending full-history secret scan, license decision, and final external-reader review
 
 ---
 
