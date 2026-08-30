@@ -18,9 +18,21 @@ The planned variant contains application, shared-services/operations, and isolat
 VPCs with multiple TGW route tables. It will demonstrate route-table association,
 propagation, segmentation, missing-route, and blackhole-route scenarios.
 
+The enterprise extension may also include a Site-to-Site VPN or Direct Connect
+attachment representing an on-premises network. This would support AWS-to-on-premises
+route diagnosis while keeping the customer network outside Terraform's control boundary.
+
+The analyzer strategy is complementary: Route Analyzer evaluates Transit Gateway
+route-table decisions between VPC, VPN, Direct Connect, and other TGW attachments; it
+does not inspect VPC route tables, security groups, NACLs, or customer-gateway settings.
+Reachability Analyzer remains useful for supported static, hop-by-hop path analysis but
+does not send packets or prove data-plane health. VPC Flow Logs and CloudWatch provide
+observed traffic evidence when live delivery is available.
+
 TGW diagnostic contracts will be evaluated for gateway, attachment, route-table,
-association, propagation, and route inspection. Exact schemas and IAM permissions must
-be approved before implementation.
+association, propagation, VPN/Direct Connect attachment, and route inspection. Exact
+schemas, IAM permissions, on-premises test ranges, and evidence requirements must be
+approved before implementation.
 
 ## Cost and deployment consequences
 TGW is not continuously deployed. Use a separate deployable configuration and separate

@@ -231,7 +231,8 @@ The following capabilities may be added only after the MVP works end-to-end:
 - AgentCore Memory
 - API Gateway external/demo entry point
 - Additional network failure scenarios
-- Transit Gateway troubleshooting
+- Transit Gateway and AWS-to-on-premises troubleshooting using TGW attachments and,
+  where selected, Site-to-Site VPN or Direct Connect
 - VPC peering troubleshooting
 - Cross-account diagnostics
 - Multi-region diagnostics

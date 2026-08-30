@@ -22,6 +22,14 @@ It is intentionally positioned as an operations and remediation workflow—not a
 
 AWS provides native diagnosis and automation capabilities, and commercial platforms provide broad monitoring and incident-management features. The differentiating focus here is the governance layer: deterministic evidence, explicit human approval, immutable remediation intent, tightly scoped IAM, and independent post-change verification.
 
+An approved post-MVP enterprise evolution is a Transit Gateway variant with multiple
+segmented VPCs and an optional Site-to-Site VPN or Direct Connect attachment for
+AWS-to-on-premises diagnosis. Route Analyzer would explain TGW route-table decisions,
+Reachability Analyzer would continue to analyze supported static paths, and Flow Logs/
+CloudWatch would supply observed traffic evidence. This is more representative of
+enterprise operations but adds TGW attachment-hour, VPN/Direct Connect, routing, and
+observability cost, so it remains separately deployed and authorized.
+
 The project should therefore be presented as a governed network-remediation copilot or consulting accelerator, rather than as a generic monitoring replacement.
 
 ## Commercialization path

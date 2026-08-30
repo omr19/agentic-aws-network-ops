@@ -27,6 +27,7 @@ Both project EC2 instances are currently stopped, and all temporary Phase 7 Flow
 - [Phase 7 Flow Logs validation evidence](docs/evidence/phase-7/flowlogs-validation.json) — sanitized cleanup and limitation record.
 - [Architecture decision records](docs/adr/README.md) — significant design decisions and rationale.
 - [Business case and market positioning](docs/business-case.md) — customer problem, target audiences, differentiation, commercialization path, and production-readiness boundary.
+- [ADR 018 — TGW evolution](docs/adr/018-post-mvp-transit-gateway-evolution.md) — future multi-VPC/TGW and optional AWS-to-on-premises design, with complementary Route Analyzer and Reachability Analyzer roles.
 
 ## Phase-by-Phase Progress
 
@@ -47,6 +48,16 @@ The table preserves the 13 authoritative phases in `PROJECT_CHECKLIST.md`.
 | 11 — Destroy & Cost Verification | Pending / future authorization | Governed teardown and independent cost/resource verification remain future work. |
 | 12 — Public GitHub Packaging & Documentation | Pending / future authorization | Public-readiness review, polished documentation, diagrams, sanitization, and packaging remain future work. |
 | 13 — Career & Demo Packaging | Pending / future authorization | Demo, interview, resume, and portfolio packaging remain future work. |
+
+### Future enterprise enhancement: TGW and on-premises connectivity
+
+The current MVP intentionally uses two-VPC peering. A future, separately authorized
+variant can replace the interconnect with a Transit Gateway and optionally add a
+Site-to-Site VPN or Direct Connect attachment to represent on-premises connectivity.
+Route Analyzer would inspect TGW route-table decisions; Reachability Analyzer would
+remain useful for supported static path and security-control analysis; Flow Logs and
+CloudWatch would provide observed traffic evidence. This enhancement would use separate
+Terraform state and a controlled demo window because TGW and VPN/Direct Connect add cost.
 
 ## Architecture Diagram
 
