@@ -121,6 +121,20 @@ module "source_workload" {
   depends_on = [module.vpc_peering]
 }
 
+module "phase8_readiness" {
+  count  = var.enable_phase8_readiness ? 1 : 0
+  source = "../../modules/phase8_readiness"
+
+  destination_network_acl_id    = module.destination_vpc.private_network_acl_id
+  destination_security_group_id = module.destination_workload.security_group_id
+  destination_route_table_ids   = module.destination_vpc.private_route_table_ids
+  destination_vpc_id            = module.destination_vpc.vpc_id
+  name_prefix                   = local.name_prefix
+  region                        = var.aws_region
+  source_route_table_ids        = module.source_vpc.private_route_table_ids
+  tags                          = local.common_tags
+}
+
 resource "aws_ec2_network_insights_path" "source_to_destination_https" {
   destination      = module.destination_workload.network_interface_id
   destination_port = local.healthy_path.destination_port

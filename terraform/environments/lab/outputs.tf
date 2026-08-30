@@ -59,6 +59,16 @@ output "reachability_analyzer_path_id" {
   value       = aws_ec2_network_insights_path.source_to_destination_https.id
 }
 
+output "phase8_readiness" {
+  description = "Opt-in Phase 8 readiness resources; null when disabled."
+  value = var.enable_phase8_readiness ? {
+    approval_table_name         = module.phase8_readiness[0].approval_table_name
+    approval_table_arn          = module.phase8_readiness[0].approval_table_arn
+    approval_lambda_role_arn    = module.phase8_readiness[0].approval_lambda_role_arn
+    remediation_lambda_role_arn = module.phase8_readiness[0].remediation_lambda_role_arn
+  } : null
+}
+
 output "active_scenario" {
   description = "Phase 6 controlled scenario and its deterministic injection signature."
   value = {

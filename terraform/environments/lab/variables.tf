@@ -48,6 +48,12 @@ variable "flow_log_retention_days" {
   }
 }
 
+variable "enable_phase8_readiness" {
+  description = "Opt in to the tagged Phase 8 approval table and separate Lambda roles. No Lambda or AgentCore deployment is included."
+  type        = bool
+  default     = false
+}
+
 variable "scenario" {
   description = <<-EOT
     Phase 6 controlled network scenario. `healthy` is the approved baseline (default).
