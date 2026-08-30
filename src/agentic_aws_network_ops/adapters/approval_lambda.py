@@ -1,0 +1,87 @@
+"""Standard local Phase 8 Approval Lambda wrapper.
+
+This module contains no AWS client. ``build_service`` is the replaceable
+production adapter boundary and deliberately fails closed until configured.
+"""
+
+from __future__ import annotations
+
+from collections.abc import Mapping
+from datetime import UTC, datetime
+from typing import Any, Protocol
+
+from agentic_aws_network_ops.approval.lambda_interface import handle_approval_event
+from agentic_aws_network_ops.approval.service import ApprovalService
+
+from .phase8_common import (
+    Phase8WrapperError,
+    authenticated_principal,
+    log_event,
+    request_id,
+    validate_approval_event,
+)
+
+
+class ApprovalServiceFactory(Protocol):
+    """Build an AWS-backed service for one authenticated invocation."""
+
+    def __call__(self, *, principal: str, context: Any) -> ApprovalService: ...
+
+
+class WrapperConfigurationError(Phase8WrapperError):
+    """Raised when a live AWS adapter has not been explicitly configured."""
+
+
+def build_service(*, principal: str, context: Any) -> ApprovalService:
+    """Default factory; a deployment must inject a DynamoDB-backed implementation."""
+    del principal, context
+    raise WrapperConfigurationError("ApprovalService AWS adapter is not configured")
+
+
+def _now() -> datetime:
+    return datetime.now(UTC)
+
+
+def dispatch(
+    event: object,
+    context: Any,
+    *,
+    service_factory: ApprovalServiceFactory = build_service,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Validate, bind identity, and dispatch one explicit approval decision."""
+    request_id(context)
+    payload = validate_approval_event(event)
+    principal = authenticated_principal(context)
+    if payload["approver_principal"] != principal:
+        raise Phase8WrapperError("event approver does not match authenticated caller")
+    service = service_factory(principal=principal, context=context)
+    if service is None:
+        raise WrapperConfigurationError("ApprovalService factory returned no service")
+    return handle_approval_event(payload, service=service, now=now or _now())
+
+
+def handler(event: Mapping[str, Any], context: Any) -> dict[str, Any]:
+    """AWS Lambda entrypoint; all failures are raised and therefore fail closed."""
+    request_id_value = request_id(context)
+    try:
+        payload = validate_approval_event(event)
+        result = dispatch(event, context, service_factory=build_service)
+    except Exception:
+        log_event(
+            "phase8_approval_invocation",
+            status="rejected",
+            request_id_value=request_id_value,
+            approval_id=payload.get("approval_id") if "payload" in locals() else None,
+            correlation_id=payload.get("correlation_id") if "payload" in locals() else None,
+        )
+        raise
+    log_event(
+        "phase8_approval_invocation",
+        status="accepted",
+        request_id_value=request_id_value,
+        approval_id=result.get("approval_id"),
+        correlation_id=result.get("correlation_id"),
+        decision=result.get("decision"),
+    )
+    return result
