@@ -24,6 +24,7 @@ REMEDIATION_OPERATIONS = frozenset(
         "AuthorizeSecurityGroupIngress",
         "CreateRoute",
         "ReplaceRoute",
+        "CreateRouteOrReplaceRoute",
         "ReplaceNetworkAclEntry",
     }
 )

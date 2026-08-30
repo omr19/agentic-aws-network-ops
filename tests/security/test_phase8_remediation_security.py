@@ -31,12 +31,7 @@ def test_diagnostic_action_names_are_not_supported_by_write_workflow() -> None:
         create_proposal(
             request=request,
             action="describe_route_tables",
-            region="eu-west-1",
-            resource="route-table",
-            operation="DescribeRouteTables",
-            parameters={},
             evidence=[],
-            expected_result="must fail",
             proposed_at=datetime.now(UTC),
         )
 
@@ -54,20 +49,7 @@ def test_natural_language_or_unrecorded_approval_cannot_execute() -> None:
     proposal = create_proposal(
         request=request,
         action="restore_network_acl_entry",
-        region="eu-west-1",
-        resource="destination-nacl",
-        operation="ReplaceNetworkAclEntry",
-        parameters={
-            "rule_number": 100,
-            "egress": False,
-            "protocol": "tcp",
-            "from_port": 443,
-            "to_port": 443,
-            "cidr_block": "10.10.0.0/16",
-            "rule_action": "allow",
-        },
         evidence=[{"fact": "deny rule observed"}],
-        expected_result="allow rule restored",
         proposed_at=datetime.now(UTC),
     )
 

@@ -15,7 +15,10 @@ from datetime import datetime, timedelta
 from typing import Any, Final, Protocol
 from uuid import UUID, uuid4
 
+from .manifest import DEFAULT_MANIFEST, RemediationSpec, resolve_manifest
+
 SCHEMA_VERSION: Final = "1.0.0"
+
 APPROVAL_TTL: Final = timedelta(minutes=5)
 SUPPORTED_ACTIONS: Final = frozenset(
     {
@@ -167,40 +170,39 @@ def create_proposal(
     *,
     request: Mapping[str, Any],
     action: str,
-    region: str,
-    resource: str,
-    operation: str,
-    parameters: Mapping[str, Any],
     evidence: list[Mapping[str, Any]],
-    expected_result: str,
     proposed_at: datetime,
+    manifest: Mapping[str, RemediationSpec] | None = None,
 ) -> dict[str, Any]:
-    """Create a proposal only; this function has no execution side effect."""
+    """Create a proposal from the immutable manifest; no caller AWS fields are accepted."""
 
-    if action not in SUPPORTED_ACTIONS:
-        raise RemediationContractError("action is unsupported")
-    _validate_action_parameters(action, operation, parameters)
     validate_request(request)
+    try:
+        spec = resolve_manifest(action, str(request["scenario_id"]))
+    except ValueError as error:
+        raise RemediationContractError(str(error)) from error
+    if manifest is not None and manifest is not DEFAULT_MANIFEST:
+        raise RemediationContractError("manifest override is not permitted")
     if proposed_at.tzinfo is None:
         raise RemediationContractError("proposed_at must be timezone-aware")
-    proposal = {
+    return {
         "schema_version": SCHEMA_VERSION,
         "proposal_id": str(uuid4()),
         "approval_id": request["approval_id"],
         "correlation_id": request["correlation_id"],
         "policy_session_id": request["policy_session_id"],
-        "scenario_id": request["scenario_id"],
-        "action": action,
-        "region": region,
-        "resource": resource,
-        "operation": operation,
-        "parameters": dict(parameters),
+        "scenario_id": spec.scenario_id,
+        "action": spec.action,
+        "region": spec.region,
+        "resource": spec.resource_id,
+        "operation": spec.operation,
+        "parameters": dict(spec.parameters()),
         "evidence": [dict(item) for item in evidence],
-        "expected_result": expected_result,
+        "expected_result": spec.expected_post_state,
+        "required_tags": dict(spec.required_tags.as_dict()),
         "request_hash": request["request_hash"],
         "proposed_at": proposed_at.isoformat().replace("+00:00", "Z"),
     }
-    return proposal
 
 
 def record_approval(

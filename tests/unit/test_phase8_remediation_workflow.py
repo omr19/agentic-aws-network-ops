@@ -69,18 +69,11 @@ def make_request(scenario: str) -> dict[str, str]:
     return request
 
 
-def make_proposal(
-    request: Mapping[str, object], action: str, operation: str, parameters: Mapping[str, object]
-) -> dict[str, object]:
+def make_proposal(request: Mapping[str, object], action: str) -> dict[str, object]:
     return create_proposal(
         request=request,
         action=action,
-        region="eu-west-1",
-        resource="approved-project-resource",
-        operation=operation,
-        parameters=parameters,
         evidence=[{"fact": "The approved corrective state is absent."}],
-        expected_result="The approved corrective state is restored.",
         proposed_at=NOW,
     )
 
@@ -121,7 +114,7 @@ def test_proposal_creation_has_no_write_side_effect(
 ) -> None:
     store = InMemoryApprovalStore({})
     adapter = FakeAdapter()
-    proposal = make_proposal(make_request(scenario), action, operation, parameters)
+    proposal = make_proposal(make_request(scenario), action)
     assert proposal["action"] == action
     assert adapter.calls == 0
     assert store.approvals == {}
@@ -132,7 +125,7 @@ def test_missing_approval_is_denied_without_adapter_call(
     scenario: str, action: str, operation: str, parameters: dict[str, object]
 ) -> None:
     request = make_request(scenario)
-    proposal = make_proposal(request, action, operation, parameters)
+    proposal = make_proposal(request, action)
     adapter = FakeAdapter()
     with pytest.raises(RemediationContractError, match="approval is required"):
         execute(
@@ -151,7 +144,7 @@ def test_explicit_denial_causes_no_adapter_call(
     scenario: str, action: str, operation: str, parameters: dict[str, object]
 ) -> None:
     request = make_request(scenario)
-    proposal = make_proposal(request, action, operation, parameters)
+    proposal = make_proposal(request, action)
     store = InMemoryApprovalStore({})
     approve(proposal, store, decision=False)
     adapter = FakeAdapter()
@@ -177,7 +170,7 @@ def test_wrong_binding_is_denied_without_adapter_call(
     parameters: dict[str, object],
 ) -> None:
     request = make_request(scenario)
-    proposal = make_proposal(request, action, operation, parameters)
+    proposal = make_proposal(request, action)
     store = InMemoryApprovalStore({})
     approve(proposal, store)
     wrong = dict(request)
@@ -200,7 +193,7 @@ def test_expired_approval_is_denied_without_adapter_call(
     scenario: str, action: str, operation: str, parameters: dict[str, object]
 ) -> None:
     request = make_request(scenario)
-    proposal = make_proposal(request, action, operation, parameters)
+    proposal = make_proposal(request, action)
     store = InMemoryApprovalStore({})
     approve(proposal, store)
     adapter = FakeAdapter()
@@ -221,7 +214,7 @@ def test_approval_replay_performs_at_most_one_write(
     scenario: str, action: str, operation: str, parameters: dict[str, object]
 ) -> None:
     request = make_request(scenario)
-    proposal = make_proposal(request, action, operation, parameters)
+    proposal = make_proposal(request, action)
     store = InMemoryApprovalStore({})
     approve(proposal, store)
     adapter = FakeAdapter()
@@ -250,7 +243,7 @@ def test_successful_execution_has_separate_bound_verification_and_drift(
     scenario: str, action: str, operation: str, parameters: dict[str, object]
 ) -> None:
     request = make_request(scenario)
-    proposal = make_proposal(request, action, operation, parameters)
+    proposal = make_proposal(request, action)
     store = InMemoryApprovalStore({})
     approve(proposal, store)
     adapter = FakeAdapter()
@@ -277,34 +270,37 @@ def test_successful_execution_has_separate_bound_verification_and_drift(
         )
 
 
-def test_peering_dns_and_arbitrary_parameters_are_not_supported() -> None:
+def test_peering_dns_and_caller_supplied_aws_fields_are_not_supported() -> None:
     request = make_request("peering_routes_dns")
-    with pytest.raises(RemediationContractError, match="unsupported"):
-        make_proposal(request, "restore_peering_dns", "ModifyVpcPeeringConnectionOptions", {})
+    with pytest.raises(RemediationContractError, match="unsupported remediation"):
+        make_proposal(request, "restore_vpc_peering_route")
 
     request = make_request("security_group_rule")
-    with pytest.raises(RemediationContractError, match="arbitrary remediation parameters"):
-        make_proposal(
-            request,
-            "restore_security_group_ingress",
-            "AuthorizeSecurityGroupIngress",
-            {"group_id": "arbitrary", "port": 22},
+    with pytest.raises(TypeError):
+        create_proposal(  # type: ignore[call-arg]
+            request=request,
+            action="restore_security_group_ingress",
+            evidence=[],
+            proposed_at=NOW,
+            resource="arbitrary-security-group",
         )
 
     request = make_request("route_table_entry")
-    with pytest.raises(RemediationContractError, match="arbitrary remediation parameters"):
-        make_proposal(
-            request,
-            "restore_vpc_peering_route",
-            "CreateRoute",
-            {"route_table_id": "rtb", "destination_cidr": "0.0.0.0/0", "target": "igw"},
+    with pytest.raises(TypeError):
+        create_proposal(  # type: ignore[call-arg]
+            request=request,
+            action="restore_vpc_peering_route",
+            evidence=[],
+            proposed_at=NOW,
+            parameters={"destination_cidr": "0.0.0.0/0"},
         )
 
     request = make_request("nacl_rule")
-    with pytest.raises(RemediationContractError, match="arbitrary remediation parameters"):
-        make_proposal(
-            request,
-            "restore_network_acl_entry",
-            "ReplaceNetworkAclEntry",
-            {"rule_number": 1, "protocol": "-1", "cidr_block": "0.0.0.0/0"},
+    with pytest.raises(TypeError):
+        create_proposal(  # type: ignore[call-arg]
+            request=request,
+            action="restore_network_acl_entry",
+            evidence=[],
+            proposed_at=NOW,
+            operation="DeleteNetworkAclEntry",
         )
