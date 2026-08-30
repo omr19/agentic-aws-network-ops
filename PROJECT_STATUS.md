@@ -2,7 +2,12 @@
 
 ## Current Phase
 
-**Phase 8 — Human-Controlled Remediation local end-to-end validation and Lambda deployment boundary are validated; trusted authenticated approval and live remediation/verification remain pending**
+**Phase 8 — Human-Controlled Remediation COMPLETE — bounded validation scope**
+
+Local end-to-end, IAM, Lambda deployment-boundary, fail-closed, and mocked remediation
+workflow evidence is validated. Trusted authenticated approval, live approved remediation,
+and live post-remediation verification are deferred by approved scope. This status does not
+claim full production live-remediation validation.
 
 Phase 6 is complete. The Phase 7 local deterministic diagnosis foundation is implemented for healthy evidence and the four implemented failure classes, with normalized evidence/result schemas, fact-versus-recommendation separation, incomplete/conflicting evidence rejection, tracked Phase 6 fixture tests, and documented limitations. CloudWatch EC2 metrics validation is complete. Live Flow Logs/CloudWatch Logs traffic evidence remains a documented limitation because the project EC2 instances have no IAM instance profile or SSM readiness; no live Flow Log record or Logs Insights query was obtained. Phase 7 is complete for all feasible deterministic diagnosis and observability work.
 
@@ -21,8 +26,8 @@ table operations and the four allowlisted EC2 remediation actions were allowed o
 scoped contexts; destructive, escalation, and unrelated-resource actions were denied. Sanitized
 evidence is recorded in
 [`docs/evidence/phase-8/iam-policy-simulation.json`](docs/evidence/phase-8/iam-policy-simulation.json).
-No remediation was executed, and Phase 8 remains incomplete pending live approval/remediation
-verification.
+No live remediation was executed. The absence of live remediation is an explicit bounded-
+validation limitation, not a claim that production remediation was validated.
 
 ### Phase 8 Lambda deployment boundary validation
 
@@ -56,12 +61,11 @@ is recorded in
 This is local-only evidence; it does not claim live AWS remediation or post-remediation
 Reachability Analyzer verification.
 
-The remaining Phase 8 checkpoint is the trusted authenticated approval path, followed by a
-separately authorized live approval, remediation, and verification workflow. The local contract
-for that path now requires a dedicated IAM/SigV4 ingress adapter to hand off a typed
-`TrustedApprovalInvocationContext`; the approval event cannot supply `approver_principal`.
-Direct Lambda Invoke remains fail-closed until that real adapter exists. Phase 8 remains
-incomplete until those gates are completed and validated.
+The trusted authenticated approval path is represented by a local typed contract requiring a
+dedicated IAM/SigV4 ingress adapter to hand off `TrustedApprovalInvocationContext`; the
+approval event cannot supply `approver_principal`. Direct Lambda Invoke remains fail-closed
+without that real adapter. Live approved remediation and post-remediation verification are
+deferred by approved scope.
 
 ### Phase 7 observability validation limitation
 
@@ -647,7 +651,13 @@ Any intentionally retained resources or artifacts must be explicitly documented 
 
 ## Exact Next Step
 
-The next governed Phase 8 task is to establish and validate the trusted authenticated approval path. The local mocked approval-to-remediation-to-verification workflow is validated, and the deployed approval Lambda’s one invalid-event smoke is recorded as rejected with no DynamoDB record and a sanitized rejection log. The live smoke did not retain approval or correlation identifiers because validation failed before payload assignment. Do not invoke another Lambda for this checkpoint; live approved remediation, post-remediation verification, and Terraform source reconciliation remain separately authorized work. Phase 8 remains in progress and its completion gate is unchecked.
+Phase 8 is closed under the bounded-validation scope. The local mocked
+approval-to-remediation-to-verification workflow is validated, and the deployed approval
+Lambda’s one invalid-event smoke is recorded as rejected with no DynamoDB record and a
+sanitized rejection log. The live smoke did not retain approval or correlation identifiers
+because validation failed before payload assignment. Any future trusted authenticated
+approval, live remediation, post-remediation verification, or Terraform source
+reconciliation is a separately authorized enhancement.
 
 The preceding Phase 5 implementation checkpoint is retained below for historical context.
 
@@ -719,7 +729,11 @@ explicitly authorized.
 
 ## Not Authorized Yet
 
-Phases 2, 3, 4, 5, 6, and 7 are complete within their documented scopes. Phase 8 local deployment-readiness foundation, Lambda deployment boundary, local mocked end-to-end workflow, and one invalid-event fail-closed smoke are documented; Phase 8 completion remains unchecked. The trusted authenticated approval path, live approved remediation, live verification, and Terraform source reconciliation remain separately authorized gates.
+Phases 2, 3, 4, 5, 6, and 7 are complete within their documented scopes. Phase 8 is complete
+under the approved bounded-validation scope: local deployment-readiness foundation, Lambda
+deployment boundary, local mocked end-to-end workflow, IAM evidence, and one invalid-event
+fail-closed smoke are documented. Trusted authenticated approval, live approved remediation,
+live verification, and Terraform source reconciliation remain deferred enhancements.
 
 The following implementation activities remain unauthorized unless separately authorized for a later approved task:
 

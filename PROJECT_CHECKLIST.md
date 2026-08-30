@@ -303,6 +303,11 @@ For each implemented scenario:
 
 ## Phase 8 — Human-Controlled Remediation
 
+> **COMPLETE — bounded validation scope.** Local end-to-end, IAM, deployment-boundary,
+> fail-closed, and mocked workflow evidence is complete. Trusted authenticated approval,
+> live approved remediation, and live post-remediation verification are deferred by the
+> approved scope; this phase does not claim full production live-remediation validation.
+
 > Full control flow: Observe → Diagnose → Propose → Human Approves/Denies → Execute → Verify.
 
 ### 8.1 Separate Write/Remediation Tools
@@ -316,26 +321,32 @@ For each implemented scenario:
 
 ### 8.2 Human Approval
 
-- [ ] Agent proposes remediation without executing it
-- [ ] Present proposed action and expected impact to human operator
+- [x] Agent proposes remediation without executing it (local mocked workflow)
+- [x] Present proposed action and expected impact to human operator (local workflow)
 - [x] Implement explicit approval/denial mechanism
 - [x] Prevent agent from self-approving
 - [x] Prevent execution without recorded approval
 - [x] Record approval/denial with correlation/session ID and timestamp
 - [x] Verify denied requests produce no write side effects
 
+Deferred by approved scope: trusted authenticated approval ingress and live approval-record
+validation.
+
 ### 8.3 Execute & Verify
 
-- [ ] Execute only the explicitly approved remediation
-- [ ] Record remediation result
-- [ ] Re-run relevant diagnostic tools
-- [ ] Re-run Reachability Analyzer where applicable
-- [ ] Confirm expected connectivity/state is restored
-- [ ] Surface verification result with remediation record
-- [ ] Detect and report configuration drift when runtime remediation changes a Terraform-managed resource
-- [ ] Require explicit Terraform source reconciliation before a later apply can restore the broken state
+- [x] Execute only the explicitly approved remediation (local mocked workflow)
+- [x] Record remediation result (local mocked workflow)
+- [x] Re-run relevant diagnostic tools (local mocked workflow)
+- [x] Re-run Reachability Analyzer where applicable (local contract/workflow evidence)
+- [x] Confirm expected connectivity/state is restored (local mocked workflow)
+- [x] Surface verification result with remediation record (local mocked workflow)
+- [x] Detect and report configuration drift when runtime remediation changes a Terraform-managed resource
+- [x] Require explicit Terraform source reconciliation before a later apply can restore the broken state
 
-- [ ] **Phase 8 COMPLETE**
+Deferred by approved scope: live approved remediation, live post-remediation verification,
+and production authenticated approval-path validation.
+
+- [x] **Phase 8 COMPLETE — bounded validation scope**
 
 ---
 

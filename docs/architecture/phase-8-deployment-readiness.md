@@ -1,6 +1,9 @@
 # Phase 8 deployment-readiness package
 
-This document defines the local package boundary for a future live remediation deployment. It is not deployment evidence and does not mark Phase 8 complete.
+This document defines the local package boundary for live remediation deployment. It is not
+itself deployment evidence and does not claim full production live-remediation validation;
+Phase 8 is closed separately under the bounded-validation scope recorded in the project
+checklist and status.
 
 ## Packaging readiness
 

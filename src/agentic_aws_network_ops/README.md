@@ -15,4 +15,4 @@ Lambda deployment packages must include the repository `schemas/` directory at t
 package root. The validator resolves it through `LAMBDA_TASK_ROOT`; local or custom
 packaging workflows may set `DIAGNOSTIC_SCHEMA_ROOT` explicitly.
 
-Phase 8 now contains a local-only approval-gated remediation workflow under `remediation/workflow.py`. It models separate proposal, explicit approval/denial, single-use execution, and READ verification contracts without AWS, IAM, Terraform, or deployment side effects. Production adapters remain future gated.
+Phase 8 contains an approval-gated remediation workflow under `remediation/workflow.py`. It models separate proposal, explicit approval/denial, single-use execution, and READ verification contracts. The local workflow and deployment-boundary adapters are validated; trusted authenticated approval and live production remediation remain deferred under the bounded-validation scope.
