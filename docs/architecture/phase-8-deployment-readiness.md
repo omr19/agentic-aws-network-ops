@@ -2,7 +2,28 @@
 
 This document defines the local package boundary for a future live remediation deployment. It is not deployment evidence and does not mark Phase 8 complete.
 
-## Approval Lambda and table
+## Packaging readiness
+
+`scripts/package_phase8_lambdas.py` creates reproducible, ignored local artifacts for the
+Approval and Remediation Lambda boundaries. It packages only the existing interfaces,
+manifest/workflow modules, and remediation schemas; it does not change behavior, add AWS
+clients, or broaden IAM permissions. Fixed ZIP timestamps and sorted members make repeated
+builds byte-identical. Each component writes:
+
+- `<component>.zip`
+- `<component>.zip.sha256`
+- `<component>.zip.manifest.txt` with per-member SHA-256 values
+- `package-manifest.json` with entrypoint contract, role boundary, runtime, members, and artifact digest
+
+`scripts/verify_phase8_lambda_packages.py` validates those files without AWS access.
+Artifacts live below `.artifacts/`, which is already ignored by `.gitignore`.
+
+The packages are not deployment authorization. Before deployment, the production wrapper
+must require authenticated IAM/SigV4 invocation, preserve the closed-world schemas, emit
+structured logs with correlation/request/approval/execution identifiers and no secrets or
+hidden reasoning, and use only the separate Phase 8 IAM roles. Lambda logging permissions,
+resource policies, and AgentCore policy/interceptor configuration remain separate approval
+gates and are not included in these packages.
 
 The Approval Lambda accepts only the closed-world `approval-lambda-event.schema.json` event and delegates to the structured `ApprovalService`. The authenticated principal must come from the production IAM/SigV4 invocation identity; conversational text is never an approval. It records the proposal/request bindings, action, exact operation/resource, principal, decision, creation/expiry timestamps, `ttl_epoch`, consumed state, execution ID/status, and execution-result audit fields.
 
