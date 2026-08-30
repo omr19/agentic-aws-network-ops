@@ -30,8 +30,12 @@ def test_phase8_declares_two_local_zip_lambda_functions_and_log_groups() -> None
         assert f"filename         = var.{component}_lambda_filename" in source
         assert f"filebase64sha256(var.{component}_lambda_filename)" in source
         assert 'retention_in_days = 7' in source
-        assert 'PHASE8_AWS_REGION          = var.region' in source
-        assert 'PHASE8_APPROVAL_TABLE_NAME = aws_dynamodb_table.approvals.name' in source
+        assert "PHASE8_AWS_REGION" in source
+        assert "PHASE8_APPROVAL_TABLE_NAME" in source
+    assert 'PHASE8_AUTHORIZED_APPROVERS_JSON' in source
+    assert 'PHASE8_DESTINATION_SECURITY_GROUP_ID' in source
+    assert 'PHASE8_DESTINATION_VPC_ID' in source
+    assert 'PHASE8_SOURCE_VPC_ID' in source
 
 
 def test_phase8_logging_policy_is_narrow_and_agentcore_free() -> None:

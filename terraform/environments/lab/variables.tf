@@ -54,6 +54,17 @@ variable "enable_phase8_readiness" {
   default     = false
 }
 
+variable "phase8_authorized_approvers" {
+  description = "Explicit IAM principal ARNs authorized to submit Phase 8 approval decisions; empty remains fail-closed."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = length(distinct(var.phase8_authorized_approvers)) == length(var.phase8_authorized_approvers) && alltrue([for principal in var.phase8_authorized_approvers : can(regex("^arn:aws:iam::[0-9]{12}:(user|role)/.+$", principal))])
+    error_message = "phase8_authorized_approvers must contain unique IAM principal ARNs."
+  }
+}
+
 variable "scenario" {
   description = <<-EOT
     Phase 6 controlled network scenario. `healthy` is the approved baseline (default).

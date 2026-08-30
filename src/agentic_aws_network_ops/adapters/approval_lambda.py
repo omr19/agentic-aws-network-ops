@@ -20,6 +20,7 @@ from .phase8_common import (
     request_id,
     validate_approval_event,
 )
+from .phase8_runtime import RuntimeConfigurationError, build_approval_service
 
 
 class ApprovalServiceFactory(Protocol):
@@ -33,9 +34,11 @@ class WrapperConfigurationError(Phase8WrapperError):
 
 
 def build_service(*, principal: str, context: Any) -> ApprovalService:
-    """Default factory; a deployment must inject a DynamoDB-backed implementation."""
-    del principal, context
-    raise WrapperConfigurationError("ApprovalService AWS adapter is not configured")
+    """Build the role-backed service from strict deployment configuration."""
+    try:
+        return build_approval_service(principal=principal, context=context)
+    except RuntimeConfigurationError as error:
+        raise WrapperConfigurationError(str(error)) from error
 
 
 def _now() -> datetime:

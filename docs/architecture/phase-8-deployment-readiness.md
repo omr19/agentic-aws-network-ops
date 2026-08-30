@@ -29,28 +29,35 @@ gates and are not included in these packages.
 
 `agentic_aws_network_ops.adapters.approval_lambda:handler` and
 `agentic_aws_network_ops.adapters.remediation_lambda:handler` are the standard local
-`handler(event, context)` entrypoints. They are deployment-boundary wrappers only: they
-perform no AWS calls and their default `build_service`/`build_executor` factories raise a
-configuration error until an approved AWS adapter is injected.
+`handler(event, context)` entrypoints. Their default factories now construct the approved
+AWS-backed adapters from strict, non-secret deployment configuration while retaining the
+injectable factory parameters used by offline tests. Missing or malformed configuration,
+including an empty approval-principal allowlist, fails closed.
+
+The Approval factory creates a region-pinned role-backed DynamoDB client and an
+`ApprovalService` whose authorized-principal set comes only from the deployment-managed
+`PHASE8_AUTHORIZED_APPROVERS_JSON` environment value. The Remediation factory creates
+region-pinned DynamoDB and EC2 clients and constructs `TrustedPhase8Resources` only from
+Terraform-managed environment values; action parameters and resource IDs are never read
+from the event. AWS credentials are never placed in environment variables; boto3 uses the
+Lambda execution role.
 
 Both wrappers validate the existing closed-world event contracts before constructing an
 adapter. They require a Lambda request ID and exactly one authenticated principal supplied
 by a trusted invocation-context adapter. They never infer identity from an event field. The
-Approval wrapper requires the event approver principal to equal that context identity before
-calling the injected service. The Remediation wrapper validates the request hash, UUIDs,
-closed fields, and immutable manifest-compatible action boundary before calling the injected
-executor. Its executor contract must perform the fail-closed approval lookup, binding checks,
-atomic approval consumption, preflight, one allowlisted write, result persistence, and
-independent READ verification; an absent or mismatched approval must never reach an AWS
-write.
+Approval wrapper requires the event approver principal to equal that context identity and
+the deployment allowlist before calling the service. The Remediation wrapper validates the
+request hash, UUIDs, closed fields, and immutable manifest-compatible action boundary before
+calling the executor. Its executor contract must perform the fail-closed approval lookup,
+binding checks, atomic approval consumption, preflight, one allowlisted write, result
+persistence, and independent READ verification; an absent or mismatched approval must never
+reach an AWS write.
 
-Direct Lambda Invoke does not expose the SigV4 caller ARN in the standard Lambda context.
-The approved deployment adapter must therefore authenticate the caller and populate the
-wrapper context's `authenticated_principal` (or the explicitly supported trusted identity
-field). Missing or ambiguous identity is rejected. Caller-supplied event identity is never
-trusted. Logs are JSON and contain only safe status and correlation/approval/execution/action
-identifiers; request bodies, resource details, hashes, credentials, exception text, and
-hidden reasoning are not logged.
+`authenticated_principal` must be populated by a trusted Gateway/authorized invocation adapter
+that has already authenticated the SigV4/IAM caller. Standard direct Lambda Invoke does not
+provide that identity, and caller-controlled `ClientContext.custom` values are rejected. The
+adapter must not copy event fields or client-supplied metadata into the trusted context. Missing,
+ambiguous, or unverified identity fails closed before an AWS-backed service is constructed.
 
 The wrappers use injectable clock and service/executor factories for offline tests. The
 repository's `InMemoryApprovalRepository` and fake executor are test doubles only; they are
@@ -72,14 +79,13 @@ unapplied unless a separate AWS deployment gate is approved:
 | CloudWatch log retention | `7 days` | `7 days` |
 | Function names | `agentic-aws-network-ops-lab-phase8-approval` | `agentic-aws-network-ops-lab-phase8-remediation` |
 
-The proposed environment allowlist is now wired into the local Terraform Lambda boundary:
-`PHASE8_AWS_REGION=eu-west-1` and
-`PHASE8_APPROVAL_TABLE_NAME=agentic-aws-network-ops-lab-phase8-approvals`. Immutable
-manifest/trusted-resource configuration remains a future approved factory input; the
-current wrappers do not read environment variables or create AWS clients and continue to
-fail closed until that factory is injected. No AWS credentials, access keys, tokens,
-approval payloads, request hashes, resource overrides, or model-provided parameters may be
-supplied through environment variables.
+The local Terraform Lambda boundary declares the trusted non-secret runtime settings:
+`PHASE8_AWS_REGION`, `PHASE8_APPROVAL_TABLE_NAME`, and the explicit
+`PHASE8_AUTHORIZED_APPROVERS_JSON` allowlist for the approval function. The remediation
+function receives only Terraform-managed destination security-group and source/destination
+VPC IDs. These values are deployment configuration, not event inputs; credentials,
+approval payloads, request hashes, model parameters, and arbitrary resource overrides remain
+prohibited from environment variables.
 
 Both functions should carry these tags:
 
@@ -177,7 +183,10 @@ The opt-in Terraform module creates an on-demand, server-side-encrypted DynamoDB
 
 The remediation Lambda accepts only `{action, request, execution_id}`. It resolves the action/scenario exclusively through the frozen manifest, then delegates to a thin executor that must perform preflight, approval consumption, one allowlisted EC2 write, result persistence, and independent READ verification. The exact tools are `restore_security_group_ingress`, `restore_vpc_peering_route`, and `restore_network_acl_entry`; there is no DNS, delete/revoke, generic AWS, or caller-supplied resource/parameter path.
 
-The local interfaces contain no boto3/AWS calls. AWS adapters are a later implementation seam and are tested with mocks only in this package.
+The local interfaces keep the AWS clients behind injected composition seams. The deployed
+runtime factory creates only the role-backed, region-pinned clients described above; offline
+unit tests continue to inject fake clients and executors. AWS adapter behavior remains
+mockable and no runtime factory accepts event-controlled resource IDs or write parameters.
 
 ## IAM and Terraform boundary
 

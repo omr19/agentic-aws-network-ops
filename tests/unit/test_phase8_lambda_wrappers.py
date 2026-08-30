@@ -91,7 +91,16 @@ def test_approval_handler_rejects_missing_or_mismatched_identity() -> None:
         )
 
 
-def test_approval_handler_rejects_extra_fields_before_adapter() -> None:
+def test_approval_handler_rejects_unverified_client_context_identity() -> None:
+    event = approval_event()
+    untrusted_context = SimpleNamespace(
+        aws_request_id="request-123",
+        client_context=SimpleNamespace(custom={"authenticated_principal": PRINCIPAL}),
+    )
+    with pytest.raises(Phase8WrapperError):
+        approval_lambda.dispatch(event, untrusted_context, now=NOW)
+
+
     event = approval_event()
     event["unexpected_field"] = "redacted-value"
     with pytest.raises(Phase8WrapperError):

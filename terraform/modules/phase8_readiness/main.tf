@@ -233,8 +233,9 @@ resource "aws_lambda_function" "approval" {
 
   environment {
     variables = {
-      PHASE8_AWS_REGION          = var.region
-      PHASE8_APPROVAL_TABLE_NAME = aws_dynamodb_table.approvals.name
+      PHASE8_AWS_REGION                = var.region
+      PHASE8_APPROVAL_TABLE_NAME       = aws_dynamodb_table.approvals.name
+      PHASE8_AUTHORIZED_APPROVERS_JSON = jsonencode(var.authorized_approvers)
     }
   }
 
@@ -256,8 +257,11 @@ resource "aws_lambda_function" "remediation" {
 
   environment {
     variables = {
-      PHASE8_AWS_REGION          = var.region
-      PHASE8_APPROVAL_TABLE_NAME = aws_dynamodb_table.approvals.name
+      PHASE8_AWS_REGION                    = var.region
+      PHASE8_APPROVAL_TABLE_NAME           = aws_dynamodb_table.approvals.name
+      PHASE8_DESTINATION_SECURITY_GROUP_ID = var.destination_security_group_id
+      PHASE8_DESTINATION_VPC_ID            = var.destination_vpc_id
+      PHASE8_SOURCE_VPC_ID                 = var.source_vpc_id
     }
   }
 

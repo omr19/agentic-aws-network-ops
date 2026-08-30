@@ -84,10 +84,11 @@ def authenticated_principal(context: Any) -> str:
     """Extract a principal from a trusted invocation-context adapter only.
 
     Direct Lambda Invoke does not expose the SigV4 caller ARN in the standard
-    Lambda context. A deployment adapter must therefore populate one of the
-    explicitly supported context fields below after authenticating the caller.
-    Arbitrary event fields are never used as identity. Missing or ambiguous
-    identity fails closed.
+    Lambda context. A deployment adapter must therefore populate the explicitly
+    supported trusted context fields below after authenticating the caller.
+    ClientContext custom values are caller-controlled and are intentionally not
+    accepted. Arbitrary event fields are never used as identity. Missing or
+    ambiguous identity fails closed.
     """
 
     candidates: list[str] = []
@@ -98,13 +99,6 @@ def authenticated_principal(context: Any) -> str:
     identity = getattr(context, "identity", None)
     for name in ("user_arn", "userArn", "principal"):
         value = getattr(identity, name, None)
-        if isinstance(value, str) and value:
-            candidates.append(value)
-
-    client_context = getattr(context, "client_context", None)
-    custom = getattr(client_context, "custom", None)
-    if isinstance(custom, Mapping):
-        value = custom.get("authenticated_principal")
         if isinstance(value, str) and value:
             candidates.append(value)
 

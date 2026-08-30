@@ -40,6 +40,12 @@ def test_phase8_packages_build_verify_and_rebuild_identically(tmp_path: Path) ->
                 "__pycache__" not in name and not name.endswith(".pyc")
                 for name in archive.namelist()
             )
+            assert "agentic_aws_network_ops/adapters/phase8_runtime.py" in archive.namelist()
+            if component == "phase8-approval-lambda":
+                assert not any(
+                    name.startswith("agentic_aws_network_ops/remediation/")
+                    for name in archive.namelist()
+                )
         metadata = json.loads((first / component / "package-manifest.json").read_text())
         assert metadata["smoke_test"] is True
         assert metadata["runtime"] == "python3.13"

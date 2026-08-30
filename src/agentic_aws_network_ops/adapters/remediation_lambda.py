@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import UTC, datetime
-from typing import Any, Protocol
+from typing import Any, Protocol, cast
 
 from agentic_aws_network_ops.remediation.lambda_interface import (
     RemediationExecutor,
@@ -24,6 +24,7 @@ from .phase8_common import (
     request_id,
     validate_remediation_event,
 )
+from .phase8_runtime import RuntimeConfigurationError, build_remediation_executor
 
 
 class RemediationExecutorFactory(Protocol):
@@ -37,9 +38,14 @@ class WrapperConfigurationError(Phase8WrapperError):
 
 
 def build_executor(*, principal: str, context: Any) -> RemediationExecutor:
-    """Default factory; a deployment must inject the approved AWS executor."""
-    del principal, context
-    raise WrapperConfigurationError("RemediationExecutor AWS adapter is not configured")
+    """Build the role-backed executor from strict deployment configuration."""
+    try:
+        return cast(
+            RemediationExecutor,
+            build_remediation_executor(principal=principal, context=context),
+        )
+    except RuntimeConfigurationError as error:
+        raise WrapperConfigurationError(str(error)) from error
 
 
 def _now() -> datetime:

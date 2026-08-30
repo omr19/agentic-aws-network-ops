@@ -9,6 +9,10 @@ approval-table consumption/result persistence.
 The module is disabled by default from the lab root, so normal Terraform validation/plan work
 creates no Phase 8 resources. When explicitly enabled, it also creates the two local
 ZIP-backed Lambda functions and their explicitly retained seven-day CloudWatch log groups.
-The module does not create AgentCore resources, Lambda resource-based invocation policies, or
-production AWS adapter factories. Destroying the opt-in module removes the table, roles,
-functions, and log groups; production retention/export policy must be approved before teardown.
+The runtime packages now include strict, role-backed deployment factories. Approval requires a
+non-empty deployment-managed IAM principal allowlist and a trusted authenticated principal
+from the eventual Gateway/authorized invocation adapter; remediation requires Terraform-managed
+trusted resource IDs. Missing or malformed configuration fails closed. The module does not
+create AgentCore resources, Lambda resource-based invocation policies, or authenticated
+Gateway configuration. Destroying the opt-in module removes the table, roles, functions, and
+log groups; production retention/export policy must be approved before teardown.

@@ -12,6 +12,10 @@ flow_log_retention_days = 7
 # Phase 8 readiness is opt-in and disabled by default; enabling it requires a separate AWS/IAM gate.
 enable_phase8_readiness = false
 
+# Explicit IAM principal ARNs authorized to submit approval decisions. Keep empty until
+# a separately approved authenticated invocation path and operator identity are configured.
+phase8_authorized_approvers = []
+
 # Phase 6 controlled scenario. Keep this at "healthy" unless running a controlled
 # failure/diagnosis exercise. Allowed: healthy, broken_sg, broken_route, broken_nacl,
 # broken_dns, broken_peering. Injecting a scenario still requires a separately

@@ -13,9 +13,25 @@ variable "tags" {
   description = "Required project ownership tags."
 }
 
+variable "authorized_approvers" {
+  type        = list(string)
+  description = "Explicit IAM principal ARNs authorized to submit approval decisions. Empty remains fail-closed."
+  default     = []
+
+  validation {
+    condition     = length(distinct(var.authorized_approvers)) == length(var.authorized_approvers) && alltrue([for principal in var.authorized_approvers : can(regex("^arn:aws:iam::[0-9]{12}:(user|role)/.+$", principal))])
+    error_message = "authorized_approvers must contain unique IAM principal ARNs."
+  }
+}
+
 variable "destination_security_group_id" {
   type        = string
   description = "Terraform-managed destination workload security group."
+}
+
+variable "source_vpc_id" {
+  type        = string
+  description = "Terraform-managed source VPC used to bind remediation resource ownership."
 }
 
 variable "destination_vpc_id" {

@@ -132,7 +132,9 @@ module "phase8_readiness" {
   name_prefix                   = local.name_prefix
   region                        = var.aws_region
   source_route_table_ids        = module.source_vpc.private_route_table_ids
+  source_vpc_id                 = module.source_vpc.vpc_id
   tags                          = local.common_tags
+  authorized_approvers          = var.phase8_authorized_approvers
 
   approval_lambda_filename    = abspath("${path.root}/../../../.artifacts/phase8-approval-lambda/phase8-approval-lambda.zip")
   remediation_lambda_filename = abspath("${path.root}/../../../.artifacts/phase8-remediation-lambda/phase8-remediation-lambda.zip")
