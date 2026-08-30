@@ -175,3 +175,13 @@ Important tradeoffs are recorded in the [ADR index](docs/adr/README.md): peering
 
 ### Private controlled sharing
 The repository is intentionally private. Raw screenshots and unsanitized state/evidence remain outside Git; screenshots are optional private/demo assets and are not repository deliverables. Safe tracked sharing relies on Terraform source, sanitized JSON evidence, Markdown, tests, and editable diagrams. Public publication is deferred; secret scanning, sanitization, link review, and external-reader review remain Phase 12 gates. See [project status](PROJECT_STATUS.md), [diagrams guidance](docs/diagrams/README.md), and [tooling-risk guidance](docs/security/tooling-risk.md).
+
+### Career and demo packaging
+
+Phase 13 materials are collected under [`docs/career/`](docs/career/):
+
+- [Demo runbook](docs/career/phase-13-demo-runbook.md) — a three-to-five-minute customer-facing walkthrough.
+- [Resume bullets](docs/career/resume-bullets.md) — role-focused achievement statements.
+- [LinkedIn summary](docs/career/linkedin-summary.md) and [GitHub description](docs/career/github-description.md).
+- [Career demonstration matrix](docs/career/career-demonstration-matrix.md) — project evidence mapped to skills.
+- [Portfolio audit checklist](docs/career/portfolio-audit.md) — review of other repositories remains a separate task.

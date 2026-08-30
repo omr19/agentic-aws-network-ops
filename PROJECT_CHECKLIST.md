@@ -569,7 +569,7 @@ Each diagram requires an editable source file plus PNG/SVG export. Use professio
 
 ### 13.1 Portfolio Demo
 
-- [ ] Prepare 3–5 minute demonstration:
+- [x] Prepare 3–5 minute demonstration runbook:
   - deploy/use intentionally broken environment
   - ask agent to diagnose
   - show tool selection
@@ -580,15 +580,15 @@ Each diagram requires an editable source file plus PNG/SVG export. Use professio
   - execute remediation
   - verify restored connectivity
   - show AgentCore/CloudWatch trace
-- [ ] Prepare concise architecture explanation
-- [ ] Prepare interview-ready project story
+- [x] Prepare concise architecture explanation
+- [x] Prepare interview-ready project story
 
 ### 13.2 Career Materials
 
-- [ ] Create 2–3 resume bullets focused on architecture, scope, security, automation, and measurable outcomes
-- [ ] Prepare LinkedIn project summary/post
-- [ ] Prepare GitHub project description
-- [ ] Document Career Demonstration Matrix mapping project components to demonstrated skills
+- [x] Create 2–3 resume bullets focused on architecture, scope, security, automation, and measurable outcomes
+- [x] Prepare LinkedIn project summary/post
+- [x] Prepare GitHub project description
+- [x] Document Career Demonstration Matrix mapping project components to demonstrated skills
 - [ ] Public demo video optional; prepare if it adds portfolio value
 
 ### 13.3 Existing GitHub Portfolio Audit
@@ -605,7 +605,7 @@ Each diagram requires an editable source file plus PNG/SVG export. Use professio
 - [ ] Position Agentic AWS Network Operations as a primary portfolio project
 - [ ] Evaluate whether a GitHub profile README improves career positioning
 
-- [ ] **Phase 13 COMPLETE**
+- [ ] **Phase 13 COMPLETE** — portfolio audit and optional public demo video remain open
 
 ---
 
