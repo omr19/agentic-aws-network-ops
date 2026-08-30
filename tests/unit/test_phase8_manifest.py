@@ -27,6 +27,10 @@ def test_manifest_resolves_exact_action_scenarios(action: str, scenario: str) ->
     assert spec.from_port == 443
     assert spec.to_port == 443
     assert spec.expected_post_state
+    if action == "restore_vpc_peering_route":
+        assert [target.vpc_role for target in spec.route_targets] == ["source", "destination"]
+    else:
+        assert spec.expected_vpc_role == "destination"
 
 
 def test_manifest_rejects_unsupported_scenario_action_pairs() -> None:

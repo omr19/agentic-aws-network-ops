@@ -103,13 +103,23 @@ same-result idempotent. TTL is derived from the UTC `expires_at` value into `ttl
 
 `agentic_aws_network_ops.remediation.aws_executor.AwsRemediationExecutor` receives the
 DynamoDB approval repository, an injected EC2 client, and a trusted
-`TrustedPhase8Resources` configuration. Resource IDs in that configuration are deployment
-inputs only; Lambda events cannot supply or override them. The executor resolves the action
-and scenario through the immutable manifest, validates every approval binding, performs a
-READ preflight, claims approval atomically, executes only the manifest operation, performs a
-separate post-write READ verification, and persists the execution result. Same-execution
-retries return the stored result before any EC2 read or write. Missing, denied, expired,
-misbound, or differently owned approvals fail closed.
+`TrustedPhase8Resources` configuration containing the destination security-group ID,
+destination VPC ID, and source VPC ID. Resource IDs and VPC IDs in that configuration are
+deployment inputs only; Lambda events cannot supply or override them. The immutable manifest
+assigns each route-table group a VPC role (`source` for the `10.20.0.0/16` route tables and
+`destination` for the `10.10.0.0/16` route tables) and assigns the NACL to the destination
+role. The executor resolves the action and scenario through the immutable manifest, validates
+every approval binding, performs a READ preflight, claims approval atomically, executes only
+the manifest operation, performs a separate post-write READ verification, and persists the
+execution result. Same-execution retries return the stored result before any EC2 read or
+write. Missing, denied, expired, misbound, differently owned, or wrong-VPC resources fail
+closed.
+
+Route-table preflight and post-write verification require every returned route table's
+`VpcId` to match its immutable manifest VPC role and the trusted source/destination VPC
+configuration. NACL preflight and post-write verification require the returned ACL `VpcId`
+to match the trusted destination VPC. These checks occur in the shared `_preflight()` path,
+which is called both before the write and by independent verification after the write.
 
 The exact adapter write boundaries are:
 

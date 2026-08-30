@@ -262,6 +262,7 @@ def executor_for(
             resources=TrustedPhase8Resources(
                 destination_security_group_id="sg-destination",
                 destination_vpc_id="vpc-destination",
+                source_vpc_id="vpc-source",
             ),
         ),
         repository,
@@ -357,7 +358,11 @@ def test_remediation_executor_same_execution_replay_returns_result_without_ec2_w
     executor = AwsRemediationExecutor(
         ec2_client=ec2,
         approval_repository=repository,
-        resources=TrustedPhase8Resources("sg-destination", "vpc-destination"),
+        resources=TrustedPhase8Resources(
+            destination_security_group_id="sg-destination",
+            destination_vpc_id="vpc-destination",
+            source_vpc_id="vpc-source",
+        ),
     )
     result = executor.execute(
         spec=resolve_manifest("restore_security_group_ingress", "security_group_rule"),
@@ -390,8 +395,9 @@ def test_approval_service_rejects_wrong_principal_with_dynamodb_repository() -> 
 
 
 class FakeRouteEc2Client:
-    def __init__(self) -> None:
+    def __init__(self, *, wrong_vpc: bool = False) -> None:
         self.calls: list[tuple[str, dict[str, Any]]] = []
+        self.wrong_vpc = wrong_vpc
         self.routes: dict[str, dict[str, str]] = {
             "rtb-0f1e30ea77719b740": {
                 "DestinationCidrBlock": "10.20.0.0/16",
@@ -409,6 +415,15 @@ class FakeRouteEc2Client:
                 tables.append(
                     {
                         "RouteTableId": route_table_id,
+                        "VpcId": (
+                            "vpc-wrong"
+                            if self.wrong_vpc
+                            else (
+                                "vpc-source"
+                                if target.vpc_role == "source"
+                                else "vpc-destination"
+                            )
+                        ),
                         "Tags": [
                             {"Key": "Project", "Value": "agentic-aws-network-ops"},
                             {"Key": "Environment", "Value": "lab"},
@@ -439,8 +454,9 @@ class FakeRouteEc2Client:
 
 
 class FakeNaclEc2Client:
-    def __init__(self) -> None:
+    def __init__(self, *, wrong_vpc: bool = False) -> None:
         self.calls: list[tuple[str, dict[str, Any]]] = []
+        self.wrong_vpc = wrong_vpc
         self.entries: list[dict[str, Any]] = []
 
     def describe_network_acls(self, **kwargs: Any) -> dict[str, Any]:
@@ -449,6 +465,7 @@ class FakeNaclEc2Client:
             "NetworkAcls": [
                 {
                     "NetworkAclId": "acl-09bd99df7314e97fd",
+                    "VpcId": "vpc-wrong" if self.wrong_vpc else "vpc-destination",
                     "Tags": [
                         {"Key": "Project", "Value": "agentic-aws-network-ops"},
                         {"Key": "Environment", "Value": "lab"},
@@ -518,3 +535,29 @@ def test_remediation_executor_uses_fixed_nacl_entry_and_verifies() -> None:
     assert writes[0][1]["RuleNumber"] == 100
     assert writes[0][1]["Protocol"] == "6"
     assert writes[0][1]["CidrBlock"] == "10.10.0.0/16"
+
+
+def test_remediation_executor_rejects_wrong_route_table_vpc_before_claim() -> None:
+    spec = resolve_manifest("restore_vpc_peering_route", "route_table_entry")
+    record = approval_record(approval_id=str(uuid4()))
+    record.update(action=spec.action, resource=spec.resource_id, operation=spec.operation)
+    request = request_for(record)
+    ec2 = FakeRouteEc2Client(wrong_vpc=True)
+    executor, repository = executor_for(record, ec2)  # type: ignore[arg-type]
+    with pytest.raises(RemediationAdapterError, match="route-table VPC binding"):
+        executor.execute(spec=spec, request=request, execution_id=str(uuid4()), now=NOW)
+    assert repository.consume_calls == 0
+    assert all(call[0] == "describe_route_tables" for call in ec2.calls)
+
+
+def test_remediation_executor_rejects_wrong_nacl_vpc_before_claim() -> None:
+    spec = resolve_manifest("restore_network_acl_entry", "nacl_rule")
+    record = approval_record(approval_id=str(uuid4()))
+    record.update(action=spec.action, resource=spec.resource_id, operation=spec.operation)
+    request = request_for(record)
+    ec2 = FakeNaclEc2Client(wrong_vpc=True)
+    executor, repository = executor_for(record, ec2)  # type: ignore[arg-type]
+    with pytest.raises(RemediationAdapterError, match="network ACL VPC binding"):
+        executor.execute(spec=spec, request=request, execution_id=str(uuid4()), now=NOW)
+    assert repository.consume_calls == 0
+    assert all(call[0] == "describe_network_acls" for call in ec2.calls)

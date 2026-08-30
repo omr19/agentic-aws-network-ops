@@ -43,12 +43,15 @@ class TrustedPhase8Resources:
 
     destination_security_group_id: str
     destination_vpc_id: str
+    source_vpc_id: str
 
     def __post_init__(self) -> None:
         if not self.destination_security_group_id.startswith("sg-"):
             raise ValueError("destination_security_group_id must be a security-group ID")
         if not self.destination_vpc_id.startswith("vpc-"):
             raise ValueError("destination_vpc_id must be a VPC ID")
+        if not self.source_vpc_id.startswith("vpc-"):
+            raise ValueError("source_vpc_id must be a VPC ID")
 
 
 @dataclass(frozen=True)
@@ -215,6 +218,8 @@ class AwsRemediationExecutor(RemediationExecutor):
                 for route_table_id in target.route_table_ids:
                     table = tables[route_table_id]
                     self._require_tags(table)
+                    if table.get("VpcId") != self._expected_vpc_id(target.vpc_role):
+                        raise RemediationAdapterError("route-table VPC binding is invalid")
                     route = next(
                         (
                             candidate
@@ -250,6 +255,8 @@ class AwsRemediationExecutor(RemediationExecutor):
                 )
             acl = acls[0]
             self._require_tags(acl)
+            if acl.get("VpcId") != self._expected_vpc_id(spec.expected_vpc_role):
+                raise RemediationAdapterError("network ACL VPC binding is invalid")
             return _Preflight(self._nacl_healthy(acl, spec))
 
         raise RemediationAdapterError("action is not manifest-approved")
@@ -400,6 +407,13 @@ class AwsRemediationExecutor(RemediationExecutor):
         if operation == "ReplaceRoute":
             return "replace_route"
         raise RemediationAdapterError("EC2 operation is not allowlisted")
+
+    def _expected_vpc_id(self, role: str | None) -> str:
+        if role == "source":
+            return self._resources.source_vpc_id
+        if role == "destination":
+            return self._resources.destination_vpc_id
+        raise RemediationAdapterError("manifest VPC binding is invalid")
 
     def _require_tags(self, resource: Mapping[str, Any]) -> None:
         tags = {

@@ -29,6 +29,7 @@ class RouteTarget:
     route_table_ids: tuple[str, ...]
     destination_cidr: str
     peering_connection_id: str
+    vpc_role: str
 
 
 @dataclass(frozen=True)
@@ -48,6 +49,7 @@ class RemediationSpec:
     nacl_action: str | None
     required_tags: RequiredTags
     expected_post_state: str
+    expected_vpc_role: str | None = None
 
     def parameters(self) -> Mapping[str, object]:
         if self.action == "restore_security_group_ingress":
@@ -109,6 +111,7 @@ DEFAULT_MANIFEST: Mapping[str, RemediationSpec] = MappingProxyType(
             expected_post_state=(
                 "Destination security group permits TCP/443 ingress from 10.10.0.0/16."
             ),
+            expected_vpc_role="destination",
         ),
         "restore_vpc_peering_route": RemediationSpec(
             scenario_id="route_table_entry",
@@ -125,11 +128,13 @@ DEFAULT_MANIFEST: Mapping[str, RemediationSpec] = MappingProxyType(
                     ("rtb-0f1e30ea77719b740", "rtb-032520fd18e9125d7"),
                     "10.20.0.0/16",
                     "pcx-05b83a5ce62cc74a9",
+                    "source",
                 ),
                 RouteTarget(
                     ("rtb-05105982ccee2a69d", "rtb-0af09ea83c79d902a"),
                     "10.10.0.0/16",
                     "pcx-05b83a5ce62cc74a9",
+                    "destination",
                 ),
             ),
             nacl_rule_number=None,
@@ -158,6 +163,7 @@ DEFAULT_MANIFEST: Mapping[str, RemediationSpec] = MappingProxyType(
             expected_post_state=(
                 "Destination NACL rule 100 allows ingress TCP/443 from 10.10.0.0/16."
             ),
+            expected_vpc_role="destination",
         ),
     }
 )
