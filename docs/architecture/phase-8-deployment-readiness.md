@@ -89,6 +89,71 @@ Both functions should carry these tags:
 The proposed settings require separate approval and remain absent from the current
 Terraform resource graph.
 
+## Local AWS-backed adapter layer
+
+`agentic_aws_network_ops.approval.dynamodb_repository.DynamoDBApprovalRepository`
+implements the existing `ApprovalRepository` contract using an injected low-level
+boto3-style DynamoDB client. It uses strong reads, `attribute_not_exists(approval_id)`
+conditional writes, and a conditional `APPROVED` to `EXECUTING` update. A duplicate approval
+ID cannot overwrite an existing record. Claim outcomes are `NOT_FOUND`, `NOT_APPROVED`,
+`EXPIRED`, `CLAIMED`, `REPLAY_SAME_EXECUTION`, or `REPLAY_DIFFERENT_EXECUTION`. A same-
+execution replay returns the stored result and a different execution can never claim or
+persist against the record. Execution-result persistence is owner-conditional and
+same-result idempotent. TTL is derived from the UTC `expires_at` value into `ttl_epoch`.
+
+`agentic_aws_network_ops.remediation.aws_executor.AwsRemediationExecutor` receives the
+DynamoDB approval repository, an injected EC2 client, and a trusted
+`TrustedPhase8Resources` configuration. Resource IDs in that configuration are deployment
+inputs only; Lambda events cannot supply or override them. The executor resolves the action
+and scenario through the immutable manifest, validates every approval binding, performs a
+READ preflight, claims approval atomically, executes only the manifest operation, performs a
+separate post-write READ verification, and persists the execution result. Same-execution
+retries return the stored result before any EC2 read or write. Missing, denied, expired,
+misbound, or differently owned approvals fail closed.
+
+The exact adapter write boundaries are:
+
+- `restore_security_group_ingress`: `AuthorizeSecurityGroupIngress` with the manifest TCP/
+  443/`10.10.0.0/16` values on the trusted destination security group only.
+- `restore_vpc_peering_route`: `CreateRoute` for absent routes or `ReplaceRoute` for wrong
+  routes, using only the four route-table/destination-CIDR/peering mappings in the frozen
+  manifest. No route deletion is supported.
+- `restore_network_acl_entry`: `ReplaceNetworkAclEntry` for the fixed destination NACL,
+  ingress rule 100, TCP/443, `10.10.0.0/16`, and `allow`. No NACL deletion or arbitrary rule
+  input is supported.
+
+The adapter rejects wrong resource ownership tags/VPC bindings, caller-supplied resource or
+write parameters, unsupported actions, deletes, revokes, DNS changes, and arbitrary EC2
+operations. AWS errors are converted to safe categorized adapter errors or persisted as
+failed execution results after a claim; raw AWS request/error details are not returned in
+structured results. Verification failure conservatively sets `status=failed`,
+`terraform_drift=true`, and `reconciliation_required=true`.
+
+The composition helpers in `adapters/phase8_aws.py` accept already-created boto3-style
+clients, so all adapter behavior remains mockable and the wrappers do not create clients
+implicitly. A live deployment factory must inject the approved DynamoDB and EC2 clients,
+table name, authorized approval principals, and trusted resource configuration.
+
+### Required runtime permissions
+
+The adapter code requires the following permissions from the separately approved execution
+roles; this task does not attach or modify any IAM policy:
+
+- Approval role: `dynamodb:PutItem` and `dynamodb:GetItem` on the Phase 8 approval table.
+- Remediation role: `dynamodb:GetItem` and `dynamodb:UpdateItem` on the Phase 8 approval table.
+- Remediation READ preflight/verification: `ec2:DescribeSecurityGroups`,
+  `ec2:DescribeRouteTables`, and `ec2:DescribeNetworkAcls`, scoped to the approved region
+  and resources/conditions supported by AWS.
+- Remediation WRITE: only the existing four allowlisted actions:
+  `ec2:AuthorizeSecurityGroupIngress`, `ec2:CreateRoute`, `ec2:ReplaceRoute`, and
+  `ec2:ReplaceNetworkAclEntry`.
+- Both functions additionally require the separately approved CloudWatch Logs permissions.
+
+The currently deployed remediation role contains the DynamoDB permissions and four EC2
+writes but does not contain the three EC2 describe permissions required by this adapter.
+That is an explicit deployment prerequisite, not an IAM change made here.
+
+
 The Approval Lambda accepts only the closed-world `approval-lambda-event.schema.json` event and delegates to the structured `ApprovalService`. The authenticated principal must come from the production IAM/SigV4 invocation identity; conversational text is never an approval. It records the proposal/request bindings, action, exact operation/resource, principal, decision, creation/expiry timestamps, `ttl_epoch`, consumed state, execution ID/status, and execution-result audit fields.
 
 The opt-in Terraform module creates an on-demand, server-side-encrypted DynamoDB table keyed by `approval_id` with TTL on `ttl_epoch`. A production adapter must use conditional writes/updates: reject duplicate approval IDs, atomically transition `APPROVED` to `EXECUTING`, bind the claiming execution ID, and permit same-execution idempotent replay while rejecting a different execution. The interceptor validates but does not consume because Gateway retries are possible.
