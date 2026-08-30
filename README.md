@@ -4,7 +4,7 @@ A portfolio project for explainable AWS network diagnosis using deterministic cl
 
 ## Project Status and Achievements
 
-**Current phase: Phase 8 — Human-Controlled Remediation (complete under bounded validation scope).** Phases 1–7 are complete within their documented scopes. Phase 8 local end-to-end, IAM, Lambda deployment-boundary, fail-closed, and mocked remediation workflow evidence is complete. Trusted authenticated approval, live approved remediation, and live post-remediation verification are explicitly deferred; this project does not claim full production live-remediation validation. The next governed phase is Phase 9 — Monitoring, Alerting & Observability.
+**Current phase: Phase 9 — Monitoring, Alerting & Observability (complete under bounded local-validation scope).** Phases 1–8 are complete within their documented scopes. Phase 9’s versioned observability schema, sanitized instrumentation, identifier propagation, redaction controls, and offline tests are complete. Live CloudWatch/AgentCore telemetry, dashboards, alarms, budgets, Flow Logs delivery, and deployed end-to-end correlation are explicitly deferred; this project does not claim production monitoring validation. The next governed phase is Phase 10 — Testing, Architecture Review, Security Review & Cost Review.
 
 Phase 7 also retains a documented limitation: CloudWatch metrics were validated, but live Flow Logs/CloudWatch Logs traffic evidence was not obtained because the project EC2 instances have no IAM instance profiles or SSM readiness. No live Flow Log record or Logs Insights query is claimed.
 
@@ -43,7 +43,7 @@ The table preserves the 13 authoritative phases in `PROJECT_CHECKLIST.md`.
 | 6 — Network Failure Scenarios | Complete | Controlled security-group, route, NACL, DNS fixture, and peering failure scenarios documented and validated. |
 | 7 — Intelligent Deterministic Diagnosis | Complete with limitation | Deterministic diagnosis foundation and CloudWatch metrics validated; live Flow Logs/CloudWatch Logs traffic evidence is limited by missing EC2 IAM instance profiles and SSM readiness. |
 | 8 — Human-Controlled Remediation | Complete — bounded validation scope | Local approval-to-remediation-to-verification workflow, IAM evidence, Lambda deployment boundary, and fail-closed smoke are validated. Trusted authenticated approval, live approved remediation, and live post-remediation verification are deferred by approved scope. |
-| 9 — Monitoring, Alerting & Observability | Pending / future authorization | End-to-end operational tracing, dashboards, alarms, and broader observability remain future work. |
+| 9 — Monitoring, Alerting & Observability | Complete — bounded local-validation scope | Versioned observability contract, sanitized instrumentation, correlation/session metadata, redaction, and offline validation are complete. Live CloudWatch/AgentCore telemetry, dashboards, alarms, budgets, Flow Logs delivery, and deployed end-to-end correlation are deferred. |
 | 10 — Testing, Architecture Review, Security Review & Cost Review | Pending / future authorization | Formal cross-cutting reviews and final cost/security validation remain future work. |
 | 11 — Destroy & Cost Verification | Pending / future authorization | Governed teardown and independent cost/resource verification remain future work. |
 | 12 — Public GitHub Packaging & Documentation | Pending / future authorization | Public-readiness review, polished documentation, diagrams, sanitization, and packaging remain future work. |

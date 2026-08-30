@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-**Phase 8 — Human-Controlled Remediation COMPLETE — bounded validation scope**
+**Phase 9 — Monitoring, Alerting & Observability COMPLETE — bounded local-validation scope**
 
 Local end-to-end, IAM, Lambda deployment-boundary, fail-closed, and mocked remediation
 workflow evidence is validated. Trusted authenticated approval, live approved remediation,
@@ -17,6 +17,12 @@ denied approval, and redaction. This does not claim deployed AgentCore Observabi
 OpenTelemetry, CloudWatch telemetry, Flow Logs, dashboards, alarms, budgets, or live
 end-to-end AWS evidence; those remain separately authorized Phase 9 gates. Architecture
 details: [`docs/architecture/phase-9-observability.md`](docs/architecture/phase-9-observability.md).
+
+Phase 9 is closed under the approved local-validation scope. Live CloudWatch and AgentCore
+Observability configuration, OpenTelemetry exporters, dashboards, alarms, budgets, Flow
+Logs delivery, and deployed end-to-end telemetry remain deferred. The repository therefore
+claims a validated, reproducible observability foundation—not production monitoring
+validation.
 
 
 ### Phase 8 deployment-readiness foundation
@@ -538,7 +544,8 @@ Cost remains a project design constraint.
 
 Potentially persistent or higher-cost AWS resources must be explicitly evaluated before deployment according to the approved project requirements and architecture process.
 
-AWS Budget/cost alert configuration remains planned for Phase 9.
+AWS Budget/cost alert configuration remains a deferred live-observability enhancement
+under the bounded Phase 9 closure.
 
 The reviewed Phase 4 plan's billable components are limited to two running `t3.nano`
 instances, two 8-GiB gp3 root volumes, and any explicitly started Reachability Analyzer
@@ -737,7 +744,11 @@ explicitly authorized.
 
 ## Not Authorized Yet
 
-Phases 2, 3, 4, 5, 6, and 7 are complete within their documented scopes. Phase 8 is complete
+Phases 2, 3, 4, 5, 6, 7, and 8 are complete within their documented scopes. Phase 9 is complete
+under the approved bounded local-validation scope: versioned observability schema, sanitized
+instrumentation, identifier propagation, redaction controls, and offline tests are documented.
+Live CloudWatch/AgentCore telemetry, dashboards, alarms, budgets, Flow Logs delivery, and
+deployed end-to-end correlation remain deferred enhancements. Phase 8 is complete
 under the approved bounded-validation scope: local deployment-readiness foundation, Lambda
 deployment boundary, local mocked end-to-end workflow, IAM evidence, and one invalid-event
 fail-closed smoke are documented. Trusted authenticated approval, live approved remediation,

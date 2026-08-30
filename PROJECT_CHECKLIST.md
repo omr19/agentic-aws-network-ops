@@ -354,27 +354,39 @@ and production authenticated approval-path validation.
 
 > Trace observable execution data only. Do not claim to expose or log hidden model chain-of-thought.
 
-- [ ] Implement structured JSON logging
-- [ ] Establish end-to-end session/correlation IDs
-- [ ] Trace user request → agent invocation → selected tool → MCP request/result → Lambda/AWS API where applicable → deterministic evidence → diagnosis/recommendation → approval/denial → remediation result → verification
-- [ ] Enable/configure AgentCore Observability
-- [ ] Implement OpenTelemetry tracing where appropriate
-- [ ] Implement MCP tool-call tracing
-- [ ] Configure CloudWatch Logs
-- [ ] Configure useful CloudWatch Metrics
-- [ ] Build CloudWatch dashboard
-- [ ] Monitor Lambda/tool errors, duration, and throttling where applicable
-- [ ] Monitor agent/tool invocation failures and latency
-- [ ] Monitor model/token usage where available
-- [ ] Monitor suspicious or denied remediation attempts
-- [ ] Enable VPC Flow Logs according to Phase 2 design
-- [ ] Configure a focused set of meaningful alarms
-- [ ] Configure AWS Budget/cost alert
-- [ ] Validate correlation IDs can trace representative sessions end-to-end
-- [ ] Validate at least one safe test alarm/alert path where practical
-- [ ] Document observability architecture and operational workflow
+> **COMPLETE — bounded local-validation scope.** The versioned observability contract,
+> sanitized instrumentation, identifier propagation, redaction controls, and offline
+> tests are complete. Live CloudWatch/AgentCore telemetry, dashboards, alarms, budgets,
+> Flow Logs delivery, and deployed end-to-end observability are deferred by approved
+> scope; this phase does not claim production monitoring validation.
 
-- [ ] **Phase 9 COMPLETE**
+- [x] Implement structured JSON logging (local versioned contract)
+- [x] Establish end-to-end session/correlation IDs (local contract and tests)
+- [x] Trace user request → agent invocation → selected tool → MCP request/result → Lambda/AWS API where applicable → deterministic evidence → diagnosis/recommendation → approval/denial → remediation result → verification (local metadata path)
+- [ ] Enable/configure AgentCore Observability — **Deferred by approved scope**
+- [ ] Implement OpenTelemetry tracing where appropriate — **Deferred by approved scope**
+- [ ] Implement MCP tool-call tracing — **Deferred by approved scope**
+- [ ] Configure CloudWatch Logs — **Deferred by approved scope**
+- [ ] Configure useful CloudWatch Metrics — **Deferred by approved scope**
+- [ ] Build CloudWatch dashboard — **Deferred by approved scope**
+- [ ] Monitor Lambda/tool errors, duration, and throttling where applicable — **Deferred by approved scope**
+- [ ] Monitor agent/tool invocation failures and latency — **Deferred by approved scope**
+- [ ] Monitor model/token usage where available — **Deferred by approved scope**
+- [ ] Monitor suspicious or denied remediation attempts — **Deferred by approved scope**
+- [ ] Enable VPC Flow Logs according to Phase 2 design — **Deferred by approved scope**
+- [ ] Configure a focused set of meaningful alarms — **Deferred by approved scope**
+- [ ] Configure AWS Budget/cost alert — **Deferred by approved scope**
+- [ ] Validate correlation IDs can trace representative sessions end-to-end — **Deferred by approved scope**
+- [ ] Validate at least one safe test alarm/alert path where practical — **Deferred by approved scope**
+- [x] Document observability architecture and operational workflow (local scope)
+
+Deferred by approved scope:
+
+- Live AgentCore Observability and OpenTelemetry exporter configuration — **Deferred by approved scope**
+- Live MCP/CloudWatch telemetry, dashboards, alarms, budgets, Flow Logs delivery, and AWS end-to-end correlation evidence — **Deferred by approved scope**
+- Production monitoring of model/token usage and suspicious remediation attempts — **Deferred by approved scope**
+
+- [x] **Phase 9 COMPLETE — bounded local-validation scope**
 
 ---
 
