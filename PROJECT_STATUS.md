@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-**Phase 8 — Human-Controlled Remediation local foundation and Lambda deployment boundary are implemented; live approval/remediation validation remains pending**
+**Phase 8 — Human-Controlled Remediation local end-to-end validation and Lambda deployment boundary are validated; trusted authenticated approval and live remediation/verification remain pending**
 
 Phase 6 is complete. The Phase 7 local deterministic diagnosis foundation is implemented for healthy evidence and the four implemented failure classes, with normalized evidence/result schemas, fact-versus-recommendation separation, incomplete/conflicting evidence rejection, tracked Phase 6 fixture tests, and documented limitations. CloudWatch EC2 metrics validation is complete. Live Flow Logs/CloudWatch Logs traffic evidence remains a documented limitation because the project EC2 instances have no IAM instance profile or SSM readiness; no live Flow Log record or Logs Insights query was obtained. Phase 7 is complete for all feasible deterministic diagnosis and observability work.
 
@@ -34,9 +34,31 @@ required tags, and non-secret environment variables. The logging policies were v
 allow only `logs:CreateLogStream` and `logs:PutLogEvents` for the corresponding log group in
 `eu-west-1`. The post-apply Terraform plan reported **no changes**.
 
-No Lambda invocation, AgentCore remediation integration, EC2 start, or remediation execution
-occurred. Sanitized evidence is recorded in
+No approved or denied decision was persisted, no remediation Lambda was invoked, and no
+AgentCore remediation integration, EC2, or network mutation occurred. One separate live
+approval-Lambda invocation used an exact-schema event with an intentionally invalid operation;
+it failed with `FunctionError=Unhandled`, wrote no DynamoDB item, and emitted a sanitized
+rejection log. Its sanitized evidence is recorded in
+[`docs/evidence/phase-8/approval-lambda-fail-closed-smoke.json`](docs/evidence/phase-8/approval-lambda-fail-closed-smoke.json).
+The rejection log recorded `approval_id=null` and `correlation_id=null` because validation
+failed before payload assignment, so this does not validate tagged identifier propagation or
+a trusted authenticated approval path. Deployment evidence remains recorded in
 [`docs/evidence/phase-8/lambda-deployment.json`](docs/evidence/phase-8/lambda-deployment.json).
+
+### Phase 8 local end-to-end validation
+
+The existing local mocked workflow passed its focused 45-test suite. It covers proposal
+creation without writes, explicit human approval and denial, binding and expiry checks,
+single-use approval consumption, injected remediation execution, separate verification, AWS
+adapter behavior with fakes, and Terraform drift/reconciliation reporting. Sanitized evidence
+is recorded in
+[`docs/evidence/phase-8/local-remediation-validation.json`](docs/evidence/phase-8/local-remediation-validation.json).
+This is local-only evidence; it does not claim live AWS remediation or post-remediation
+Reachability Analyzer verification.
+
+The remaining Phase 8 checkpoint is the trusted authenticated approval path, followed by a
+separately authorized live approval, remediation, and verification workflow. Phase 8 remains
+incomplete until those gates are completed and validated.
 
 ### Phase 7 observability validation limitation
 
@@ -493,8 +515,7 @@ total one-time charge. Exact billed compute/storage cost is not yet available.
 
 No AgentCore Runtime, Gateway, Identity, Observability, Memory, model, or other AgentCore project usage has occurred.
 
-No project Lambda, API Gateway, load balancer, NAT Gateway, Transit Gateway, VPC Flow
-Logs, CloudWatch monitoring infrastructure, or AgentCore component has been deployed.
+Two Phase 8 Lambda functions, their seven-day CloudWatch log groups, and their scoped logging policies are deployed and retained for the separately gated approval/remediation workflow. No approved remediation execution or live post-remediation verification has occurred.
 
 ### Cost Controls
 
@@ -623,7 +644,7 @@ Any intentionally retained resources or artifacts must be explicitly documented 
 
 ## Exact Next Step
 
-Phase 6 is complete. The Phase 7 local deterministic diagnosis foundation is implemented and validated for healthy evidence and the four implemented failure classes. The optional observability validation was attempted under explicit temporary authorization, but produced no live Flow Logs or CloudWatch evidence because the current least-privilege role denied the required SSM and CloudWatch read actions. Both instances were restored to stopped, no Flow Logs were created, and the next governed work is a separately authorized temporary read-only observability role enhancement; Phase 7 remains in progress and its completion gate is unchecked.
+The next governed Phase 8 task is to establish and validate the trusted authenticated approval path. The local mocked approval-to-remediation-to-verification workflow is validated, and the deployed approval Lambda’s one invalid-event smoke is recorded as rejected with no DynamoDB record and a sanitized rejection log. The live smoke did not retain approval or correlation identifiers because validation failed before payload assignment. Do not invoke another Lambda for this checkpoint; live approved remediation, post-remediation verification, and Terraform source reconciliation remain separately authorized work. Phase 8 remains in progress and its completion gate is unchecked.
 
 The preceding Phase 5 implementation checkpoint is retained below for historical context.
 
@@ -695,10 +716,7 @@ explicitly authorized.
 
 ## Not Authorized Yet
 
-Phases 2, 3, 4, 5, 6, and 7 are complete within their documented scopes. Phase 8 local
-deployment-readiness foundation work is implemented and committed; Phase 8 completion remains
-unchecked. Live Phase 8 AWS deployment, IAM changes, Terraform apply, remediation execution,
-and AWS evidence collection remain unauthorized until separately approved.
+Phases 2, 3, 4, 5, 6, and 7 are complete within their documented scopes. Phase 8 local deployment-readiness foundation, Lambda deployment boundary, local mocked end-to-end workflow, and one invalid-event fail-closed smoke are documented; Phase 8 completion remains unchecked. The trusted authenticated approval path, live approved remediation, live verification, and Terraform source reconciliation remain separately authorized gates.
 
 The following implementation activities remain unauthorized unless separately authorized for a later approved task:
 
@@ -706,7 +724,7 @@ The following implementation activities remain unauthorized unless separately au
 - Terraform-managed AWS resource creation for pending or future scenarios
 - AgentCore deployment or configuration
 - MCP deployment
-- Lambda deployment
+- Future Lambda deployment or configuration changes
 - API Gateway implementation or deployment
 - Creation, modification, or deletion of AWS project resources through the AWS CLI, AWS Console, SDKs, Terraform, Kiro, or other tooling for pending or future scenarios
 - IAM policy/role changes for project implementation

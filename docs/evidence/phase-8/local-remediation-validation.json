@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0.0",
+  "evidence_type": "phase_8_local_remediation_validation",
+  "validation_status": "validated_local_mocked_workflow",
+  "local_only": true,
+  "aws_called": false,
+  "lambda_invoked": false,
+  "terraform_changed": false,
+  "iam_changed": false,
+  "scenarios": [
+    "security_group_rule",
+    "route_table_entry",
+    "nacl_rule",
+    "peering_routes_dns"
+  ],
+  "checks": {
+    "proposal_does_not_execute": true,
+    "explicit_approval_required": true,
+    "denial_has_zero_write_side_effects": true,
+    "wrong_correlation_rejected": true,
+    "wrong_policy_session_rejected": true,
+    "expired_approval_rejected": true,
+    "approval_replay_rejected": true,
+    "unsupported_action_rejected": true,
+    "malformed_request_rejected": true,
+    "verification_is_separate": true,
+    "terraform_drift_is_reported": true
+  },
+  "observations": [
+    {
+      "command": "uv run pytest tests/unit/test_phase8_remediation_workflow.py tests/unit/test_phase8_aws_adapters.py tests/security/test_phase8_remediation_security.py tests/security/test_phase8_lambda_security.py",
+      "result": "45 passed",
+      "scope": "offline mocked Phase 8 workflow, AWS adapters, and security boundaries"
+    },
+    {
+      "flow": "create_proposal -> record_approval -> execute -> verify",
+      "result": "passed",
+      "details": "Injected fake execution and verification adapters were exercised separately; approval consumption remained single-use."
+    },
+    {
+      "negative_controls": "passed",
+      "details": "Missing, denied, expired, replayed, and incorrectly bound approvals were rejected before a write adapter call."
+    },
+    {
+      "drift_boundary": "passed",
+      "details": "Successful mocked execution reports terraform_drift=true and reconciliation_required=true."
+    }
+  ],
+  "prohibited_claims": [
+    "No live AWS remediation was executed.",
+    "No live Flow Log or CloudWatch Logs traffic evidence is implied.",
+    "Phase 8 is not complete."
+  ],
+  "provenance": "Local sanitized evidence from the existing mocked approval-to-remediation-to-verification test workflow; no AWS call was made."
+}
