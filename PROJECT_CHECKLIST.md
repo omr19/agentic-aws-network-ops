@@ -307,21 +307,21 @@ For each implemented scenario:
 
 ### 8.1 Separate Write/Remediation Tools
 
-- [ ] Define remediation/write MCP contracts separately from diagnostic contracts
-- [ ] Define explicit input/output schemas
-- [ ] Create separate least-privilege write IAM role/policy
-- [ ] Restrict write permissions to specific approved corrective actions
-- [ ] Document authorization boundary and blast radius for every write tool
+- [x] Define remediation/write MCP contracts separately from diagnostic contracts
+- [x] Define explicit input/output schemas
+- [x] Create separate least-privilege write IAM role/policy
+- [x] Restrict write permissions to specific approved corrective actions
+- [x] Document authorization boundary and blast radius for every write tool
 
 ### 8.2 Human Approval
 
 - [ ] Agent proposes remediation without executing it
 - [ ] Present proposed action and expected impact to human operator
-- [ ] Implement explicit approval/denial mechanism
-- [ ] Prevent agent from self-approving
-- [ ] Prevent execution without recorded approval
-- [ ] Record approval/denial with correlation/session ID and timestamp
-- [ ] Verify denied requests produce no write side effects
+- [x] Implement explicit approval/denial mechanism
+- [x] Prevent agent from self-approving
+- [x] Prevent execution without recorded approval
+- [x] Record approval/denial with correlation/session ID and timestamp
+- [x] Verify denied requests produce no write side effects
 
 ### 8.3 Execute & Verify
 

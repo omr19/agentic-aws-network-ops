@@ -2,9 +2,20 @@
 
 ## Current Phase
 
-**Phase 7 — Intelligent Deterministic Diagnosis is COMPLETE for all feasible deterministic diagnosis and observability work**
+**Phase 8 — Human-Controlled Remediation local foundation is implemented; live validation remains pending**
 
 Phase 6 is complete. The Phase 7 local deterministic diagnosis foundation is implemented for healthy evidence and the four implemented failure classes, with normalized evidence/result schemas, fact-versus-recommendation separation, incomplete/conflicting evidence rejection, tracked Phase 6 fixture tests, and documented limitations. CloudWatch EC2 metrics validation is complete. Live Flow Logs/CloudWatch Logs traffic evidence remains a documented limitation because the project EC2 instances have no IAM instance profile or SSM readiness; no live Flow Log record or Logs Insights query was obtained. Phase 7 is complete for all feasible deterministic diagnosis and observability work.
+
+### Phase 8 deployment-readiness foundation
+
+The Phase 8 local deployment-readiness foundation is implemented and checkpointed in commit
+`0f4e1a1` (`Add Phase 8 deployment readiness foundation`). It includes separate approval and
+remediation Lambda interfaces, event schemas, least-privilege IAM policy fixtures, an opt-in
+tagged Terraform readiness module, live-remediation evidence templates, and contract/security
+tests. The readiness module is disabled by default, so this commit created no AWS resources.
+The full local suite passed (204 tests), JSON/schema validation passed, Ruff/mypy passed, and
+Terraform formatting/validation passed. Live Lambda/DynamoDB/IAM deployment, AgentCore
+integration, and remediation execution/verification remain separate AWS approval gates.
 
 ### Phase 7 observability validation limitation
 
@@ -663,7 +674,10 @@ explicitly authorized.
 
 ## Not Authorized Yet
 
-Phases 2, 3, and 4 are complete. Phase 5 local implementation is complete locally. Phase 6 is complete. Phase 7 local deterministic diagnosis foundation work is authorized and in progress; AWS deployment, IAM changes, Terraform, and additional AWS evidence collection remain unauthorized. Phase 7 completion remains unchecked.
+Phases 2, 3, 4, 5, 6, and 7 are complete within their documented scopes. Phase 8 local
+deployment-readiness foundation work is implemented and committed; Phase 8 completion remains
+unchecked. Live Phase 8 AWS deployment, IAM changes, Terraform apply, remediation execution,
+and AWS evidence collection remain unauthorized until separately approved.
 
 The following implementation activities remain unauthorized unless separately authorized for a later approved task:
 
@@ -685,4 +699,4 @@ Future AWS implementation and provisioning must remain separately authorized for
 
 ---
 
-*Last updated: 2026-08-28*
+*Last updated: 2026-08-29*
