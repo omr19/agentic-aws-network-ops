@@ -4,7 +4,7 @@ A portfolio project for explainable AWS network diagnosis using deterministic cl
 
 ## Project Status and Achievements
 
-**Current phase: Phase 11 — Destroy & Cost Verification (read-only preflight; teardown not authorized).** Phase 10 remains complete under bounded validation scope. The preflight reconciles 48 Terraform-managed state entries—35 Phase 4 baseline resources plus 13 Phase 8 readiness resources—nine retained Network Insights analyses, and separately managed Phase 5 diagnostic Lambda, AgentCore Gateway/Runtime, IAM roles, Runtime S3 bucket, and artifact. It records cost drivers, billing lag, exact teardown order, pre-deletion evidence, and independent verification in the [Phase 11 teardown preflight](docs/architecture/phase-11-teardown-preflight.md). No Terraform destroy, AWS mutation, resource lifecycle action, deletion, commit, or push has occurred.
+**Current phase: Phase 11 — Destroy & Cost Verification (bounded teardown and immediate cost verification complete; delayed billing verification follow-up pending).** Phase 10 remains complete under bounded validation scope. The approved Terraform teardown completed and Terraform state is empty. The nine Network Insights analyses, AgentCore Runtime/Gateway/target, Phase 5 diagnostic Lambda and log group, dedicated IAM roles, Runtime S3 object, and Runtime S3 bucket were deleted and independently verified absent. Immediate Cost Explorer review completed with account-level, estimated, non-project-attributed results; delayed billing verification remains a follow-up for the next billing refresh. The [Phase 11 teardown preflight](docs/architecture/phase-11-teardown-preflight.md) records the evidence, stale tag-index limitation, cleanup order, and billing follow-up.
 
 Phase 7 also retains a documented limitation: CloudWatch metrics were validated, but live Flow Logs/CloudWatch Logs traffic evidence was not obtained because the project EC2 instances have no IAM instance profiles or SSM readiness. No live Flow Log record or Logs Insights query is claimed.
 
@@ -12,12 +12,12 @@ The delivered architecture and foundation include:
 
 - Two private VPCs with private subnets, controlled routes, security groups, NACLs, and VPC peering.
 - Terraform-managed network and lab foundations with deterministic validation evidence.
-- An AgentCore Runtime/Gateway direction with a deployed, ready MCP Gateway path.
+- An AgentCore Runtime/Gateway design with historical deployed MCP Gateway/Runtime evidence; those separately managed resources were removed during Phase 11 cleanup.
 - A diagnostic Lambda behind MCP tools for structured, read-only network observation.
 - Deterministic evidence from VPC facts, routes, security groups, NACLs, VPC Reachability Analyzer, CloudWatch metrics, and optional observability inputs.
 - Least-privilege IAM with diagnostic/read boundaries separated from future remediation/write authorization.
 
-Both project EC2 instances are currently stopped, and all temporary Phase 7 Flow Logs, log group, and IAM validation roles were cleaned up. The authoritative project records and detailed evidence are:
+Both project EC2 instances were terminated during the approved teardown, and no active project EC2 or EBS resources remain. The nine remaining EC2 tag-index entries are stale historical records for terminated/deleted Terraform resources. All temporary Phase 7 Flow Logs, log group, and IAM validation roles were previously cleaned up.
 
 - [Project checklist](PROJECT_CHECKLIST.md) — authoritative phase order and completion gates.
 - [Project status](PROJECT_STATUS.md) — current state, governance decisions, and limitations.
@@ -26,7 +26,7 @@ Both project EC2 instances are currently stopped, and all temporary Phase 7 Flow
 - [Phase 4 validation report](docs/evidence/phase-4-validation.md) — network lab validation.
 - [Phase 7 Flow Logs validation evidence](docs/evidence/phase-7/flowlogs-validation.json) — sanitized cleanup and limitation record.
 - [Phase 10 requirements-to-evidence matrix](docs/architecture/phase-10-validation-matrix.md) — bounded local coverage, deferred live checks, and unresolved review items.
-- [Phase 11 teardown preflight](docs/architecture/phase-11-teardown-preflight.md) — reconciled inventory, cost considerations, proposed teardown order, evidence capture, and independent verification checklist.
+- [Phase 11 teardown preflight](docs/architecture/phase-11-teardown-preflight.md) — reconciled inventory, cost considerations, executed teardown order, evidence capture, and delayed-billing follow-up.
 - [Architecture decision records](docs/adr/README.md) — significant design decisions and rationale.
 - [Business case and market positioning](docs/business-case.md) — customer problem, target audiences, differentiation, commercialization path, and production-readiness boundary.
 - [ADR 018 — TGW evolution](docs/adr/018-post-mvp-transit-gateway-evolution.md) — future multi-VPC/TGW and optional AWS-to-on-premises design, with complementary Route Analyzer and Reachability Analyzer roles.
@@ -47,7 +47,7 @@ The table preserves the 13 authoritative phases in `PROJECT_CHECKLIST.md`.
 | 8 — Human-Controlled Remediation | Complete — bounded validation scope | Local approval-to-remediation-to-verification workflow, IAM evidence, Lambda deployment boundary, and fail-closed smoke are validated. Trusted authenticated approval, live approved remediation, and live post-remediation verification are deferred by approved scope. |
 | 9 — Monitoring, Alerting & Observability | Complete — bounded local-validation scope | Versioned observability contract, sanitized instrumentation, correlation/session metadata, redaction, and offline validation are complete. Live CloudWatch/AgentCore telemetry, dashboards, alarms, budgets, Flow Logs delivery, and deployed end-to-end correlation are deferred. |
 | 10 — Testing, Architecture Review, Security Review & Cost Review | Complete — bounded validation scope | Repository-only offline functional/repeatability tests, deterministic diagnosis, local approval/denial/verification contracts, architecture/security review, exact-account IAM correction, local quality validation, and cost-control documentation. Live and unresolved capabilities are deferred by approved bounded scope; this is not a production-readiness or full live-remediation claim. |
-| 11 — Destroy & Cost Verification | Read-only preflight; teardown not authorized | Inventory reconciliation, nine analysis records, separately managed Phase 5 resources, cost drivers, billing lag, proposed teardown order, pre-deletion evidence, and independent verification are documented. No teardown or completion claim. |
+| 11 — Destroy & Cost Verification | Complete — bounded teardown and immediate cost verification; delayed billing follow-up pending | Terraform state is empty; all nine analyses, AgentCore Runtime/Gateway/target, Phase 5 Lambda/log group, dedicated IAM roles, Runtime S3 object/bucket are deleted and independently verified absent. No active EC2/EBS resources remain; nine EC2 tag-index entries are stale historical records. Immediate Cost Explorer data is account-level, estimated, and not project-attributed. Delayed billing verification remains a follow-up for the next billing refresh. |
 | 12 — Public GitHub Packaging & Documentation | Pending / future authorization | Public-readiness review, polished documentation, diagrams, sanitization, and packaging remain future work. |
 | 13 — Career & Demo Packaging | Pending / future authorization | Demo, interview, resume, and portfolio packaging remain future work. |
 
@@ -117,7 +117,7 @@ P1 Requirements
 - **Redeployment:** Terraform defines the network lab and environment composition. Review the [lab Terraform configuration](terraform/environments/lab/main.tf), [Terraform modules](terraform/modules/), and [`terraform.tfvars.example`](terraform/environments/lab/terraform.tfvars.example) before any authorized deployment.
 - **Validation and evidence:** Local tests and diagnosis contracts live under [`tests/`](tests/); architecture and sanitized validation records are collected under [`docs/architecture/`](docs/architecture/) and [`docs/evidence/`](docs/evidence/).
 - **Temporary resources:** Validation resources are explicitly tagged, scoped to the test, and cleaned up after use. The Phase 7 record documents cleanup of temporary Flow Logs, the log group, and IAM roles.
-- **EC2 operating model:** Keep the two lab instances stopped when not testing. Stopping them reduces compute charges while retaining EBS storage charges; restarting, termination, and Terraform destroy belong to the governed operational path.
+- **EC2 operating model:** Historical validation kept the lab instances stopped when not testing; Phase 11 teardown subsequently terminated/deleted the project EC2 and EBS resources, so no active project compute or storage remains.
 - **Observability boundary:** CloudWatch metrics are validated. Live Flow Logs/CloudWatch Logs traffic evidence remains unavailable because the instances lack IAM instance profiles and SSM readiness; no profile, endpoint, or additional IAM permission was added to bypass that boundary.
 - **Teardown and validation guidance:** Start with the [Phase 4 validation report](docs/evidence/phase-4-validation.md), [Phase 7 evidence](docs/evidence/phase-7/flowlogs-validation.json), [project status](PROJECT_STATUS.md), and the [authoritative checklist](PROJECT_CHECKLIST.md). Follow the documented approval gates before any AWS-changing action.
 

@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-**Phase 11 — Destroy & Cost Verification read-only preflight; Phase 10 COMPLETE — bounded validation scope; Phase 9 COMPLETE — bounded local-validation scope**
+**Phase 11 — Destroy & Cost Verification COMPLETE — bounded teardown and immediate cost verification; delayed billing follow-up pending; Phase 10 COMPLETE — bounded validation scope; Phase 9 COMPLETE — bounded local-validation scope**
 
 Phase 10 is complete under an explicitly approved repository-only bounded-validation scope. The checked items in `PROJECT_CHECKLIST.md` are supported by offline functional and repeatability tests, deterministic diagnosis evidence, local approval/denial/verification contracts, architecture and security review, the exact-account IAM correction, local packaging/quality validation, and cost-control documentation. The requirements-to-evidence matrix is [`docs/architecture/phase-10-validation-matrix.md`](docs/architecture/phase-10-validation-matrix.md).
 
@@ -10,7 +10,7 @@ This completion does not claim production-readiness or full live-remediation val
 
 Local end-to-end, IAM, Lambda deployment-boundary, fail-closed, and mocked remediation workflow evidence is validated. Trusted authenticated approval, live approved remediation, and live post-remediation verification remain **Deferred by approved bounded scope**. This status does not claim full production live-remediation validation.
 
-Phase 11 read-only teardown and cost-verification preflight is documented in [`docs/architecture/phase-11-teardown-preflight.md`](docs/architecture/phase-11-teardown-preflight.md). No Phase 11 destructive action, Terraform destroy, resource deletion, lifecycle action, or completion gate has occurred. The preflight reconciles 48 Terraform-managed state entries, nine retained Network Insights analyses, separately managed Phase 5 resources, cost drivers, billing lag, and the proposed teardown/verification sequence.
+Phase 11 bounded teardown and immediate cost-verification work is complete and documented in [`docs/architecture/phase-11-teardown-preflight.md`](docs/architecture/phase-11-teardown-preflight.md). Terraform state is empty. The nine Network Insights analyses, AgentCore Runtime/Gateway/target, Phase 5 diagnostic Lambda and log group, dedicated IAM roles, Runtime S3 object, and Runtime S3 bucket were deleted and independently verified absent. No active project EC2 or EBS resources remain. The Resource Groups Tagging API still returns nine stale EC2-service entries representing historical terminated/deleted Terraform resources. Immediate Cost Explorer review completed with account-level, estimated, non-project-attributed results. Phase 11 is complete for the bounded teardown and immediate cost-verification scope; delayed billing verification remains a follow-up for the next billing refresh and is not claimed as complete.
 
 The Phase 9 local observability foundation is implemented and validated. It provides a
 versioned `1.0.0` sanitized JSON event schema and shared `allowlist-v1` logging helper for
@@ -90,23 +90,16 @@ The explicitly authorized temporary validation started both tagged Phase 4 EC2 i
 
 ### Phase 7 observability role validation
 
-A temporary, separately scoped observability role was created, used, and deleted after validation. CloudWatch EC2 metric listing and `GetMetricData` succeeded. No Flow Logs or CloudWatch log groups exist, and both tagged EC2 instances remain stopped. Existing Runtime and diagnostic roles were unchanged. Sanitized evidence: [`docs/evidence/phase-7/observability-role-validation.json`](docs/evidence/phase-7/observability-role-validation.json). Live Flow Logs/CloudWatch Logs traffic evidence remains a documented limitation; no live Flow Log record or Logs Insights query was obtained. Creating a delivery log group or Flow Logs delivery role requires separate approval.
+A temporary, separately scoped observability role was created, used, and deleted after validation. CloudWatch EC2 metric listing and `GetMetricData` succeeded. No Flow Logs or CloudWatch log groups existed during that validation, and both tagged EC2 instances were then left stopped. Existing Runtime and diagnostic roles were unchanged. Phase 11 teardown subsequently removed the project EC2 and EBS resources. Sanitized evidence: [`docs/evidence/phase-7/observability-role-validation.json`](docs/evidence/phase-7/observability-role-validation.json). Live Flow Logs/CloudWatch Logs traffic evidence remains a documented limitation; no live Flow Log record or Logs Insights query was obtained. Creating a delivery log group or Flow Logs delivery role requires separate approval.
 ### Phase 7 temporary Flow Logs validation attempt
 
 After explicit approval, one tagged one-day CloudWatch log group, one temporary log-group provisioning role, one temporary Flow Logs delivery role, and two tagged VPC Flow Logs were created for the source and destination project VPCs. The two tagged EC2 instances were started and then restored to `stopped`; both instances have no IAM instance profile and therefore are not SSM-managed or ready for `ssm:SendCommand`. `ssm:SendCommand` was denied, and no instance-side SSM authorization was present, so no TCP/443 probe ran and no live Flow Log record was delivered or queried. No instance profile, SSM endpoint, or additional IAM permission was added. Cleanup succeeded: both Flow Logs, the log group, and both temporary IAM roles were deleted; no other resources were created or changed. Sanitized evidence: [`docs/evidence/phase-7/flowlogs-validation.json`](docs/evidence/phase-7/flowlogs-validation.json). CloudWatch EC2 metrics remain complete. Live Flow Logs/CloudWatch Logs traffic evidence remains a documented limitation; no live Flow Log record or Logs Insights query was obtained.
 
-Both project EC2 instances remain stopped, and all temporary Flow Logs, the temporary log group, and temporary IAM roles were cleaned up.
+Historical Phase 7 validation left both project EC2 instances stopped, and all temporary Flow Logs, the temporary log group, and temporary IAM roles were cleaned up. Phase 11 teardown subsequently terminated/deleted the project EC2 and EBS resources.
 
-P5-01 and P5-02 are implemented, independently reviewed by Kiro, and validated locally,
-but not yet committed or pushed.
-The diagnostic Lambda and its execution role/log group are deployed. An AgentCore MCP
-Gateway with one diagnostic Lambda target is now deployed and READY; Runtime deployment
-and end-to-end Gateway invocation remain separately gated.
+P5-01 and P5-02 were implemented, independently reviewed by Kiro, and validated locally, but were not yet committed or pushed at that historical checkpoint. The diagnostic Lambda and its execution role/log group were then deployed for Phase 5 validation. An AgentCore MCP Gateway with one diagnostic Lambda target reached READY; Runtime deployment and end-to-end Gateway invocation remained separately gated at that time. Phase 11 later deleted the Phase 5 Lambda, log group, AgentCore resources, and dedicated IAM roles and verified them absent.
 
-On 2026-08-29, the user stopped both tagged Phase 4 `t3.nano` project instances in
-`eu-west-1` through the AWS Console to pause EC2 compute charges. They were stopped, not
-terminated. The encrypted gp3 volumes and the remaining network lab resources are still
-present. Live TCP/443 testing requires restarting both instances first.
+Historical Phase 5 evidence records that the user stopped both tagged Phase 4 `t3.nano` project instances in `eu-west-1` through the AWS Console to pause EC2 compute charges. They were stopped, not terminated, at that point; the encrypted gp3 volumes and remaining network lab resources were still present then. Phase 11 later terminated/deleted the project EC2, EBS, and network resources. Live TCP/443 testing therefore requires a separately authorized redeployment.
 
 Phase 1 — Business Requirements & Learning Objectives is **COMPLETE** and was formally reviewed and approved on 2026-08-28.
 
@@ -209,9 +202,9 @@ Read-only AWS region reconnaissance identified `eu-west-1` (Ireland) as a relati
 
 Read-only AWS region reconnaissance identified `eu-west-1` (Ireland) as a relatively clean candidate, and Phase 2 service-availability review subsequently confirmed it as the approved target region.
 
-Historical Phase 5 evidence and the current read-only inventory establish separately managed Phase 5 resources: the diagnostic Lambda, its log group and IAM role, the AgentCore Gateway with its diagnostic target, the Gateway IAM role, the AgentCore Runtime `agentic_aws_network_ops_p5_runtime`, its Runtime role, and the tagged Runtime S3 bucket/artifact. The installed AWS CLI lacks the AgentCore control-plane service needed for a fresh Runtime/Gateway status read, so current control-plane status remains a preflight blocker rather than an absence claim.
+Historical Phase 5 evidence established separately managed resources: the diagnostic Lambda, its log group and IAM role, the AgentCore Gateway with its diagnostic target, the Gateway IAM role, the AgentCore Runtime `agentic_aws_network_ops_p5_runtime`, its Runtime role, and the tagged Runtime S3 bucket/artifact. The installed AWS CLI lacked the AgentCore control-plane service needed for a fresh control-plane status read at that historical point. The Phase 11 record separately documents manual deletion and verification of the Runtime, Gateway target, Gateway, Lambda, log group, dedicated IAM roles, Runtime object, and bucket.
 
-The Phase 5 diagnostic Lambda and Gateway target remain read-only; no remediation target or write path was exercised. Historical Runtime and Gateway evidence is retained separately, and current cleanup scope is reconciled in [`docs/architecture/phase-11-teardown-preflight.md`](docs/architecture/phase-11-teardown-preflight.md).
+Historical Phase 5 evidence records that the diagnostic Lambda and Gateway target were read-only; no remediation target or write path was exercised. Historical Runtime and Gateway evidence is retained separately, and current cleanup scope is reconciled in [`docs/architecture/phase-11-teardown-preflight.md`](docs/architecture/phase-11-teardown-preflight.md).
 
 Current working branch:
 
@@ -503,26 +496,25 @@ Read-only AWS CLI reconnaissance was performed using the existing `rizwan-sts-ro
 
 ### Reconciled project-created AWS resources
 
-The current read-only preflight reconciles the local Terraform state with the approved `eu-west-1` project inventory:
+The approved Phase 11 teardown and separate manual cleanup are complete for the project-owned scope:
 
-- **48 Terraform-managed state entries:** 35 Phase 4 baseline resources plus 13 Phase 8 readiness resources. The state also contains one AMI data source, which is not a managed resource.
-- **Nine retained tagged Network Insights analyses:** these are manually created validation artifacts attached to the Terraform-managed TCP/443 path and are not in Terraform state. Their IDs and scenarios are recorded in [`docs/architecture/phase-11-teardown-preflight.md`](docs/architecture/phase-11-teardown-preflight.md).
-- **Separately managed Phase 5 resources:** diagnostic Lambda, diagnostic log group, diagnostic and Gateway IAM roles, AgentCore Gateway/diagnostic target, AgentCore Runtime evidence and Runtime role, Runtime S3 bucket, and `phase5/runtime.zip`.
-- **Current workload state:** two Terraform-managed `t3.nano` instances are stopped; their two encrypted 8-GiB gp3 root volumes remain attached.
-
-The previous “35 Terraform-managed resources” statement referred only to the Phase 4 baseline. The previous “one retained healthy-path analysis” statement is superseded by the current nine-analysis inventory. Historical cleanup evidence remains valid for the specific temporary resources it covered but does not establish that these nine analyses are absent.
-
-The detailed ownership classification, current inconsistencies, pre-deletion evidence, teardown order, and independent verification checklist are in [`docs/architecture/phase-11-teardown-preflight.md`](docs/architecture/phase-11-teardown-preflight.md).
+- **Terraform state is empty.** The 48 Terraform-managed resources and AMI data-source state entry are no longer present in local state.
+- **Network Insights:** all nine manually retained analyses and the managed TCP/443 path were deleted and independently verified absent.
+- **AgentCore:** the project Runtime, Gateway target, and Gateway were manually deleted and verified absent.
+- **Phase 5:** the diagnostic Lambda, its CloudWatch log group, and the dedicated diagnostic, Gateway, and Runtime IAM roles were deleted and independently verified absent. Only the expected inline policies on those dedicated roles were removed; no attached managed policies or unrelated IAM roles were changed.
+- **Runtime artifact:** `phase5/runtime.zip`, all object versions/delete markers found, and the dedicated Runtime S3 bucket were deleted and independently verified absent.
+- **Compute/storage:** no active project EC2 instances or EBS volumes remain.
+- **Tag-index limitation:** the Resource Groups Tagging API still returns nine `ec2`-service entries, representing stale historical records for terminated/deleted Terraform resources rather than active project resources. Direct inventory found zero active tagged EC2 instances and zero tagged EBS volumes.
 
 ### Project infrastructure cost and billing lag
 
-Stopped EC2 instances avoid active compute charges, but the two encrypted gp3 volumes continue to incur storage charges. Other cost drivers or cost risks are Lambda invocation/code storage, seven-day CloudWatch log retention, the on-demand Phase 8 DynamoDB table, the Phase 5 diagnostic log group, S3 Standard storage for `phase5/runtime.zip`, AgentCore Runtime/Gateway usage, and one-time Network Insights analysis charges. The older `$0.20` analysis estimate is historical evidence, not the current billing total after nine retained analyses were identified.
+Immediate Cost Explorer review completed for 2026-08-16 through 2026-08-30. Returned data was account-level, estimated, and not project-attributed; it showed historical/account-level S3, CloudWatch, EC2/VPC, and AgentCore service signals. The result is evidence of an immediate billing read, not proof of project-specific cost or final zero billing.
 
-VPCs, subnets, route tables, security groups, NACLs, and the peering connection are not expected to create standing hourly charges under the documented MVP design. No project Budget/cost-alert configuration was verified. Cost Explorer/billing data may lag resource activity, so immediate and delayed billing checks are required before Phase 11 completion.
+Billing data may lag resource deletion. Delayed billing verification remains a follow-up for the next billing refresh and is outside the bounded Phase 11 completion gate. No project Budget/cost-alert configuration was verified.
 
 ### Current cleanup and retention status
 
-No Phase 11 teardown, Terraform destroy, AWS deletion, instance lifecycle action, or AgentCore cleanup has occurred. Keep local Terraform state and its backup private until independent resource and billing verification are complete. The exact proposed order is: preserve evidence; remove the nine manually retained analyses; execute the separately approved Terraform teardown for the 48 managed entries; remove Phase 5 AgentCore Runtime/Gateway/target and diagnostic Lambda resources; remove the Runtime S3 object and bucket; independently verify all service inventories; then perform immediate and delayed billing checks.
+Cleanup evidence and local Terraform state/backup remain preserved and private. No active project Lambda, CloudWatch log group, IAM role, AgentCore resource, S3 bucket/object, EC2 instance, or EBS volume remains. The bounded Phase 11 completion gate is recorded; delayed Cost Explorer/billing verification remains a follow-up for the next billing refresh.
 
 
 ## Current Design / Governance Decisions
@@ -587,8 +579,7 @@ architecture and do not justify broader IAM permissions.
 
 ### Current Project Blockers
 
-**None identified for Phase 4.** Healthy and intentionally blocked validation, temporary
-evidence cleanup, state/drift review, cost recording, and documentation are complete.
+**No resource-cleanup blocker identified.** Terraform teardown and separately managed cleanup are complete and independently verified. The bounded Phase 11 teardown and immediate cost-verification scope is complete; delayed billing verification remains a follow-up for the next billing refresh.
 
 ### Phase 1 Completion Gate
 
@@ -613,35 +604,21 @@ Phase 2 — Architecture & Technical Design is **COMPLETE**.
 
 ### Project Resources
 
-Cleanup is not currently requested. The 35 Terraform-managed Phase 4 resources remain
-active for validation and demonstration. They are recoverably removable with the
-planned, separately authorized Terraform destroy workflow. The tagged successful TCP/443
-analysis remains as validation evidence. The temporary TCP/80 analysis and path were
-deleted after evidence capture; deletion does not reverse the analysis charge.
+Terraform teardown is complete and local Terraform state is empty. Separately managed project resources were deleted and independently verified absent, including the nine Network Insights analyses, AgentCore Runtime/Gateway/target, Phase 5 diagnostic Lambda and log group, dedicated IAM roles, Runtime S3 object, and Runtime S3 bucket. No active project EC2 or EBS resources remain; nine stale EC2 tag-index entries represent historical terminated/deleted resources. The bounded Phase 11 teardown and immediate cost-verification scope is complete; delayed billing verification remains a follow-up for the next billing refresh.
 
 ### Local / Repository State
 
-The ignored local `terraform.tfstate` is now the authoritative state for the 35 managed
-Phase 4 resources. The ignored saved plan remains local. Neither file is tracked by Git.
+The ignored local Terraform state and backup record the empty post-teardown state and remain private. Neither file is tracked by Git.
 
 ### Future Cleanup
 
-Formal project teardown and independent AWS resource verification remain scheduled for **Phase 11 — Destroy & Cost Verification** after implementation and testing are complete.
-
-Any intentionally retained resources or artifacts must be explicitly documented at that time.
+No further project-resource cleanup is pending. After the billing-lag window, perform the delayed Cost Explorer/billing verification and record the result as a follow-up to the completed bounded Phase 11 scope.
 
 ---
 
 ## Exact Next Step
 
-Phase 8 is closed under the bounded-validation scope. The local mocked
-approval-to-remediation-to-verification workflow is validated, and the deployed approval
-Lambda’s one invalid-event smoke is recorded as rejected with no DynamoDB record and a
-sanitized rejection log. The live smoke did not retain approval or correlation identifiers
-because validation failed before payload assignment. Any future trusted authenticated
-approval, live remediation, post-remediation verification, or Terraform source
-reconciliation is a separately authorized enhancement.
-
+The bounded Phase 11 teardown and immediate cost-verification scope is complete. After the billing-lag window, perform the delayed Cost Explorer/billing review and record whether any project-attributable charges remain. No AWS or Terraform action is authorized by this checkpoint.
 The preceding Phase 5 implementation checkpoint is retained below for historical context.
 
 Kiro completed the planned independent P5-01/P5-02 review on 2026-08-29. Its three

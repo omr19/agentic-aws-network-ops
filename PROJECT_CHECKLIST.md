@@ -466,21 +466,37 @@ Deferred by approved scope:
 
 ## Phase 11 — Destroy & Cost Verification
 
-- [ ] Run planned Terraform teardown
-- [ ] Confirm `terraform destroy` completes successfully
-- [ ] Independently verify project-created resources in AWS
-- [ ] Verify AgentCore resources are removed or intentionally retained/documented
-- [ ] Verify Lambda resources are removed where applicable
-- [ ] Verify API Gateway resources are removed if selected
-- [ ] Verify EC2/network resources are removed
-- [ ] Verify CloudWatch/logging resources according to retention plan
-- [ ] Verify S3/resources according to retention plan
-- [ ] Verify no unintended project-created billable resources remain
-- [ ] Document any intentionally retained Terraform state/backend resources if applicable
-- [ ] Review immediate Cost Explorer/billing signals where available
-- [ ] Document teardown and independent verification procedure
+- [x] Run planned Terraform teardown
+  - The approved final Terraform destroy plan completed successfully; Terraform state is empty.
+- [x] Confirm `terraform destroy` completes successfully
+  - The final plan reported **0 added, 0 changed, 21 destroyed** after the earlier 27-resource partial teardown.
+- [x] Independently verify project-created resources in AWS
+  - Terraform-managed resources are absent; the nine remaining EC2 tag-index entries are stale historical records for terminated/deleted resources.
+- [x] Verify AgentCore resources are removed or intentionally retained/documented
+  - Runtime, Gateway target, and Gateway were manually deleted and verified absent.
+- [x] Verify Lambda resources are removed where applicable
+  - The Phase 5 diagnostic Lambda and its CloudWatch log group were deleted and independently verified absent.
+- [x] Verify API Gateway resources are removed if selected
+  - No API Gateway resource was selected for this project teardown scope.
+- [x] Verify EC2/network resources are removed
+  - No active project EC2, EBS, VPC, peering, or Flow Logs resources remain.
+- [x] Verify CloudWatch/logging resources according to retention plan
+  - The Phase 5 diagnostic log group was deleted and verified absent; historical Phase 7 cleanup evidence is preserved.
+- [x] Verify S3/resources according to retention plan
+  - `phase5/runtime.zip`, all object versions/delete markers, and the Runtime bucket were deleted and verified absent.
+- [x] Verify no unintended project-created billable resources remain
+  - No active project compute or storage resources remain; account-level billing data is estimated and not project-attributed.
+- [x] Document any intentionally retained Terraform state/backend resources if applicable
+  - Local Terraform state and backup evidence remain private and uncommitted.
+- [x] Review immediate Cost Explorer/billing signals where available
+  - Immediate Cost Explorer review completed; returned data is account-level, estimated, and not project-attributed.
+- [ ] Perform delayed billing verification after the billing-lag window
+  - Follow-up for the next billing refresh; this is outside the bounded teardown and immediate cost-verification completion gate.
+- [x] Document teardown and independent verification procedure
+  - Completed teardown order, resource evidence, inventory limitations, and billing follow-up are documented in the Phase 11 preflight.
 
-- [ ] **Phase 11 COMPLETE**
+- [x] **Phase 11 COMPLETE — bounded teardown and immediate cost verification**
+  - Delayed billing verification remains a follow-up for the next billing refresh.
 
 ---
 
