@@ -11,8 +11,11 @@ creates no Phase 8 resources. When explicitly enabled, it also creates the two l
 ZIP-backed Lambda functions and their explicitly retained seven-day CloudWatch log groups.
 The runtime packages now include strict, role-backed deployment factories. Approval requires a
 non-empty deployment-managed IAM principal allowlist and a trusted authenticated principal
-from the eventual Gateway/authorized invocation adapter; remediation requires Terraform-managed
-trusted resource IDs. Missing or malformed configuration fails closed. The module does not
+from the eventual Gateway/authorized invocation adapter. Remediation currently receives
+Terraform-managed destination security-group and VPC IDs through environment configuration;
+route-table and destination-NACL identifiers remain in the source-frozen local manifest and
+are not all environment-injected. Missing or malformed configured values fail closed, but
+complete deployment-time manifest/binding injection remains deferred. The module does not
 create AgentCore resources, Lambda resource-based invocation policies, or authenticated
 Gateway configuration. Destroying the opt-in module removes the table, roles, functions, and
 log groups; production retention/export policy must be approved before teardown.

@@ -64,3 +64,47 @@ def test_local_runtime_gateway_diagnostic_path_uses_only_stubbed_read_api() -> N
     assert response.result["status"] == "success"
     assert response.result["correlation_id"] == request.correlation_id
     assert response.result["data"]["resources"][0]["VpcId"] == "vpc-0123456789abcdef0"
+
+
+def test_repeated_local_runs_preserve_evidence_and_binding_without_state_leak() -> None:
+    ec2 = client("ec2")
+    diagnostic = DiagnosticService(
+        DiagnosticClients(ec2=ec2, logs=client("logs"), cloudwatch=client("cloudwatch"))
+    )
+    gateway = LocalGatewayAdapter(LocalDiagnosticLambdaTarget(diagnostic))
+    runtime = Runtime(
+        FixedToolSelector(
+            "describe_vpcs",
+            {"schema_version": "1.0.0", "project_tag": "agentic-aws-network-ops"},
+        ),
+        gateway,
+    )
+    request = RuntimeRequest.from_mapping(load("runtime-describe-vpcs.json"))
+    responses = []
+
+    with Stubber(ec2) as stubber:
+        for _ in range(3):
+            stubber.add_response(
+                "describe_vpcs",
+                {"Vpcs": [{"VpcId": "vpc-0123456789abcdef0"}]},
+                {"Filters": [{"Name": "tag:Project", "Values": ["agentic-aws-network-ops"]}]},
+            )
+            responses.append(runtime.handle(request))
+
+    def stable_response(response: Any) -> dict[str, Any]:
+        mapping = cast(dict[str, Any], response.to_mapping())
+        result = mapping.get("result")
+        if isinstance(result, dict):
+            stable_result = dict(result)
+            stable_result.pop("observed_at", None)
+            mapping["result"] = stable_result
+        return mapping
+
+    baseline = stable_response(responses[0])
+    assert all(stable_response(response) == baseline for response in responses)
+    assert all(response.accepted for response in responses)
+    assert [response.correlation_id for response in responses] == [request.correlation_id] * 3
+    assert [response.session_id for response in responses] == [request.session_id] * 3
+    assert [response.result["data"]["resources"] for response in responses if response.result] == [
+        [{"VpcId": "vpc-0123456789abcdef0"}]
+    ] * 3

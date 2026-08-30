@@ -321,6 +321,7 @@ def test_remediation_executor_handles_aws_error_and_verification_failure() -> No
     )
     assert result["status"] == "failed"
     assert repository.result is not None
+    assert ec2.calls.count("authorize_security_group_ingress") == 1
 
     record = approval_record(approval_id=str(uuid4()))
     request = request_for(record)
@@ -335,6 +336,11 @@ def test_remediation_executor_handles_aws_error_and_verification_failure() -> No
     assert result["status"] == "failed"
     assert result["reconciliation_required"] is True
     assert repository.result == result
+    assert ec2.calls == [
+        "describe_security_groups",
+        "authorize_security_group_ingress",
+        "describe_security_groups",
+    ]
 
 
 def test_remediation_executor_same_execution_replay_returns_result_without_ec2_write() -> None:
@@ -419,9 +425,7 @@ class FakeRouteEc2Client:
                             "vpc-wrong"
                             if self.wrong_vpc
                             else (
-                                "vpc-source"
-                                if target.vpc_role == "source"
-                                else "vpc-destination"
+                                "vpc-source" if target.vpc_role == "source" else "vpc-destination"
                             )
                         ),
                         "Tags": [

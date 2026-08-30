@@ -45,7 +45,11 @@ normalized READ facts
 
 Denial, absent approval, expiration, changed hash, wrong correlation/session, and replay all stop before the execution adapter. A successful local execution result explicitly reports Terraform drift and required source reconciliation because a future runtime correction would change Terraform-managed state.
 
-## Contracts and evidence
+Verification exceptions are emitted as failure observability and propagated to the caller in
+this local workflow; a verifier-returned non-`verified` result is preserved as a failure
+result. The AWS-backed executor separately converts write and post-write verification failures
+into persisted failed results with Terraform reconciliation required. Neither path claims a
+live retry or production recovery policy.
 
 - `schemas/remediation/request.schema.json` — model-controlled request with no AWS parameters.
 - `schemas/remediation/proposal.schema.json` — complete human-reviewable change proposal.
@@ -67,4 +71,4 @@ Focused tests are in `tests/unit/test_phase8_approval_service.py` and `tests/sec
 
 `src/agentic_aws_network_ops/remediation/manifest.py` is the local typed manifest boundary. Frozen dataclasses and immutable tuples/maps define the three supported action/scenario pairs, `eu-west-1`, required ownership tags, fixed TCP/443 values, approved CIDRs, verified route-table/peering/NACL identifiers, deployment placeholders for sanitized identifiers, and expected post-remediation states. `create_proposal()` accepts only the scenario/action plus approval-bound request identifiers and evidence; it resolves resource, operation, parameters, tags, and expected state from the manifest. Caller-supplied resource IDs, AWS operations, parameters, foreign manifests, peering DNS changes, and delete/revoke operations are rejected.
 
-The concrete identifiers are sourced only from sanitized Phase 6 evidence; account, VPC, and parent security-group identifiers remain immutable deployment placeholders where the evidence redacts them. The manifest is local-only and does not load Terraform state or call AWS. Future deployment must inject an equivalent trusted immutable manifest rather than accepting model-controlled resource facts.
+The concrete identifiers are sourced only from sanitized Phase 6 evidence; account, VPC, and parent security-group identifiers remain immutable deployment placeholders where the evidence redacts them. The manifest is local-only and does not load Terraform state or call AWS. The current Phase 8 readiness environment injects only the configured security-group and VPC IDs; route-table and destination-NACL identifiers remain source-frozen manifest values. Complete deployment-time manifest/binding injection is deferred. Future deployment must inject and validate an equivalent trusted immutable manifest rather than accepting model-controlled resource facts.

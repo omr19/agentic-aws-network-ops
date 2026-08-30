@@ -11,7 +11,7 @@ import hashlib
 import json
 import logging
 import time
-from collections.abc import Mapping
+from collections.abc import Collection, Mapping
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any, Final, Protocol
@@ -217,11 +217,19 @@ def record_approval(
     approved: bool,
     approved_at: datetime,
     store: ApprovalStore,
+    authorized_approvers: Collection[str] | None = None,
 ) -> dict[str, Any]:
-    """Record an explicit approval or denial; natural language is not accepted."""
+    """Record an explicit decision only for a configured local approver allowlist."""
 
-    if not approver_principal or approved not in {True, False}:
-        raise RemediationContractError("approver and explicit boolean decision are required")
+    if approved not in {True, False}:
+        raise RemediationContractError("explicit boolean decision is required")
+    if (
+        not isinstance(approver_principal, str)
+        or not approver_principal.strip()
+        or not authorized_approvers
+        or approver_principal not in authorized_approvers
+    ):
+        raise RemediationContractError("approver principal is unauthorized")
     if approved_at.tzinfo is None:
         raise RemediationContractError("approved_at must be timezone-aware")
     approval = {

@@ -49,7 +49,7 @@
   "prohibited_claims": [
     "No live AWS remediation was executed.",
     "No live Flow Log or CloudWatch Logs traffic evidence is implied.",
-    "Phase 8 is not complete."
+    "Phase 8 bounded local validation is complete; production/live remediation validation is deferred."
   ],
   "provenance": "Local sanitized evidence from the existing mocked approval-to-remediation-to-verification test workflow; no AWS call was made."
 }

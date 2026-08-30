@@ -73,6 +73,32 @@ def test_natural_language_or_unrecorded_approval_cannot_execute() -> None:
     assert adapter.calls == 0
 
 
+def test_unallowlisted_principal_is_rejected_before_persistence() -> None:
+    proposal = {
+        "approval_id": str(uuid4()),
+        "correlation_id": str(uuid4()),
+        "policy_session_id": str(uuid4()),
+        "proposal_id": str(uuid4()),
+        "request_hash": "a" * 64,
+        "action": "restore_network_acl_entry",
+        "resource": "${destination_network_acl_id}",
+        "operation": "ReplaceNetworkAclEntry",
+    }
+    store = InMemoryApprovalStore({})
+
+    with pytest.raises(RemediationContractError, match="unauthorized"):
+        record_approval(
+            proposal=proposal,
+            approver_principal="arn:aws:iam::000000000000:user/not-allowed",
+            approved=True,
+            approved_at=datetime.now(UTC),
+            store=store,
+            authorized_approvers={"arn:aws:iam::000000000000:user/approved"},
+        )
+
+    assert store.approvals == {}
+
+
 def test_approval_store_requires_explicit_recorded_decision() -> None:
     store = InMemoryApprovalStore({})
     assert store.approvals == {}
@@ -83,4 +109,5 @@ def test_approval_store_requires_explicit_recorded_decision() -> None:
             approved=True,
             approved_at=datetime.now(UTC),
             store=store,
+            authorized_approvers={"human@example"},
         )

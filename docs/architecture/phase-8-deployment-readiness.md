@@ -116,10 +116,14 @@ same-result idempotent. TTL is derived from the UTC `expires_at` value into `ttl
 DynamoDB approval repository, an injected EC2 client, and a trusted
 `TrustedPhase8Resources` configuration containing the destination security-group ID,
 destination VPC ID, and source VPC ID. Resource IDs and VPC IDs in that configuration are
-deployment inputs only; Lambda events cannot supply or override them. The immutable manifest
-assigns each route-table group a VPC role (`source` for the `10.20.0.0/16` route tables and
-`destination` for the `10.10.0.0/16` route tables) and assigns the NACL to the destination
-role. The executor resolves the action and scenario through the immutable manifest, validates
+deployment inputs only; Lambda events cannot supply or override them. The current readiness
+module does not inject every identifier present in the local immutable manifest: route-table
+IDs and the destination NACL ID remain source-frozen manifest values, while the configured
+security-group and VPC IDs are injected as trusted runtime bindings. Complete deployment-time
+manifest/binding injection is deferred. The immutable manifest assigns each route-table group
+a VPC role (`source` for the `10.20.0.0/16` route tables and `destination` for the
+`10.10.0.0/16` route tables) and assigns the NACL to the destination role. The executor
+resolves the action and scenario through the immutable manifest, validates
 every approval binding, performs a READ preflight, claims approval atomically, executes only
 the manifest operation, performs a separate post-write READ verification, and persists the
 execution result. Same-execution retries return the stored result before any EC2 read or

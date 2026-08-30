@@ -2,7 +2,12 @@
 
 ## Current Phase
 
-**Phase 9 — Monitoring, Alerting & Observability COMPLETE — bounded local-validation scope**
+**Phase 10 — Testing, Architecture Review, Security Review & Cost Review PREPARATION ACTIVE; Phase 9 COMPLETE — bounded local-validation scope**
+
+Phase 10 preparation is the active governed task. The Phase 10 completion gate remains
+unchecked in `PROJECT_CHECKLIST.md`; this status records local preparation evidence and
+review findings only. The requirements-to-evidence matrix is
+[`docs/architecture/phase-10-validation-matrix.md`](docs/architecture/phase-10-validation-matrix.md).
 
 Local end-to-end, IAM, Lambda deployment-boundary, fail-closed, and mocked remediation
 workflow evidence is validated. Trusted authenticated approval, live approved remediation,

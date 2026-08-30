@@ -25,6 +25,7 @@ Both project EC2 instances are currently stopped, and all temporary Phase 7 Flow
 - [Phase 7 deterministic diagnosis](docs/architecture/phase-7-deterministic-diagnosis.md) — diagnosis contract and evidence boundary.
 - [Phase 4 validation report](docs/evidence/phase-4-validation.md) — network lab validation.
 - [Phase 7 Flow Logs validation evidence](docs/evidence/phase-7/flowlogs-validation.json) — sanitized cleanup and limitation record.
+- [Phase 10 requirements-to-evidence matrix](docs/architecture/phase-10-validation-matrix.md) — bounded local coverage, deferred live checks, and unresolved review items.
 - [Architecture decision records](docs/adr/README.md) — significant design decisions and rationale.
 - [Business case and market positioning](docs/business-case.md) — customer problem, target audiences, differentiation, commercialization path, and production-readiness boundary.
 - [ADR 018 — TGW evolution](docs/adr/018-post-mvp-transit-gateway-evolution.md) — future multi-VPC/TGW and optional AWS-to-on-premises design, with complementary Route Analyzer and Reachability Analyzer roles.

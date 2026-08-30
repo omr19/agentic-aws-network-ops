@@ -108,6 +108,52 @@ def test_native_client_uses_injected_sigv4_metadata_and_transport() -> None:
     assert config.endpoint_url == "${agentcore_gateway_endpoint}"
 
 
+def test_runtime_surfaces_selector_failure_without_gateway_call() -> None:
+    request = RuntimeRequest.from_mapping(load("runtime-describe-vpcs.json"))
+
+    class FailingSelector:
+        def select(self, value: RuntimeRequest) -> GatewayReadRequest:
+            del value
+            raise RuntimeError("injected selector failure")
+
+    gateway = FakeGateway(
+        GatewayReadResponse.rejected(
+            tool="describe_vpcs",
+            correlation_id=request.correlation_id,
+            session_id=request.session_id,
+            code="NOT_REACHED",
+            message="not reached",
+        )
+    )
+
+    with pytest.raises(RuntimeError, match="injected selector failure"):
+        Runtime(FailingSelector(), gateway).handle(request)
+    assert gateway.requests == []
+
+
+def test_runtime_surfaces_gateway_failure_after_one_call() -> None:
+    request = RuntimeRequest.from_mapping(load("runtime-describe-vpcs.json"))
+
+    class FailingGateway:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def invoke(self, value: GatewayReadRequest) -> GatewayReadResponse:
+            del value
+            self.calls += 1
+            raise TimeoutError("injected Gateway timeout")
+
+    gateway = FailingGateway()
+    runtime = Runtime(
+        FixedToolSelector("describe_vpcs", {"schema_version": "1.0.0"}),
+        gateway,
+    )
+
+    with pytest.raises(TimeoutError, match="injected Gateway timeout"):
+        runtime.handle(request)
+    assert gateway.calls == 1
+
+
 def test_runtime_rejects_selector_binding_mismatch_without_gateway_call() -> None:
     request = RuntimeRequest.from_mapping(load("runtime-describe-vpcs.json"))
     gateway = FakeGateway(

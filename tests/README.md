@@ -18,3 +18,16 @@ The P5-04 local-flow tests compose Runtime, Gateway, the diagnostic Lambda adapt
 the existing diagnostic service using injected fakes and Botocore Stubber responses. They
 prove correlation/session binding, rejection before target invocation, and evidence
 round-tripping without model calls, credentials, sockets, or AWS resources.
+
+## Current local test scope
+
+Phase 10 adds focused offline coverage for selector/Gateway/diagnostic failures, repeated
+Runtime → Gateway → diagnostic runs, local verification failure, and bounded no-automatic-
+retry behavior. The local selector remains intentionally fixed to the Phase 5 demonstration
+tool; semantic irrelevant-tool selection is therefore an unresolved capability rather than a
+passing test claim. Diagnostic errors expose retryable classification, but no retry loop is
+implemented; remediation writes are not automatically retried after approval consumption.
+
+These tests use fakes, Botocore Stubber, and sanitized fixtures. They do not validate live
+AWS state, deployed AgentCore observability, current billing, production readiness, or live
+post-remediation behavior.

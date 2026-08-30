@@ -47,8 +47,9 @@ schemas/common/result-envelope.schema.json
 schemas/diagnostic/read-tools.schema.json
 ```
 
-The artifact targets Python 3.13 on Linux x86_64, matching the planned Lambda runtime
-architecture. A Lambda ARM64 deployment requires a separately built ARM64 artifact. The
+The packaging workflow currently produces the documented Linux x86_64 artifact variant.
+The Phase 8 Lambda readiness package is a separate ARM64 artifact path; architecture must be
+recorded per package and must not be inferred from this diagnostic package document. The
 artifact is deployment-ready only after the separate IAM simulation, role attachment,
 Lambda configuration, Gateway target mapping, and AWS approval gates in
 `phase-5-deployment-readiness.md` are completed.

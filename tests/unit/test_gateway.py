@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 from typing import Any, cast
 
+import pytest
+
 from agentic_aws_network_ops.adapters.gateway import (
     LocalDiagnosticLambdaTarget,
     LocalGatewayAdapter,
@@ -48,6 +50,24 @@ def test_gateway_forwards_valid_request_to_diagnostic_lambda_shape() -> None:
             },
         }
     ]
+
+
+def test_gateway_surfaces_diagnostic_target_failure_without_retry() -> None:
+    class FailingTarget:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def invoke(self, event: dict[str, Any]) -> dict[str, Any]:
+            del event
+            self.calls += 1
+            raise TimeoutError("injected diagnostic timeout")
+
+    target = FailingTarget()
+    adapter = LocalGatewayAdapter(target)
+
+    with pytest.raises(TimeoutError, match="injected diagnostic timeout"):
+        adapter.handle_event(load("gateway-forward-describe-vpcs.json"))
+    assert target.calls == 1
 
 
 def test_gateway_rejects_invalid_generic_execution_request_without_target_call() -> None:

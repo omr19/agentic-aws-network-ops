@@ -41,9 +41,14 @@ NACLs; delete entries; change associations; or modify a default NACL.
 
 ## Remediation manifest and input
 
-Terraform injects an immutable, non-secret remediation manifest into the remediation
-Lambda configuration. It maps each scenario to exact project resource IDs, expected
-CIDRs, ports/protocols, peering target, NACL rule, and required tags.
+The local package contains an immutable, non-secret remediation manifest in
+`src/agentic_aws_network_ops/remediation/manifest.py`. It maps each scenario to the
+approved resource facts, expected CIDRs, ports/protocols, peering target, NACL rule, and
+required tags. The current Terraform readiness module injects only a subset of trusted
+runtime identifiers (destination security group and source/destination VPC IDs); the
+route-table and destination-NACL identifiers used by the local manifest are not all
+injected into the Lambda environment. Complete deployment-time manifest/binding injection
+is deferred and must be reconciled before production claims.
 
 The model-controlled input is limited to:
 
@@ -85,9 +90,12 @@ or out-of-project WRITE capability.
 ## Execution and verification
 
 Each tool performs a READ preflight, confirms ownership/manifest match, validates and
-atomically consumes approval, executes at most one correction, reruns relevant READ
-diagnostics and Reachability Analyzer where applicable, reports verification, and
-emits an explicit Terraform-drift/reconciliation warning.
+atomically consumes approval, executes only its approved bounded operation, reruns relevant
+READ diagnostics and Reachability Analyzer where applicable, reports verification, and
+emits an explicit Terraform-drift/reconciliation warning. The route-remediation operation
+is one approved operation but may perform up to four manifest-bounded `CreateRoute` or
+`ReplaceRoute` writes—one for each approved source/destination route-table mapping. This
+is not a generic multi-write capability and no route deletion is supported.
 
 ## References
 

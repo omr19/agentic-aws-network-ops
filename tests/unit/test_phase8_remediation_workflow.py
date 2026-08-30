@@ -96,6 +96,19 @@ class FakeVerifier:
         return {"status": "verified", "remediation_fact": "Approved state is present."}
 
 
+class FailingVerifier:
+    def __init__(self, *, raises: bool) -> None:
+        self.calls = 0
+        self.raises = raises
+
+    def verify(self, proposal: object) -> dict[str, object]:
+        del proposal
+        self.calls += 1
+        if self.raises:
+            raise TimeoutError("injected verification timeout")
+        return {"status": "failed", "remediation_fact": "Approved state is absent."}
+
+
 def approve(
     proposal: dict[str, object], store: InMemoryApprovalStore, decision: bool = True
 ) -> None:
@@ -105,6 +118,7 @@ def approve(
         approved=decision,
         approved_at=NOW,
         store=store,
+        authorized_approvers={"human@example"},
     )
 
 
@@ -268,6 +282,42 @@ def test_successful_execution_has_separate_bound_verification_and_drift(
             execution_result=dict(result, correlation_id=str(uuid4())),
             verifier=verifier,
         )
+
+
+@pytest.mark.parametrize("raises", [False, True], ids=["failed-result", "exception"])
+def test_verification_failure_is_preserved_without_a_second_write(raises: bool) -> None:
+    request = make_request("security_group_rule")
+    proposal = make_proposal(request, "restore_security_group_ingress")
+    store = InMemoryApprovalStore({})
+    approve(proposal, store)
+    adapter = FakeAdapter()
+    execution_result = execute(
+        request=request,
+        proposal=proposal,
+        execution_id=str(uuid4()),
+        now=NOW,
+        store=store,
+        adapter=adapter,
+    )
+    verifier = FailingVerifier(raises=raises)
+
+    if raises:
+        with pytest.raises(TimeoutError, match="injected verification timeout"):
+            verify(
+                proposal=proposal,
+                execution_result=execution_result,
+                verifier=verifier,
+            )
+    else:
+        result = verify(
+            proposal=proposal,
+            execution_result=execution_result,
+            verifier=verifier,
+        )
+        assert result["status"] == "failed"
+        assert result["remediation_fact"] == "Approved state is absent."
+    assert verifier.calls == 1
+    assert adapter.calls == 1
 
 
 def test_peering_dns_and_caller_supplied_aws_fields_are_not_supported() -> None:

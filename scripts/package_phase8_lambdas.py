@@ -61,6 +61,8 @@ PACKAGE_SPECS = (
             "agentic_aws_network_ops/approval/lambda_interface.py",
             "agentic_aws_network_ops/approval/repository.py",
             "agentic_aws_network_ops/approval/service.py",
+            "agentic_aws_network_ops/shared/__init__.py",
+            "agentic_aws_network_ops/shared/observability.py",
         ),
         schema_files=(
             "approval-lambda-event.schema.json",
@@ -91,6 +93,8 @@ PACKAGE_SPECS = (
             "agentic_aws_network_ops/remediation/lambda_interface.py",
             "agentic_aws_network_ops/remediation/manifest.py",
             "agentic_aws_network_ops/remediation/workflow.py",
+            "agentic_aws_network_ops/shared/__init__.py",
+            "agentic_aws_network_ops/shared/observability.py",
         ),
         schema_files=(
             "execution-result.schema.json",

@@ -1,7 +1,7 @@
 # ADR 016 — Git Workflow and Testing
 
 ## Status
-Accepted with open tool selection
+Accepted; quality tool selection locked by ADR 023
 
 ## Decision
 Use `develop` for integration and `main` for stable state, with optional feature
