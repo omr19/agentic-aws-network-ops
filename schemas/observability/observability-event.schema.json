@@ -1,0 +1,30 @@
+{
+  "title": "Agentic AWS Network Operations Observability Event",
+  "description": "Sanitized observable execution metadata. Hidden model chain-of-thought and request payloads are never represented.",
+  "$comment": "Redaction policy: allowlist-v1. Producers may emit only the properties defined here; payloads, secrets, credentials, principals, exception messages, prompts, tool arguments, and model chain-of-thought are prohibited.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["event_name", "schema_version", "status", "environment", "redaction_policy"],
+  "properties": {
+    "event_name": {"type": "string", "pattern": "^[a-z][a-z0-9_]{2,63}$"},
+    "schema_version": {"const": "1.0.0"},
+    "correlation_id": {"type": "string", "minLength": 1},
+    "session_id": {"type": "string", "minLength": 1},
+    "request_id": {"type": "string", "minLength": 1},
+    "tool_call_id": {"type": "string", "minLength": 1},
+    "approval_id": {"type": "string", "minLength": 1},
+    "execution_id": {"type": "string", "minLength": 1},
+    "verification_id": {"type": "string", "minLength": 1},
+    "status": {"type": "string", "pattern": "^[a-z][a-z0-9_.-]{1,31}$"},
+    "duration_ms": {"type": "number", "minimum": 0},
+    "error_class": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_.]{0,127}$"},
+    "region": {"type": "string", "minLength": 1},
+    "environment": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{0,31}$"},
+    "redaction_policy": {"const": "allowlist-v1"},
+    "tool_name": {"type": "string", "pattern": "^[a-z][a-z0-9_]{2,63}$"},
+    "action": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_.:-]{0,127}$"},
+    "decision": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_.:-]{0,63}$"},
+    "evidence_completeness": {"type": "string", "enum": ["complete", "partial", "none", "unknown"]},
+    "write_performed": {"type": "boolean"}
+  }
+}

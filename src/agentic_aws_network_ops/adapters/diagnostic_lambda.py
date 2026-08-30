@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-import json
 import logging
+import time
 from typing import Any, Protocol
 
 import boto3  # type: ignore[import-untyped]
 
 from agentic_aws_network_ops.diagnostics.service import DiagnosticClients, DiagnosticService
+from agentic_aws_network_ops.shared.observability import emit_event, emit_exception
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
@@ -59,22 +60,39 @@ def _context_tool_name(context: Any) -> str:
 
 def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
     """Adapt a strict tool event to the framework-independent service."""
+    started = time.perf_counter()
     arguments = event.get("arguments")
     payload = arguments if isinstance(arguments, dict) else {}
     region = str(payload.get("region", "eu-west-1"))
+    correlation_id = payload.get("correlation_id")
     event_with_tool = dict(event)
-    event_with_tool["tool"] = _context_tool_name(context) or str(event.get("tool", ""))
-    result = dispatch(event_with_tool, build_service(region))
-    LOGGER.info(
-        json.dumps(
-            {
-                "event": "diagnostic_tool_call",
-                "tool": result.get("tool", str(event.get("tool", ""))),
-                "status": result["status"],
-                "correlation_id": result["correlation_id"],
-                "evidence_completeness": result["evidence_completeness"],
-            },
-            sort_keys=True,
+    tool_name = _context_tool_name(context) or str(event.get("tool", ""))
+    event_with_tool["tool"] = tool_name
+    request_id = getattr(context, "aws_request_id", None)
+    try:
+        result = dispatch(event_with_tool, build_service(region))
+    except Exception as error:
+        emit_exception(
+            LOGGER,
+            "diagnostic_tool_call",
+            error,
+            status="failure",
+            correlation_id=correlation_id if isinstance(correlation_id, str) else None,
+            request_id=request_id if isinstance(request_id, str) else None,
+            duration_ms=(time.perf_counter() - started) * 1000,
+            region=region,
+            tool_name=tool_name,
         )
+        raise
+    emit_event(
+        LOGGER,
+        "diagnostic_tool_call",
+        status=str(result["status"]),
+        correlation_id=result.get("correlation_id"),
+        request_id=request_id if isinstance(request_id, str) else None,
+        duration_ms=(time.perf_counter() - started) * 1000,
+        region=region,
+        tool_name=str(result.get("tool", tool_name)),
+        evidence_completeness=result.get("evidence_completeness"),
     )
     return result

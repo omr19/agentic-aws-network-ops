@@ -7,6 +7,7 @@ persistence, and independent read verification. No AWS client is created here.
 
 from __future__ import annotations
 
+import time
 from collections.abc import Mapping
 from datetime import UTC, datetime
 from typing import Any, Protocol, cast
@@ -77,6 +78,7 @@ def dispatch(
 def handler(event: Mapping[str, Any], context: Any) -> dict[str, Any]:
     """AWS Lambda entrypoint; absent context or approval is a failed invocation."""
     request_id_value = request_id(context)
+    started = time.perf_counter()
     payload: dict[str, Any] = {}
     try:
         payload = validate_remediation_event(event)
@@ -91,6 +93,7 @@ def handler(event: Mapping[str, Any], context: Any) -> dict[str, Any]:
             correlation_id=request.get("correlation_id"),
             execution_id=payload.get("execution_id"),
             action=payload.get("action"),
+            duration_ms=(time.perf_counter() - started) * 1000,
         )
         raise
     request = payload["request"]
@@ -102,5 +105,17 @@ def handler(event: Mapping[str, Any], context: Any) -> dict[str, Any]:
         correlation_id=request.get("correlation_id"),
         execution_id=payload.get("execution_id"),
         action=payload.get("action"),
+        duration_ms=(time.perf_counter() - started) * 1000,
+    )
+    log_event(
+        "phase8_remediation_result",
+        status=str(result.get("status", "failed")),
+        request_id_value=request_id_value,
+        approval_id=request.get("approval_id"),
+        correlation_id=request.get("correlation_id"),
+        execution_id=payload.get("execution_id"),
+        action=payload.get("action"),
+        write_performed=result.get("write_performed"),
+        duration_ms=(time.perf_counter() - started) * 1000,
     )
     return result

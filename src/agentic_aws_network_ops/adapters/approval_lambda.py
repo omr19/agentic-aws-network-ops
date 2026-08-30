@@ -6,6 +6,7 @@ production adapter boundary and deliberately fails closed until configured.
 
 from __future__ import annotations
 
+import time
 from collections.abc import Mapping
 from datetime import UTC, datetime
 from typing import Any, Protocol
@@ -66,6 +67,7 @@ def dispatch(
 def handler(event: Mapping[str, Any], context: Any) -> dict[str, Any]:
     """AWS Lambda entrypoint; all failures are raised and therefore fail closed."""
     request_id_value = request_id(context)
+    started = time.perf_counter()
     payload: dict[str, Any] = {}
     try:
         result = dispatch(event, context, service_factory=build_service)
@@ -76,6 +78,7 @@ def handler(event: Mapping[str, Any], context: Any) -> dict[str, Any]:
             request_id_value=request_id_value,
             approval_id=payload.get("approval_id") if "payload" in locals() else None,
             correlation_id=payload.get("correlation_id") if "payload" in locals() else None,
+            duration_ms=(time.perf_counter() - started) * 1000,
         )
         raise
     log_event(
@@ -85,5 +88,6 @@ def handler(event: Mapping[str, Any], context: Any) -> dict[str, Any]:
         approval_id=result.get("approval_id"),
         correlation_id=result.get("correlation_id"),
         decision=result.get("decision"),
+        duration_ms=(time.perf_counter() - started) * 1000,
     )
     return result

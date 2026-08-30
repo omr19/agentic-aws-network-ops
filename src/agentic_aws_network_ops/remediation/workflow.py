@@ -9,15 +9,20 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
+import time
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any, Final, Protocol
 from uuid import UUID, uuid4
 
+from agentic_aws_network_ops.shared.observability import emit_event, emit_exception
+
 from .manifest import DEFAULT_MANIFEST, RemediationSpec, resolve_manifest
 
 SCHEMA_VERSION: Final = "1.0.0"
+LOGGER = logging.getLogger(__name__)
 
 APPROVAL_TTL: Final = timedelta(minutes=5)
 SUPPORTED_ACTIONS: Final = frozenset(
@@ -302,15 +307,49 @@ def verify(
 
     if execution_result.get("correlation_id") != proposal.get("correlation_id"):
         raise RemediationContractError("verification correlation_id does not match proposal")
-    result = dict(verifier.verify(proposal))
+    verification_id = str(uuid4())
+    started = time.perf_counter()
+    correlation_id = proposal["correlation_id"]
+    execution_id = execution_result["execution_id"]
+    emit_event(
+        LOGGER,
+        "verification",
+        status="started",
+        correlation_id=correlation_id,
+        execution_id=execution_id,
+        verification_id=verification_id,
+    )
+    try:
+        result = dict(verifier.verify(proposal))
+    except Exception as error:
+        emit_exception(
+            LOGGER,
+            "verification",
+            error,
+            status="failure",
+            correlation_id=correlation_id,
+            execution_id=execution_id,
+            verification_id=verification_id,
+            duration_ms=(time.perf_counter() - started) * 1000,
+        )
+        raise
     result.update(
         {
             "schema_version": SCHEMA_VERSION,
-            "correlation_id": proposal["correlation_id"],
-            "execution_id": execution_result["execution_id"],
+            "correlation_id": correlation_id,
+            "execution_id": execution_id,
             "status": result.get("status", "verified"),
             "remediation_fact": result.get("remediation_fact", "verification completed"),
         }
+    )
+    emit_event(
+        LOGGER,
+        "verification",
+        status="success" if result["status"] == "verified" else "failure",
+        correlation_id=correlation_id,
+        execution_id=execution_id,
+        verification_id=verification_id,
+        duration_ms=(time.perf_counter() - started) * 1000,
     )
     return result
 

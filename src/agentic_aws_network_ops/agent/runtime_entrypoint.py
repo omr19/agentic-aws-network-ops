@@ -3,17 +3,23 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
+import time
 import urllib.error
 import urllib.request
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Any
+from uuid import uuid4
 
-import boto3
-from botocore.auth import SigV4Auth
-from botocore.awsrequest import AWSRequest
+import boto3  # type: ignore[import-untyped]
+from botocore.auth import SigV4Auth  # type: ignore[import-untyped]
+from botocore.awsrequest import AWSRequest  # type: ignore[import-untyped]
 
 from agentic_aws_network_ops.shared.boundaries import RuntimeRequest
+from agentic_aws_network_ops.shared.observability import emit_event, emit_exception
+
+LOGGER = logging.getLogger(__name__)
 
 
 class RuntimeHandler(BaseHTTPRequestHandler):
@@ -53,9 +59,21 @@ def main() -> None:
 
 def invoke_gateway(request: RuntimeRequest) -> dict[str, Any]:
     """Invoke only the fixed read-only Gateway tool through IAM/SigV4."""
+    started = time.perf_counter()
+    tool_call_id = str(uuid4())
+    emit_event(
+        LOGGER,
+        "mcp_tool_call",
+        status="started",
+        correlation_id=request.correlation_id,
+        session_id=request.session_id,
+        tool_call_id=tool_call_id,
+        region=request.region,
+        tool_name="describe_vpcs",
+    )
     endpoint = os.environ.get("AGENTCORE_GATEWAY_ENDPOINT", "")
     if not endpoint:
-        return {
+        response = {
             "accepted": False,
             "correlation_id": request.correlation_id,
             "session_id": request.session_id,
@@ -64,6 +82,18 @@ def invoke_gateway(request: RuntimeRequest) -> dict[str, Any]:
                 "message": "AGENTCORE_GATEWAY_ENDPOINT is required",
             },
         }
+        emit_event(
+            LOGGER,
+            "mcp_tool_call",
+            status="failure",
+            correlation_id=request.correlation_id,
+            session_id=request.session_id,
+            tool_call_id=tool_call_id,
+            duration_ms=(time.perf_counter() - started) * 1000,
+            region=request.region,
+            tool_name="describe_vpcs",
+        )
+        return response
     args = {
         "schema_version": "1.0.0",
         "correlation_id": request.correlation_id,
@@ -97,19 +127,43 @@ def invoke_gateway(request: RuntimeRequest) -> dict[str, Any]:
             urllib.request.Request(url, data=data, headers=dict(signed.headers), method="POST"),  # noqa: S310
             timeout=60,
         ) as response:  # noqa: S310 - endpoint is operator-configured HTTPS Gateway URL
-            return {
+            result = {
                 "accepted": True,
                 "correlation_id": request.correlation_id,
                 "session_id": request.session_id,
                 "result": json.loads(response.read().decode()),
             }
     except (urllib.error.URLError, json.JSONDecodeError) as error:
+        emit_exception(
+            LOGGER,
+            "mcp_tool_call",
+            error,
+            status="failure",
+            correlation_id=request.correlation_id,
+            session_id=request.session_id,
+            tool_call_id=tool_call_id,
+            duration_ms=(time.perf_counter() - started) * 1000,
+            region=request.region,
+            tool_name="describe_vpcs",
+        )
         return {
             "accepted": False,
             "correlation_id": request.correlation_id,
             "session_id": request.session_id,
             "error": {"code": "GATEWAY_INVOCATION_FAILED", "message": str(error)},
         }
+    emit_event(
+        LOGGER,
+        "mcp_tool_call",
+        status="success",
+        correlation_id=request.correlation_id,
+        session_id=request.session_id,
+        tool_call_id=tool_call_id,
+        duration_ms=(time.perf_counter() - started) * 1000,
+        region=request.region,
+        tool_name="describe_vpcs",
+    )
+    return result
 
 
 if __name__ == "__main__":

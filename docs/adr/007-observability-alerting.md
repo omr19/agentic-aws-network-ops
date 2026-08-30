@@ -1,7 +1,9 @@
 # ADR 007 — Observability and Alerting
 
 ## Status
-Accepted with implementation details deferred
+Accepted; local observability foundation implemented. AgentCore Observability,
+OpenTelemetry exporters, CloudWatch resources, alarms, SNS, budgets, and live AWS telemetry
+remain separately authorized implementation gates.
 
 ## Decision
 Use correlation IDs, structured JSON events, AgentCore Observability, OpenTelemetry,

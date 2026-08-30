@@ -9,7 +9,15 @@ workflow evidence is validated. Trusted authenticated approval, live approved re
 and live post-remediation verification are deferred by approved scope. This status does not
 claim full production live-remediation validation.
 
-Phase 6 is complete. The Phase 7 local deterministic diagnosis foundation is implemented for healthy evidence and the four implemented failure classes, with normalized evidence/result schemas, fact-versus-recommendation separation, incomplete/conflicting evidence rejection, tracked Phase 6 fixture tests, and documented limitations. CloudWatch EC2 metrics validation is complete. Live Flow Logs/CloudWatch Logs traffic evidence remains a documented limitation because the project EC2 instances have no IAM instance profile or SSM readiness; no live Flow Log record or Logs Insights query was obtained. Phase 7 is complete for all feasible deterministic diagnosis and observability work.
+The Phase 9 local observability foundation is implemented and validated. It provides a
+versioned `1.0.0` sanitized JSON event schema and shared `allowlist-v1` logging helper for
+observable Runtime, Gateway/MCP, diagnostic, approval, remediation, and verification
+metadata. Offline tests cover schema conformance, identifier consistency, success/failure,
+denied approval, and redaction. This does not claim deployed AgentCore Observability,
+OpenTelemetry, CloudWatch telemetry, Flow Logs, dashboards, alarms, budgets, or live
+end-to-end AWS evidence; those remain separately authorized Phase 9 gates. Architecture
+details: [`docs/architecture/phase-9-observability.md`](docs/architecture/phase-9-observability.md).
+
 
 ### Phase 8 deployment-readiness foundation
 

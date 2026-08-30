@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-import json
 import logging
 import re
 from collections.abc import Mapping
 from typing import Any
 from uuid import UUID
+
+from agentic_aws_network_ops.shared.observability import emit_event
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
@@ -104,20 +105,33 @@ def request_id(context: Any) -> str:
 
 
 def log_event(event_name: str, *, status: str, request_id_value: str, **safe_fields: Any) -> None:
-    """Emit only identifiers/status fields; never serialize the request or exception."""
+    """Emit Phase 8 metadata through the shared sanitized observability contract."""
 
-    safe = {
-        "event": event_name,
-        "status": status,
-        "aws_request_id": request_id_value,
+    emit_event(
+        LOGGER,
+        event_name,
+        status=status,
+        request_id=request_id_value,
         **{
             key: value
             for key, value in safe_fields.items()
-            if key in {"approval_id", "correlation_id", "execution_id", "action", "decision"}
-            and isinstance(value, (str, type(None)))
+            if key
+            in {
+                "approval_id",
+                "correlation_id",
+                "session_id",
+                "tool_call_id",
+                "execution_id",
+                "verification_id",
+                "duration_ms",
+                "error_class",
+                "region",
+                "action",
+                "decision",
+                "write_performed",
+            }
         },
-    }
-    LOGGER.info(json.dumps(safe, sort_keys=True))
+    )
 
 
 def validate_approval_event(event: object) -> dict[str, Any]:

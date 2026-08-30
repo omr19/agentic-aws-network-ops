@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import logging
+import time
 from dataclasses import dataclass
 from typing import Protocol
+from uuid import uuid4
 
 from agentic_aws_network_ops.shared.boundaries import (
     BoundaryError,
@@ -14,6 +17,9 @@ from agentic_aws_network_ops.shared.boundaries import (
     RuntimeResponse,
     ToolName,
 )
+from agentic_aws_network_ops.shared.observability import emit_event, emit_exception
+
+LOGGER = logging.getLogger(__name__)
 
 
 class ToolSelector(Protocol):
@@ -51,11 +57,65 @@ class Runtime:
         self._gateway = gateway
 
     def handle(self, request: RuntimeRequest) -> RuntimeResponse:
+        started = time.perf_counter()
+        tool_call_id = str(uuid4())
+        emit_event(
+            LOGGER,
+            "runtime_request",
+            status="started",
+            correlation_id=request.correlation_id,
+            session_id=request.session_id,
+            region=request.region,
+        )
         try:
             selected = self._selector.select(request)
             self._validate_binding(request, selected)
-            return RuntimeResponse.from_gateway(self._gateway.invoke(selected))
+            emit_event(
+                LOGGER,
+                "mcp_tool_call",
+                status="selected",
+                correlation_id=request.correlation_id,
+                session_id=request.session_id,
+                tool_call_id=tool_call_id,
+                region=request.region,
+                tool_name=selected.tool,
+            )
+            gateway_response = self._gateway.invoke(selected)
+            emit_event(
+                LOGGER,
+                "mcp_tool_call",
+                status="success" if gateway_response.accepted else "failure",
+                correlation_id=request.correlation_id,
+                session_id=request.session_id,
+                tool_call_id=tool_call_id,
+                duration_ms=(time.perf_counter() - started) * 1000,
+                region=request.region,
+                tool_name=selected.tool,
+            )
+            response = RuntimeResponse.from_gateway(gateway_response)
+            emit_event(
+                LOGGER,
+                "runtime_request",
+                status="success" if response.accepted else "failure",
+                correlation_id=request.correlation_id,
+                session_id=request.session_id,
+                tool_call_id=tool_call_id,
+                duration_ms=(time.perf_counter() - started) * 1000,
+                region=request.region,
+            )
+            return response
         except BoundaryError as error:
+            emit_exception(
+                LOGGER,
+                "runtime_request",
+                error,
+                status="rejected",
+                correlation_id=request.correlation_id,
+                session_id=request.session_id,
+                tool_call_id=tool_call_id,
+                duration_ms=(time.perf_counter() - started) * 1000,
+                region=request.region,
+            )
             return RuntimeResponse.rejected(request, "INVALID_REQUEST", str(error))
 
     @staticmethod
