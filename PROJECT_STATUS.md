@@ -17,6 +17,14 @@ The full local suite passed (204 tests), JSON/schema validation passed, Ruff/myp
 Terraform formatting/validation passed. Live Lambda/DynamoDB/IAM deployment, AgentCore
 integration, and remediation execution/verification remain separate AWS approval gates.
 
+The deployed Phase 8 approval and remediation roles passed read-only IAM simulation. Approval
+table operations and the four allowlisted EC2 remediation actions were allowed only in their
+scoped contexts; destructive, escalation, and unrelated-resource actions were denied. Sanitized
+evidence is recorded in
+[`docs/evidence/phase-8/iam-policy-simulation.json`](docs/evidence/phase-8/iam-policy-simulation.json).
+No remediation was executed, and Phase 8 remains incomplete pending Lambda deployment and live
+approval/remediation verification.
+
 ### Phase 7 observability validation limitation
 
 The explicitly authorized temporary validation started both tagged Phase 4 EC2 instances and restored both to `stopped`. No Flow Logs were created. No test traffic was generated. The current least-privilege role denied `ssm:DescribeInstanceInformation` and `logs:DescribeLogGroups`, so no live Flow Logs or CloudWatch Logs evidence was collected; CloudWatch EC2 metric listing and `GetMetricData` succeeded. The existing diagnostic and Runtime IAM roles must not be broadened to overcome this boundary. A separate temporary read-only observability role was created, used, and deleted after validation; its local policy fixture is `iam/phase7/observability-read-permissions.json`, and its sanitized evidence is recorded in `docs/evidence/phase-7/observability-role-validation.json`. Live Flow Logs/CloudWatch Logs traffic evidence remains a documented limitation; no live Flow Log record or Logs Insights query was obtained.

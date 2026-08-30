@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0.0",
+  "evidence_type": "phase_8_iam_policy_simulation",
+  "validation_status": "succeeded",
+  "region": "eu-west-1",
+  "roles": {
+    "approval_lambda": {
+      "name": "agentic-aws-network-ops-lab-phase8-approval-lambda",
+      "allowed": [
+        "dynamodb:PutItem on the Phase 8 approval table",
+        "dynamodb:GetItem on the Phase 8 approval table"
+      ],
+      "denied": ["dynamodb:PutItem on an unrelated table"]
+    },
+    "remediation_lambda": {
+      "name": "agentic-aws-network-ops-lab-phase8-remediation-lambda",
+      "allowed": [
+        "dynamodb:GetItem on the Phase 8 approval table",
+        "dynamodb:UpdateItem on the Phase 8 approval table",
+        "ec2:AuthorizeSecurityGroupIngress on the approved destination security group",
+        "ec2:CreateRoute on the approved project route tables",
+        "ec2:ReplaceRoute on the approved project route tables",
+        "ec2:ReplaceNetworkAclEntry on the approved destination network ACL"
+      ],
+      "denied": [
+        "ec2:DeleteRoute",
+        "ec2:RevokeSecurityGroupIngress",
+        "ec2:DeleteNetworkAclEntry",
+        "iam:PassRole",
+        "lambda:InvokeFunction",
+        "ec2:AuthorizeSecurityGroupIngress on an unrelated security group"
+      ]
+    }
+  },
+  "method": "AWS IAM simulate-principal-policy",
+  "mutations_performed": false,
+  "remediation_executed": false,
+  "limitations": [
+    "Route simulations returned a generic simulator resource label; the deployed policy document was separately confirmed to contain the four intended route-table ARNs."
+  ],
+  "provenance": "Sanitized summary of read-only simulations; no credentials, account identifiers, or raw AWS response payloads are stored."
+}
