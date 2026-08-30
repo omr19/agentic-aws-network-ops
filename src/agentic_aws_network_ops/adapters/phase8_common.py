@@ -81,31 +81,19 @@ def require_hash(payload: Mapping[str, Any], field: str = "request_hash") -> str
 
 
 def authenticated_principal(context: Any) -> str:
-    """Extract a principal from a trusted invocation-context adapter only.
+    """Extract only the principal from the typed verified-IAM handoff context.
 
-    Direct Lambda Invoke does not expose the SigV4 caller ARN in the standard
-    Lambda context. A deployment adapter must therefore populate the explicitly
-    supported trusted context fields below after authenticating the caller.
-    ClientContext custom values are caller-controlled and are intentionally not
-    accepted. Arbitrary event fields are never used as identity. Missing or
-    ambiguous identity fails closed.
+    Standard direct Lambda context, arbitrary attributes, event fields, and
+    ``ClientContext.custom`` values are not authentication evidence and fail
+    closed. A separate IAM/SigV4 ingress adapter must construct the typed
+    context after authenticating the caller.
     """
 
-    candidates: list[str] = []
-    direct = getattr(context, "authenticated_principal", None)
-    if isinstance(direct, str) and direct:
-        candidates.append(direct)
+    from .phase8_identity import TrustedApprovalInvocationContext
 
-    identity = getattr(context, "identity", None)
-    for name in ("user_arn", "userArn", "principal"):
-        value = getattr(identity, name, None)
-        if isinstance(value, str) and value:
-            candidates.append(value)
-
-    unique = set(candidates)
-    if len(unique) != 1:
-        raise Phase8WrapperError("a single authenticated caller identity is required")
-    return next(iter(unique))
+    if not isinstance(context, TrustedApprovalInvocationContext):
+        raise Phase8WrapperError("trusted IAM/SigV4 invocation context is required")
+    return context.principal
 
 
 def request_id(context: Any) -> str:
@@ -145,7 +133,6 @@ def validate_approval_event(event: object) -> dict[str, Any]:
             "action",
             "resource",
             "remediation_operation",
-            "approver_principal",
         }
     )
     require_exact_fields(payload, expected, "approval event")
@@ -159,7 +146,6 @@ def validate_approval_event(event: object) -> dict[str, Any]:
     require_string(payload, "resource")
     if payload["remediation_operation"] not in REMEDIATION_OPERATIONS:
         raise Phase8WrapperError("remediation operation is unsupported")
-    require_string(payload, "approver_principal")
     return payload
 
 

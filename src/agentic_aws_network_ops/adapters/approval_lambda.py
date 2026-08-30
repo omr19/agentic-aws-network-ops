@@ -56,8 +56,7 @@ def dispatch(
     request_id(context)
     payload = validate_approval_event(event)
     principal = authenticated_principal(context)
-    if payload["approver_principal"] != principal:
-        raise Phase8WrapperError("event approver does not match authenticated caller")
+    payload["approver_principal"] = principal
     service = service_factory(principal=principal, context=context)
     if service is None:
         raise WrapperConfigurationError("ApprovalService factory returned no service")
@@ -67,8 +66,8 @@ def dispatch(
 def handler(event: Mapping[str, Any], context: Any) -> dict[str, Any]:
     """AWS Lambda entrypoint; all failures are raised and therefore fail closed."""
     request_id_value = request_id(context)
+    payload: dict[str, Any] = {}
     try:
-        payload = validate_approval_event(event)
         result = dispatch(event, context, service_factory=build_service)
     except Exception:
         log_event(

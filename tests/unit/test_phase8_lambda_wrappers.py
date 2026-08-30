@@ -11,6 +11,10 @@ import pytest
 
 from agentic_aws_network_ops.adapters import approval_lambda, remediation_lambda
 from agentic_aws_network_ops.adapters.phase8_common import Phase8WrapperError
+from agentic_aws_network_ops.adapters.phase8_identity import (
+    TrustedApprovalInvocationContext,
+    handoff_verified_iam_principal,
+)
 from agentic_aws_network_ops.approval.repository import InMemoryApprovalRepository
 from agentic_aws_network_ops.approval.service import ApprovalService
 from agentic_aws_network_ops.remediation.workflow import request_hash
@@ -19,16 +23,14 @@ NOW = datetime(2026, 9, 5, 12, 0, tzinfo=UTC)
 PRINCIPAL = "arn:aws:iam::000000000000:user/approved-operator"
 
 
-class Context(SimpleNamespace):
-    aws_request_id: str
-    authenticated_principal: str
+def context(principal: str = PRINCIPAL) -> TrustedApprovalInvocationContext:
+    return handoff_verified_iam_principal(
+        aws_request_id="request-123",
+        principal=principal,
+    )
 
 
-def context(principal: str = PRINCIPAL) -> Context:
-    return Context(aws_request_id="request-123", authenticated_principal=principal)
-
-
-def approval_event(principal: str = PRINCIPAL) -> dict[str, str]:
+def approval_event() -> dict[str, str]:
     return {
         "operation": "approve",
         "proposal_id": str(uuid4()),
@@ -39,7 +41,6 @@ def approval_event(principal: str = PRINCIPAL) -> dict[str, str]:
         "action": "restore_security_group_ingress",
         "resource": "${destination_security_group_id}",
         "remediation_operation": "AuthorizeSecurityGroupIngress",
-        "approver_principal": principal,
     }
 
 
@@ -82,7 +83,7 @@ def test_approval_handler_rejects_missing_or_mismatched_identity() -> None:
     event = approval_event()
     with pytest.raises(Phase8WrapperError):
         approval_lambda.dispatch(event, SimpleNamespace(aws_request_id="request-123"), now=NOW)
-    with pytest.raises(Phase8WrapperError):
+    with pytest.raises(ValueError):
         approval_lambda.dispatch(
             event,
             context("arn:aws:iam::000000000000:user/different"),

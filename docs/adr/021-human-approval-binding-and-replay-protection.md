@@ -12,7 +12,11 @@ that request.
 An authenticated human explicitly approves the proposal through a dedicated Approval
 Lambda that is invoked directly with IAM/SigV4. The Approval Lambda is not a Gateway
 target or MCP tool, and Agent Runtime, diagnostic, and remediation identities cannot
-invoke it.
+invoke it. The dedicated ingress adapter authenticates the IAM/SigV4 caller and hands the
+canonical principal to the wrapper through the typed local `TrustedApprovalInvocationContext`.
+The approval event contains no `approver_principal`; the wrapper injects the trusted identity
+into the persisted approval record, and the configured approver allowlist independently
+authorizes it. Direct Lambda Invoke and caller-controlled context metadata fail closed.
 
 Store the approval in a dedicated DynamoDB on-demand table with:
 

@@ -11,7 +11,21 @@ Phase 8 begins with a local-only contract and state-machine foundation. It does 
 - Execution requires a matching, unexpired, unconsumed approval and uses an injected adapter only in this local foundation.
 - Verification is a separate READ adapter/result and cannot be represented as execution evidence.
 
-## Supported corrective actions
+## Trusted approver identity handoff
+
+The Approval Lambda is a dedicated direct IAM/SigV4 ingress boundary, not an AgentCore
+Runtime/Gateway target or MCP tool. A separately authenticated ingress adapter must call
+`handoff_verified_iam_principal()` to create a `TrustedApprovalInvocationContext` containing
+the Lambda request ID and canonical IAM user/role ARN. The wrapper accepts only that typed
+context, injects its principal into the server-side approval payload, and then lets the
+configured approver allowlist authorize persistence.
+
+The approval Lambda event intentionally excludes `approver_principal`. Event fields,
+conversation text, arbitrary Lambda context attributes, and `ClientContext.custom` values
+cannot establish identity. Direct Lambda Invoke therefore remains fail-closed for approval
+until a real authenticated ingress adapter supplies the typed context. The persisted approval
+schema retains `approver_principal` as an audit field after trusted injection.
+
 
 The local scenario contract covers the approved Phase 6 corrections: `security_group_rule`, `route_table_entry`, `nacl_rule`, and `peering_routes_dns`. They map only to the three ADR-approved narrow tools: `restore_security_group_ingress`, `restore_vpc_peering_route`, and `restore_network_acl_entry`. No generic AWS command, arbitrary resource selection, delete operation, or diagnostic READ tool can enter this workflow.
 

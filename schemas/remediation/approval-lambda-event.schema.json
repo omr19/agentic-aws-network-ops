@@ -3,7 +3,7 @@
   "title": "Approval Lambda event",
   "type": "object",
   "additionalProperties": false,
-  "required": ["operation", "proposal_id", "approval_id", "correlation_id", "policy_session_id", "request_hash", "action", "resource", "remediation_operation", "approver_principal"],
+  "required": ["operation", "proposal_id", "approval_id", "correlation_id", "policy_session_id", "request_hash", "action", "resource", "remediation_operation"],
   "properties": {
     "operation": { "enum": ["approve", "deny"] },
     "proposal_id": { "type": "string", "format": "uuid" },
@@ -13,7 +13,6 @@
     "request_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
     "action": { "enum": ["restore_security_group_ingress", "restore_vpc_peering_route", "restore_network_acl_entry"] },
     "resource": { "type": "string", "minLength": 1 },
-    "remediation_operation": { "enum": ["AuthorizeSecurityGroupIngress", "CreateRoute", "ReplaceRoute", "CreateRouteOrReplaceRoute", "ReplaceNetworkAclEntry"] },
-    "approver_principal": { "type": "string", "minLength": 1 }
+    "remediation_operation": { "enum": ["AuthorizeSecurityGroupIngress", "CreateRoute", "ReplaceRoute", "CreateRouteOrReplaceRoute", "ReplaceNetworkAclEntry"] }
   }
 }

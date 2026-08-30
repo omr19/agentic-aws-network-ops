@@ -44,20 +44,20 @@ Lambda execution role.
 
 Both wrappers validate the existing closed-world event contracts before constructing an
 adapter. They require a Lambda request ID and exactly one authenticated principal supplied
-by a trusted invocation-context adapter. They never infer identity from an event field. The
-Approval wrapper requires the event approver principal to equal that context identity and
-the deployment allowlist before calling the service. The Remediation wrapper validates the
-request hash, UUIDs, closed fields, and immutable manifest-compatible action boundary before
-calling the executor. Its executor contract must perform the fail-closed approval lookup,
-binding checks, atomic approval consumption, preflight, one allowlisted write, result
-persistence, and independent READ verification; an absent or mismatched approval must never
-reach an AWS write.
+by the typed `TrustedApprovalInvocationContext` handoff. They never infer identity from an
+event field. The Approval wrapper injects that context principal into the server-side
+approval payload and the deployment allowlist authorizes it before persistence. The
+Remediation wrapper validates the request hash, UUIDs, closed fields, and immutable
+manifest-compatible action boundary before calling the executor. Its executor contract must
+perform the fail-closed approval lookup, binding checks, atomic approval consumption,
+preflight, one allowlisted write, result persistence, and independent READ verification; an
+absent or mismatched approval must never reach an AWS write.
 
-`authenticated_principal` must be populated by a trusted Gateway/authorized invocation adapter
-that has already authenticated the SigV4/IAM caller. Standard direct Lambda Invoke does not
-provide that identity, and caller-controlled `ClientContext.custom` values are rejected. The
-adapter must not copy event fields or client-supplied metadata into the trusted context. Missing,
-ambiguous, or unverified identity fails closed before an AWS-backed service is constructed.
+`handoff_verified_iam_principal()` creates the typed context only after a dedicated IAM/SigV4
+ingress adapter has authenticated the caller. Standard direct Lambda Invoke context, arbitrary
+context attributes, event fields, and caller-controlled `ClientContext.custom` values cannot
+establish identity. Missing, ambiguous, malformed, or unverified identity fails closed before
+an AWS-backed service is constructed.
 
 The wrappers use injectable clock and service/executor factories for offline tests. The
 repository's `InMemoryApprovalRepository` and fake executor are test doubles only; they are

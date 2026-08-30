@@ -1,4 +1,9 @@
-"""Deployment-facing Approval Lambda contract without an AWS runtime dependency."""
+"""Deployment-facing Approval Lambda contract without an AWS runtime dependency.
+
+The event is a closed request/decision contract and intentionally contains no
+approver identity. The authenticated ingress adapter establishes that identity
+before the wrapper injects it into the service payload.
+"""
 
 from __future__ import annotations
 

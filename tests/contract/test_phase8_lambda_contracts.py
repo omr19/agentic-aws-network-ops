@@ -39,3 +39,23 @@ def test_remediation_event_is_closed_world() -> None:
     validator.validate(payload)
     payload["resource"] = "attacker"
     assert list(validator.iter_errors(payload))
+
+
+def test_approval_lambda_event_excludes_caller_identity() -> None:
+    validator = Draft202012Validator(
+        schema("approval-lambda-event.schema.json"), format_checker=FormatChecker()
+    )
+    payload = {
+        "operation": "approve",
+        "proposal_id": "00000000-0000-4000-8000-000000000001",
+        "approval_id": "00000000-0000-4000-8000-000000000002",
+        "correlation_id": "00000000-0000-4000-8000-000000000003",
+        "policy_session_id": "00000000-0000-4000-8000-000000000004",
+        "request_hash": "0" * 64,
+        "action": "restore_security_group_ingress",
+        "resource": "${destination_security_group_id}",
+        "remediation_operation": "AuthorizeSecurityGroupIngress",
+    }
+    validator.validate(payload)
+    payload["approver_principal"] = "arn:aws:iam::000000000000:user/operator"
+    assert list(validator.iter_errors(payload))

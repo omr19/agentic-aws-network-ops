@@ -57,7 +57,10 @@ This is local-only evidence; it does not claim live AWS remediation or post-reme
 Reachability Analyzer verification.
 
 The remaining Phase 8 checkpoint is the trusted authenticated approval path, followed by a
-separately authorized live approval, remediation, and verification workflow. Phase 8 remains
+separately authorized live approval, remediation, and verification workflow. The local contract
+for that path now requires a dedicated IAM/SigV4 ingress adapter to hand off a typed
+`TrustedApprovalInvocationContext`; the approval event cannot supply `approver_principal`.
+Direct Lambda Invoke remains fail-closed until that real adapter exists. Phase 8 remains
 incomplete until those gates are completed and validated.
 
 ### Phase 7 observability validation limitation
