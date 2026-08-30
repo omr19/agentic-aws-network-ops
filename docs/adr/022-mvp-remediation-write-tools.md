@@ -62,12 +62,16 @@ proposal displays that complete resolved change before approval.
 
 ## IAM and prohibitions
 
-The remediation role receives only:
+The remediation role's separate WRITE policy receives only:
 
 - `ec2:AuthorizeSecurityGroupIngress`
 - `ec2:CreateRoute`
 - `ec2:ReplaceRoute`
 - `ec2:ReplaceNetworkAclEntry`
+
+A separate READ policy is required for preflight and verification: `ec2:DescribeSecurityGroups`,
+`ec2:DescribeRouteTables`, and `ec2:DescribeNetworkAcls`. It does not broaden the WRITE
+boundary and is scoped to `Resource = "*"` with `aws:RequestedRegion = eu-west-1`.
 
 Use exact resource ARNs, project tags, `eu-west-1`, and supported EC2 condition keys
 where AWS supports them. Where an EC2 action lacks resource-level permissions, combine

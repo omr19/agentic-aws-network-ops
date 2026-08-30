@@ -147,26 +147,29 @@ table name, authorized approval principals, and trusted resource configuration.
 ### Required runtime permissions
 
 The adapter code requires the following permissions from the separately approved execution
-roles; this task does not attach or modify any IAM policy:
+roles. The opt-in Terraform module defines separate local policy proposals for these
+capabilities; this task does not attach or modify any live IAM policy:
 
 - Approval role: `dynamodb:PutItem` and `dynamodb:GetItem` on the Phase 8 approval table.
-- Remediation role: `dynamodb:GetItem` and `dynamodb:UpdateItem` on the Phase 8 approval table.
+- Remediation persistence: `dynamodb:GetItem` and `dynamodb:UpdateItem` on the Phase 8 approval table.
 - Remediation READ preflight/verification: `ec2:DescribeSecurityGroups`,
-  `ec2:DescribeRouteTables`, and `ec2:DescribeNetworkAcls`, scoped to the approved region
-  and resources/conditions supported by AWS.
+  `ec2:DescribeRouteTables`, and `ec2:DescribeNetworkAcls`, in a separate policy with
+  `Resource = "*"` and `aws:RequestedRegion = eu-west-1`.
 - Remediation WRITE: only the existing four allowlisted actions:
   `ec2:AuthorizeSecurityGroupIngress`, `ec2:CreateRoute`, `ec2:ReplaceRoute`, and
-  `ec2:ReplaceNetworkAclEntry`.
+  `ec2:ReplaceNetworkAclEntry`, in a separate policy with its existing resource/tag/VPC
+  conditions.
 - Both functions additionally require the separately approved CloudWatch Logs permissions.
 
 The currently deployed remediation role contains the DynamoDB permissions and four EC2
 writes but does not contain the three EC2 describe permissions required by this adapter.
-That is an explicit deployment prerequisite, not an IAM change made here.
+The new read policy is a local Terraform/fixture proposal only; attaching it remains an
+explicitly approved deployment prerequisite and is not performed here.
 
 
 The Approval Lambda accepts only the closed-world `approval-lambda-event.schema.json` event and delegates to the structured `ApprovalService`. The authenticated principal must come from the production IAM/SigV4 invocation identity; conversational text is never an approval. It records the proposal/request bindings, action, exact operation/resource, principal, decision, creation/expiry timestamps, `ttl_epoch`, consumed state, execution ID/status, and execution-result audit fields.
 
-The opt-in Terraform module creates an on-demand, server-side-encrypted DynamoDB table keyed by `approval_id` with TTL on `ttl_epoch`. A production adapter must use conditional writes/updates: reject duplicate approval IDs, atomically transition `APPROVED` to `EXECUTING`, bind the claiming execution ID, and permit same-execution idempotent replay while rejecting a different execution. The interceptor validates but does not consume because Gateway retries are possible.
+The opt-in Terraform module creates an on-demand, server-side-encrypted DynamoDB table keyed by `approval_id` with TTL on `ttl_epoch`. It defines separate remediation DynamoDB persistence, remediation-read, and remediation-write inline policies on the remediation role. A production adapter must use conditional writes/updates: reject duplicate approval IDs, atomically transition `APPROVED` to `EXECUTING`, bind the claiming execution ID, and permit same-execution idempotent replay while rejecting a different execution. The interceptor validates but does not consume because Gateway retries are possible.
 
 ## Remediation Lambda
 
@@ -176,7 +179,7 @@ The local interfaces contain no boto3/AWS calls. AWS adapters are a later implem
 
 ## IAM and Terraform boundary
 
-`terraform/modules/phase8_readiness` is opt-in and reproducible. It defines the tagged approval table and separate Approval Lambda/remediation Lambda roles. The remediation policy contains only the four ADR 022 EC2 writes and DynamoDB consumption/result persistence. The module is disabled by default, supports teardown by normal Terraform destruction, and uses PAY_PER_REQUEST/TTL to avoid persistent baseline cost.
+`terraform/modules/phase8_readiness` is opt-in and reproducible. It defines the tagged approval table and separate Approval Lambda/remediation Lambda roles. The remediation role has separate inline policies for DynamoDB consumption/result persistence, the three EC2 read actions required for preflight/verification, and the four ADR 022 EC2 writes. The module is disabled by default, supports teardown by normal Terraform destruction, and uses PAY_PER_REQUEST/TTL to avoid persistent baseline cost.
 
 Lambda packaging, CloudWatch logging permissions, resource-based invocation policies, AgentCore policy/interceptor resources, and live manifest injection are intentionally not invented in Terraform. The current AWS provider/resource graph does not establish those AgentCore deployment contracts; their exact later boundary is: approved Lambda artifact/package and role wiring, direct IAM/SigV4 Approval Lambda invocation, Gateway interceptor/policy configuration through the supported AgentCore control-plane/API path, then policy LOG_ONLY validation before ENFORCE.
 

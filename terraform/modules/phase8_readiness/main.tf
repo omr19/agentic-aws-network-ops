@@ -147,3 +147,25 @@ resource "aws_iam_role_policy" "remediation_write" {
     ]
   })
 }
+
+resource "aws_iam_role_policy" "remediation_read" {
+  name = "${var.name_prefix}-phase8-remediation-read"
+  role = aws_iam_role.remediation_lambda.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid    = "RemediationReadPreflightAndVerification"
+      Effect = "Allow"
+      Action = [
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeRouteTables",
+        "ec2:DescribeNetworkAcls",
+      ]
+      Resource = "*"
+      Condition = {
+        StringEquals = { "aws:RequestedRegion" = var.region }
+      }
+    }]
+  })
+}

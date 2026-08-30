@@ -2,8 +2,9 @@
 
 This opt-in module defines the supported persistent approval boundary: one tagged,
 on-demand DynamoDB table with TTL and separate Approval Lambda/remediation Lambda
-execution roles. The remediation role is restricted to the three ADR 022 EC2 write
-capabilities plus approval-table consumption/result persistence.
+execution roles. The remediation role uses separate inline policies for the four ADR 022 EC2 write
+capabilities, the three EC2 read actions required for preflight/verification, and
+approval-table consumption/result persistence.
 
 Lambda functions, packages, AgentCore policy resources, and Gateway interceptors are
 not created here. Lambda code uses the local interfaces under `src/`; packaging and
