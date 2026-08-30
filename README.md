@@ -4,7 +4,7 @@ A portfolio project for explainable AWS network diagnosis using deterministic cl
 
 ## Project Status and Achievements
 
-**Current phase: Phase 9 — Monitoring, Alerting & Observability (complete under bounded local-validation scope).** Phases 1–8 are complete within their documented scopes. Phase 9’s versioned observability schema, sanitized instrumentation, identifier propagation, redaction controls, and offline tests are complete. Live CloudWatch/AgentCore telemetry, dashboards, alarms, budgets, Flow Logs delivery, and deployed end-to-end correlation are explicitly deferred; this project does not claim production monitoring validation. The next governed phase is Phase 10 — Testing, Architecture Review, Security Review & Cost Review.
+**Current phase: Phase 10 — Testing, Architecture Review, Security Review & Cost Review (COMPLETE — bounded validation scope).** Phases 1–9 are complete within their documented scopes. Phase 10 closure covers repository-only offline functional/repeatability tests, deterministic diagnosis, local approval/denial/verification contracts, architecture/security review, exact-account IAM correction, local packaging/quality validation, and cost-control documentation. This does **not** claim production-readiness or full live-remediation validation. Live AWS validation, authenticated approval ingress, AgentCore Policy/interceptor enforcement, live remediation/post-remediation verification, observability, billing, budgets, teardown, semantic/model-driven tool selection, production retry/timeout/recovery, and complete deployment-time manifest binding are **Deferred by approved bounded scope**. See the [Phase 10 validation matrix](docs/architecture/phase-10-validation-matrix.md).
 
 Phase 7 also retains a documented limitation: CloudWatch metrics were validated, but live Flow Logs/CloudWatch Logs traffic evidence was not obtained because the project EC2 instances have no IAM instance profiles or SSM readiness. No live Flow Log record or Logs Insights query is claimed.
 
@@ -45,7 +45,7 @@ The table preserves the 13 authoritative phases in `PROJECT_CHECKLIST.md`.
 | 7 — Intelligent Deterministic Diagnosis | Complete with limitation | Deterministic diagnosis foundation and CloudWatch metrics validated; live Flow Logs/CloudWatch Logs traffic evidence is limited by missing EC2 IAM instance profiles and SSM readiness. |
 | 8 — Human-Controlled Remediation | Complete — bounded validation scope | Local approval-to-remediation-to-verification workflow, IAM evidence, Lambda deployment boundary, and fail-closed smoke are validated. Trusted authenticated approval, live approved remediation, and live post-remediation verification are deferred by approved scope. |
 | 9 — Monitoring, Alerting & Observability | Complete — bounded local-validation scope | Versioned observability contract, sanitized instrumentation, correlation/session metadata, redaction, and offline validation are complete. Live CloudWatch/AgentCore telemetry, dashboards, alarms, budgets, Flow Logs delivery, and deployed end-to-end correlation are deferred. |
-| 10 — Testing, Architecture Review, Security Review & Cost Review | Pending / future authorization | Formal cross-cutting reviews and final cost/security validation remain future work. |
+| 10 — Testing, Architecture Review, Security Review & Cost Review | Complete — bounded validation scope | Repository-only offline functional/repeatability tests, deterministic diagnosis, local approval/denial/verification contracts, architecture/security review, exact-account IAM correction, local quality validation, and cost-control documentation. Live and unresolved capabilities are deferred by approved bounded scope; this is not a production-readiness or full live-remediation claim. |
 | 11 — Destroy & Cost Verification | Pending / future authorization | Governed teardown and independent cost/resource verification remain future work. |
 | 12 — Public GitHub Packaging & Documentation | Pending / future authorization | Public-readiness review, polished documentation, diagrams, sanitization, and packaging remain future work. |
 | 13 — Career & Demo Packaging | Pending / future authorization | Demo, interview, resume, and portfolio packaging remain future work. |
@@ -105,7 +105,10 @@ P1 Requirements
       -> P7 Diagnosis
       -> P8 Remediation (bounded validation complete)
       -> P9 Monitoring/observability
-      -> P10–P13 Future enhancements
+      -> P10 Testing/architecture/security/cost review (bounded validation complete)
+      -> P11 Destroy/cost verification
+      -> P12 Public packaging/documentation
+      -> P13 Career/demo packaging
 ```
 
 ## Reproducibility and Cost Controls

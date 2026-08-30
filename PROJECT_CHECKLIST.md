@@ -392,52 +392,75 @@ Deferred by approved scope:
 
 ## Phase 10 — Testing, Architecture Review, Security Review & Cost Review
 
+**Phase 10 status: COMPLETE — bounded validation scope.** Checked items below are limited to repository evidence, offline tests, reviewed contracts, and documented decisions. Unchecked items are explicitly deferred by approved bounded scope; this gate does not claim production-readiness or full live-remediation validation.
+
 ### 10.1 Functional & End-to-End Testing
 
-- [ ] Test healthy baseline
-- [ ] Test each implemented failure scenario
-- [ ] Test deterministic diagnosis
+- [x] Test healthy baseline
+  - Bounded offline fixtures and local workflow evidence only; live AWS validation is **Deferred by approved bounded scope**.
+- [x] Test each implemented failure scenario
+- [x] Test deterministic diagnosis
 - [ ] Test incorrect/irrelevant tool-selection handling
+  - Semantic/model-driven relevance selection is **Deferred by approved bounded scope**; invalid-tool rejection is covered locally.
 - [ ] Test agent/tool failure handling
-- [ ] Test remediation approval
-- [ ] Test remediation denial
-- [ ] Test post-remediation verification
-- [ ] Test representative repeated runs for consistency
-- [ ] Document test matrix and results
+  - Local fail-fast propagation is documented; structured normalization, production retry, timeout, and recovery behavior are **Deferred by approved bounded scope**.
+- [x] Test remediation approval
+  - Local approval contract and workflow only; authenticated approval ingress and AgentCore policy/interceptor enforcement are **Deferred by approved bounded scope**.
+- [x] Test remediation denial
+- [x] Test post-remediation verification
+  - Local verifier behavior only; live remediation and live post-remediation verification are **Deferred by approved bounded scope**.
+- [x] Test representative repeated runs for consistency
+- [x] Document test matrix and results
+  - Local packaging and quality validation is recorded in the matrix; deployment-time package/manifest binding is **Deferred by approved bounded scope**.
 
 ### 10.2 Architecture Review
 
-- [ ] Review implementation against approved Phase 2 architecture
-- [ ] Document intentional deviations
-- [ ] Reassess single-agent vs. multi-agent decision
-- [ ] Reassess API Gateway/Lambda entry-path decision
-- [ ] Reassess MCP hosting/integration decision
-- [ ] Reassess network topology choices
-- [ ] Review scalability, resilience, and operational limitations
-- [ ] Perform senior-architect-style design review
+- [x] Review implementation against approved Phase 2 architecture
+- [x] Document intentional deviations
+- [x] Reassess single-agent vs. multi-agent decision
+- [x] Reassess API Gateway/Lambda entry-path decision
+- [x] Reassess MCP hosting/integration decision
+  - Deployed policy/interceptor behavior remains **Deferred by approved bounded scope**.
+- [x] Reassess network topology choices
+- [x] Review scalability, resilience, and operational limitations
+  - Live operational behavior and production recovery remain **Deferred by approved bounded scope**.
+- [x] Perform senior-architect-style design review
 
 ### 10.3 IAM & Security Review
 
-- [ ] Verify least-privilege IAM
-- [ ] Verify read and write roles remain separated
-- [ ] Verify no unintended sensitive-action wildcards
-- [ ] Verify human approval cannot be bypassed
+- [x] Verify least-privilege IAM
+  - Exact-account Terraform IAM correction and offline policy evidence are validated; live IAM/SigV4 enforcement is **Deferred by approved bounded scope**.
+- [x] Verify read and write roles remain separated
+- [x] Verify no unintended sensitive-action wildcards
+- [x] Verify human approval cannot be bypassed
+  - Local fail-closed contract only; authenticated ingress and AgentCore enforcement are **Deferred by approved bounded scope**.
 - [ ] Verify no raw credentials/secrets are committed or logged
-- [ ] Verify managed secret/config references are used appropriately where needed
+  - Full current history/secret scan is **Deferred by approved bounded scope**.
+- [x] Verify managed secret/config references are used appropriately where needed
+  - Repository/config contract only; live secret/config verification is **Deferred by approved bounded scope**.
 - [ ] Review project resources for unintended public/cross-account exposure
+  - **Deferred by approved bounded scope**; no current AWS inspection was performed.
 - [ ] Run agreed IaC/security scanning
-- [ ] Document accepted findings with rationale
+  - **Deferred by approved bounded scope**; no infrastructure or security scan execution is claimed here.
+- [x] Document accepted findings with rationale
 
 ### 10.4 Cost Review
 
 - [ ] Review actual project-created resource usage
+  - **Deferred by approved bounded scope**; no current AWS inventory was inspected.
 - [ ] Estimate representative lab cost
-- [ ] Identify primary cost drivers
+  - Current billing/account estimate is **Deferred by approved bounded scope**.
+- [x] Identify primary cost drivers
+  - Qualitative repository documentation only; billing validation is **Deferred by approved bounded scope**.
 - [ ] Verify unnecessary persistent resources were avoided
+  - Current resource-state verification is **Deferred by approved bounded scope**.
 - [ ] Verify Budget/cost alert configuration
-- [ ] Document cost controls and expected operating model
+  - **Deferred by approved bounded scope**.
+- [x] Document cost controls and expected operating model
 
-- [ ] **Phase 10 COMPLETE**
+- [x] **Phase 10 COMPLETE — bounded validation scope**
+  - This completion gate records repository-only bounded validation and does not claim production-readiness or full live-remediation validation.
+
 
 ---
 

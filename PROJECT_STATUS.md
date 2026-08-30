@@ -2,17 +2,13 @@
 
 ## Current Phase
 
-**Phase 10 — Testing, Architecture Review, Security Review & Cost Review PREPARATION ACTIVE; Phase 9 COMPLETE — bounded local-validation scope**
+**Phase 10 — Testing, Architecture Review, Security Review & Cost Review COMPLETE — bounded validation scope; Phase 9 COMPLETE — bounded local-validation scope**
 
-Phase 10 preparation is the active governed task. The Phase 10 completion gate remains
-unchecked in `PROJECT_CHECKLIST.md`; this status records local preparation evidence and
-review findings only. The requirements-to-evidence matrix is
-[`docs/architecture/phase-10-validation-matrix.md`](docs/architecture/phase-10-validation-matrix.md).
+Phase 10 is complete under an explicitly approved repository-only bounded-validation scope. The checked items in `PROJECT_CHECKLIST.md` are supported by offline functional and repeatability tests, deterministic diagnosis evidence, local approval/denial/verification contracts, architecture and security review, the exact-account IAM correction, local packaging/quality validation, and cost-control documentation. The requirements-to-evidence matrix is [`docs/architecture/phase-10-validation-matrix.md`](docs/architecture/phase-10-validation-matrix.md).
 
-Local end-to-end, IAM, Lambda deployment-boundary, fail-closed, and mocked remediation
-workflow evidence is validated. Trusted authenticated approval, live approved remediation,
-and live post-remediation verification are deferred by approved scope. This status does not
-claim full production live-remediation validation.
+This completion does not claim production-readiness or full live-remediation validation. **Deferred by approved bounded scope** are live AWS validation and current resource/exposure state, authenticated approval ingress, AgentCore Policy/interceptor enforcement, live remediation and post-remediation verification, deployed observability, billing, budgets, teardown, semantic/model-driven tool selection, production retry/timeout/recovery behavior, and complete deployment-time manifest binding. Current billing/resource usage, full history/secret scanning, and agreed IaC/security scan execution are also deferred by approved bounded scope.
+
+Local end-to-end, IAM, Lambda deployment-boundary, fail-closed, and mocked remediation workflow evidence is validated. Trusted authenticated approval, live approved remediation, and live post-remediation verification remain **Deferred by approved bounded scope**. This status does not claim full production live-remediation validation.
 
 The Phase 9 local observability foundation is implemented and validated. It provides a
 versioned `1.0.0` sanitized JSON event schema and shared `allowlist-v1` logging helper for
