@@ -1,9 +1,10 @@
 # Phase 8 Remediation IAM Foundation
 
-`iam/phase8/remediation-write-permissions.json` and
-`iam/phase8/remediation-read-permissions.json` are unattached local policy fixtures for
-the narrow Phase 8 remediation role. They are not created, attached, simulated, or used
-against AWS.
+`iam/phase8/remediation-write-permissions.json` remains an unattached local fixture for
+the write boundary. `iam/phase8/remediation-read-permissions.json` is the offline
+representation of the deployed and verified read policy; its sanitized live verification
+is recorded in [`docs/evidence/phase-8/remediation-read-iam-verification.json`](../evidence/phase-8/remediation-read-iam-verification.json).
+Neither fixture is itself attached or deployed by local validation.
 
 ## Allowlist
 

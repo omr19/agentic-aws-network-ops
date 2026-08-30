@@ -62,10 +62,18 @@ output "reachability_analyzer_path_id" {
 output "phase8_readiness" {
   description = "Opt-in Phase 8 readiness resources; null when disabled."
   value = var.enable_phase8_readiness ? {
-    approval_table_name         = module.phase8_readiness[0].approval_table_name
-    approval_table_arn          = module.phase8_readiness[0].approval_table_arn
-    approval_lambda_role_arn    = module.phase8_readiness[0].approval_lambda_role_arn
-    remediation_lambda_role_arn = module.phase8_readiness[0].remediation_lambda_role_arn
+    approval_table_name               = module.phase8_readiness[0].approval_table_name
+    approval_table_arn                = module.phase8_readiness[0].approval_table_arn
+    approval_lambda_role_arn          = module.phase8_readiness[0].approval_lambda_role_arn
+    remediation_lambda_role_arn       = module.phase8_readiness[0].remediation_lambda_role_arn
+    approval_lambda_function_name     = module.phase8_readiness[0].approval_lambda_function_name
+    approval_lambda_function_arn      = module.phase8_readiness[0].approval_lambda_function_arn
+    approval_lambda_log_group_name    = module.phase8_readiness[0].approval_lambda_log_group_name
+    approval_lambda_log_group_arn     = module.phase8_readiness[0].approval_lambda_log_group_arn
+    remediation_lambda_function_name  = module.phase8_readiness[0].remediation_lambda_function_name
+    remediation_lambda_function_arn   = module.phase8_readiness[0].remediation_lambda_function_arn
+    remediation_lambda_log_group_name = module.phase8_readiness[0].remediation_lambda_log_group_name
+    remediation_lambda_log_group_arn  = module.phase8_readiness[0].remediation_lambda_log_group_arn
   } : null
 }
 

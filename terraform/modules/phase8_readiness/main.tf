@@ -169,3 +169,99 @@ resource "aws_iam_role_policy" "remediation_read" {
     }]
   })
 }
+
+resource "aws_cloudwatch_log_group" "approval" {
+  name              = "/aws/lambda/${var.name_prefix}-phase8-approval"
+  retention_in_days = 7
+
+  tags = merge(var.tags, { Component = "phase8-approval" })
+}
+
+resource "aws_cloudwatch_log_group" "remediation" {
+  name              = "/aws/lambda/${var.name_prefix}-phase8-remediation"
+  retention_in_days = 7
+
+  tags = merge(var.tags, { Component = "phase8-remediation" })
+}
+
+resource "aws_iam_role_policy" "approval_logging" {
+  name = "${var.name_prefix}-phase8-approval-logging"
+  role = aws_iam_role.approval_lambda.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid      = "ApprovalLambdaCloudWatchLogging"
+      Effect   = "Allow"
+      Action   = ["logs:CreateLogStream", "logs:PutLogEvents"]
+      Resource = "${aws_cloudwatch_log_group.approval.arn}:*"
+      Condition = {
+        StringEquals = { "aws:RequestedRegion" = var.region }
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "remediation_logging" {
+  name = "${var.name_prefix}-phase8-remediation-logging"
+  role = aws_iam_role.remediation_lambda.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid      = "RemediationLambdaCloudWatchLogging"
+      Effect   = "Allow"
+      Action   = ["logs:CreateLogStream", "logs:PutLogEvents"]
+      Resource = "${aws_cloudwatch_log_group.remediation.arn}:*"
+      Condition = {
+        StringEquals = { "aws:RequestedRegion" = var.region }
+      }
+    }]
+  })
+}
+
+resource "aws_lambda_function" "approval" {
+  function_name    = "${var.name_prefix}-phase8-approval"
+  filename         = var.approval_lambda_filename
+  source_code_hash = filebase64sha256(var.approval_lambda_filename)
+  role             = aws_iam_role.approval_lambda.arn
+  handler          = "agentic_aws_network_ops.adapters.approval_lambda.handler"
+  runtime          = "python3.13"
+  architectures    = ["arm64"]
+  memory_size      = 256
+  timeout          = 30
+
+  environment {
+    variables = {
+      PHASE8_AWS_REGION          = var.region
+      PHASE8_APPROVAL_TABLE_NAME = aws_dynamodb_table.approvals.name
+    }
+  }
+
+  tags = merge(var.tags, { Component = "phase8-approval" })
+
+  depends_on = [aws_iam_role_policy.approval_logging]
+}
+
+resource "aws_lambda_function" "remediation" {
+  function_name    = "${var.name_prefix}-phase8-remediation"
+  filename         = var.remediation_lambda_filename
+  source_code_hash = filebase64sha256(var.remediation_lambda_filename)
+  role             = aws_iam_role.remediation_lambda.arn
+  handler          = "agentic_aws_network_ops.adapters.remediation_lambda.handler"
+  runtime          = "python3.13"
+  architectures    = ["arm64"]
+  memory_size      = 256
+  timeout          = 30
+
+  environment {
+    variables = {
+      PHASE8_AWS_REGION          = var.region
+      PHASE8_APPROVAL_TABLE_NAME = aws_dynamodb_table.approvals.name
+    }
+  }
+
+  tags = merge(var.tags, { Component = "phase8-remediation" })
+
+  depends_on = [aws_iam_role_policy.remediation_logging]
+}

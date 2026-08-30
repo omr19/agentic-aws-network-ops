@@ -60,7 +60,8 @@ without broadening the existing IAM boundaries.
 
 ## Proposed deployment settings
 
-These are explicit proposed values for later review; none are applied by this local task:
+These values are now declared by the local opt-in Terraform Lambda boundary. They remain
+unapplied unless a separate AWS deployment gate is approved:
 
 | Setting | Approval | Remediation |
 |---|---|---|
@@ -71,13 +72,14 @@ These are explicit proposed values for later review; none are applied by this lo
 | CloudWatch log retention | `7 days` | `7 days` |
 | Function names | `agentic-aws-network-ops-lab-phase8-approval` | `agentic-aws-network-ops-lab-phase8-remediation` |
 
-Environment variables must contain non-secret, deployment-scoped configuration only. The
-proposed allowlist is `PHASE8_AWS_REGION=eu-west-1`,
-`PHASE8_APPROVAL_TABLE_NAME=agentic-aws-network-ops-lab-phase8-approvals`, and immutable
-manifest/configuration identifiers required by the approved adapter. No AWS credentials,
-access keys, tokens, approval payloads, request hashes, resource overrides, or model-provided
-parameters may be supplied through environment variables. Secrets must not be added to the
-wrapper configuration; the Lambda execution role is the only AWS credential source.
+The proposed environment allowlist is now wired into the local Terraform Lambda boundary:
+`PHASE8_AWS_REGION=eu-west-1` and
+`PHASE8_APPROVAL_TABLE_NAME=agentic-aws-network-ops-lab-phase8-approvals`. Immutable
+manifest/trusted-resource configuration remains a future approved factory input; the
+current wrappers do not read environment variables or create AWS clients and continue to
+fail closed until that factory is injected. No AWS credentials, access keys, tokens,
+approval payloads, request hashes, resource overrides, or model-provided parameters may be
+supplied through environment variables.
 
 Both functions should carry these tags:
 
@@ -161,10 +163,10 @@ capabilities; this task does not attach or modify any live IAM policy:
   conditions.
 - Both functions additionally require the separately approved CloudWatch Logs permissions.
 
-The currently deployed remediation role contains the DynamoDB permissions and four EC2
-writes but does not contain the three EC2 describe permissions required by this adapter.
-The new read policy is a local Terraform/fixture proposal only; attaching it remains an
-explicitly approved deployment prerequisite and is not performed here.
+The remediation-read policy is deployed and verified. Its sanitized evidence is recorded in
+[`docs/evidence/phase-8/remediation-read-iam-verification.json`](../evidence/phase-8/remediation-read-iam-verification.json).
+The local Terraform boundary adds Lambda logging permissions separately; it does not broaden
+DynamoDB, EC2 read, or EC2 write access.
 
 
 The Approval Lambda accepts only the closed-world `approval-lambda-event.schema.json` event and delegates to the structured `ApprovalService`. The authenticated principal must come from the production IAM/SigV4 invocation identity; conversational text is never an approval. It records the proposal/request bindings, action, exact operation/resource, principal, decision, creation/expiry timestamps, `ttl_epoch`, consumed state, execution ID/status, and execution-result audit fields.
@@ -181,7 +183,12 @@ The local interfaces contain no boto3/AWS calls. AWS adapters are a later implem
 
 `terraform/modules/phase8_readiness` is opt-in and reproducible. It defines the tagged approval table and separate Approval Lambda/remediation Lambda roles. The remediation role has separate inline policies for DynamoDB consumption/result persistence, the three EC2 read actions required for preflight/verification, and the four ADR 022 EC2 writes. The module is disabled by default, supports teardown by normal Terraform destruction, and uses PAY_PER_REQUEST/TTL to avoid persistent baseline cost.
 
-Lambda packaging, CloudWatch logging permissions, resource-based invocation policies, AgentCore policy/interceptor resources, and live manifest injection are intentionally not invented in Terraform. The current AWS provider/resource graph does not establish those AgentCore deployment contracts; their exact later boundary is: approved Lambda artifact/package and role wiring, direct IAM/SigV4 Approval Lambda invocation, Gateway interceptor/policy configuration through the supported AgentCore control-plane/API path, then policy LOG_ONLY validation before ENFORCE.
+The opt-in Terraform module now declares the two local ZIP-backed Lambda functions, explicit
+seven-day CloudWatch log groups, and narrowly scoped log-stream/event permissions on the
+existing separate execution roles. It still does not create resource-based Lambda invocation
+policies, AgentCore policy/interceptor resources, or live AWS adapter factories. The module
+is disabled by default, supports teardown by normal Terraform destruction, and uses
+PAY_PER_REQUEST/TTL plus seven-day log retention to control persistent baseline cost.
 
 ## Later AWS approval gates
 

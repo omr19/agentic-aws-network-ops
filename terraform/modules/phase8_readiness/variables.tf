@@ -37,3 +37,13 @@ variable "destination_network_acl_id" {
   type        = string
   description = "Terraform-managed destination private network ACL."
 }
+
+variable "approval_lambda_filename" {
+  type        = string
+  description = "Local deterministic Approval Lambda ZIP path."
+}
+
+variable "remediation_lambda_filename" {
+  type        = string
+  description = "Local deterministic Remediation Lambda ZIP path."
+}
