@@ -502,7 +502,7 @@ Deferred by approved scope:
 
 ## Phase 12 — Public GitHub Packaging & Documentation
 
-> **IN PROGRESS — controlled private sharing.** README and technical documentation, the five editable architecture diagrams and SVG exports, diagram flow summaries, deployment/teardown guidance, and the private screenshot strategy are documented under bounded scope. Full Git-history secret scanning, the license decision, and final external-reader review remain open. Public repository publication and unsupported live-production claims remain deferred.
+> **COMPLETE — controlled private-sharing scope.** README and technical documentation, the five editable architecture diagrams and SVG exports, diagram flow summaries, deployment/teardown guidance, sanitization review, and the private screenshot strategy are documented. Public repository publication and unsupported live-production claims remain deferred by decision.
 
 ### 12.1 README & Technical Documentation
 
@@ -532,7 +532,7 @@ Deferred by approved scope:
   - Do not copy or commit raw or sanitized screenshots at this time
   - Sanitized screenshots may be added later only when they provide clear value for an interview, demo, or controlled portfolio review
   - Repository reproducibility relies on Terraform source, sanitized JSON evidence, Markdown documentation, tests, and future editable architecture diagrams
-- [ ] Add appropriate license
+- [x] License decision recorded: no public license is added because the repository is private; rights remain reserved for controlled sharing
 
 ### 12.2 Professional Architecture Diagrams
 
@@ -549,18 +549,19 @@ Each diagram requires an editable source file plus PNG/SVG export. Use professio
 
 ### 12.3 Repository Sanitization & Public Readiness
 
-- [ ] Scan full Git history for secrets
-- [ ] Confirm no raw credentials/secrets in repository history
+- [x] Scan full Git history for secrets using repository-wide credential-pattern review
+- [x] Confirm no live/raw credentials or secrets in repository history; matches are inert `testing` values in Stubber tests only
 - [x] Confirm example variable files contain placeholders only
 - [x] Sanitize account IDs and environment-specific identifiers from public-facing artifacts where appropriate
 - [x] Verify no Terraform state is committed
 - [x] Verify documentation links
 - [x] Verify setup/teardown instructions
-- [ ] Review repository as an external reader
+- [x] Review repository as an external reader
 - [x] Confirm the GitHub repository remains private intentionally for controlled portfolio sharing
 - [ ] Publish the repository publicly — **Deferred; not required for Phase 12 completion**
 
-- [ ] **Phase 12 COMPLETE** — pending full-history secret scan, license decision, and final external-reader review
+- [x] **Phase 12 COMPLETE — controlled private-sharing scope**
+  - Public publication remains deferred by decision; this completion does not claim public release or unsupported production capabilities.
 
 ---
 
