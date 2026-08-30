@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0.0",
+  "evidence_type": "phase_8_remediation_read_iam_verification",
+  "validation_status": "succeeded",
+  "region": "eu-west-1",
+  "terraform_apply": {
+    "plan_path": "/tmp/phase8-remediation-read.tfplan",
+    "resource_address": "module.phase8_readiness[0].aws_iam_role_policy.remediation_read",
+    "resources_added": 1,
+    "resources_changed": 0,
+    "resources_destroyed": 0
+  },
+  "iam_policy": {
+    "role_name": "agentic-aws-network-ops-lab-phase8-remediation-lambda",
+    "policy_name": "agentic-aws-network-ops-lab-phase8-remediation-read",
+    "version": "2012-10-17",
+    "effect": "Allow",
+    "actions": [
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeRouteTables",
+      "ec2:DescribeNetworkAcls"
+    ],
+    "resource": "*",
+    "condition": {
+      "StringEquals": {
+        "aws:RequestedRegion": "eu-west-1"
+      }
+    },
+    "principal_present": false
+  },
+  "post_apply_terraform_plan": {
+    "status": "no_changes",
+    "other_resource_changes": false
+  },
+  "remediation_executed": false,
+  "lambda_deployed_or_invoked": false,
+  "agentcore_changed": false,
+  "network_or_dynamodb_changed": false,
+  "provenance": "Sanitized summary of the authorized Terraform apply, read-only IAM get-role-policy verification, and post-apply Terraform plan. No credentials, account identifiers, or raw AWS response payloads are stored. This evidence does not mark Phase 8 complete."
+}
