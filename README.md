@@ -24,6 +24,7 @@ Both project EC2 instances are currently stopped, and all temporary Phase 7 Flow
 - [Phase 4 validation report](docs/evidence/phase-4-validation.md) — network lab validation.
 - [Phase 7 Flow Logs validation evidence](docs/evidence/phase-7/flowlogs-validation.json) — sanitized cleanup and limitation record.
 - [Architecture decision records](docs/adr/README.md) — significant design decisions and rationale.
+- [Business case and market positioning](docs/business-case.md) — customer problem, target audiences, differentiation, commercialization path, and production-readiness boundary.
 
 ## Phase-by-Phase Progress
 
