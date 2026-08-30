@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-**Phase 11 — Destroy & Cost Verification COMPLETE — bounded teardown and immediate cost verification; delayed billing follow-up pending; Phase 10 COMPLETE — bounded validation scope; Phase 9 COMPLETE — bounded local-validation scope**
+**Phase 11 — Destroy & Cost Verification COMPLETE — bounded teardown, immediate cost verification, and delayed billing review recorded; Phase 10 COMPLETE — bounded validation scope; Phase 9 COMPLETE — bounded local-validation scope**
 
 Phase 10 is complete under an explicitly approved repository-only bounded-validation scope. The checked items in `PROJECT_CHECKLIST.md` are supported by offline functional and repeatability tests, deterministic diagnosis evidence, local approval/denial/verification contracts, architecture and security review, the exact-account IAM correction, local packaging/quality validation, and cost-control documentation. The requirements-to-evidence matrix is [`docs/architecture/phase-10-validation-matrix.md`](docs/architecture/phase-10-validation-matrix.md).
 
@@ -10,7 +10,7 @@ This completion does not claim production-readiness or full live-remediation val
 
 Local end-to-end, IAM, Lambda deployment-boundary, fail-closed, and mocked remediation workflow evidence is validated. Trusted authenticated approval, live approved remediation, and live post-remediation verification remain **Deferred by approved bounded scope**. This status does not claim full production live-remediation validation.
 
-Phase 11 bounded teardown and immediate cost-verification work is complete and documented in [`docs/architecture/phase-11-teardown-preflight.md`](docs/architecture/phase-11-teardown-preflight.md). Terraform state is empty. The nine Network Insights analyses, AgentCore Runtime/Gateway/target, Phase 5 diagnostic Lambda and log group, dedicated IAM roles, Runtime S3 object, and Runtime S3 bucket were deleted and independently verified absent. No active project EC2 or EBS resources remain. The Resource Groups Tagging API still returns nine stale EC2-service entries representing historical terminated/deleted Terraform resources. Immediate Cost Explorer review completed with account-level, estimated, non-project-attributed results. Phase 11 is complete for the bounded teardown and immediate cost-verification scope; delayed billing verification remains a follow-up for the next billing refresh and is not claimed as complete.
+Phase 11 bounded teardown, immediate cost-verification work, and delayed billing review are complete and documented in [`docs/architecture/phase-11-teardown-preflight.md`](docs/architecture/phase-11-teardown-preflight.md). Terraform state is empty. The nine Network Insights analyses, AgentCore Runtime/Gateway/target, Phase 5 diagnostic Lambda and log group, dedicated IAM roles, Runtime S3 object, and Runtime S3 bucket were deleted and independently verified absent. No active project EC2 or EBS resources remain. The Resource Groups Tagging API still returns nine stale EC2-service entries representing historical terminated/deleted Terraform resources. The delayed Cost Explorer review completed on 2026-08-27 for 2026-08-16 through 2026-08-28 (end exclusive), returning 12 estimated daily periods and an account-level, service-grouped total of $0.237502973 USD. The result is not project-attributed, includes unrelated account services, and does not establish project-specific zero billing.
 
 The Phase 9 local observability foundation is implemented and validated. It provides a
 versioned `1.0.0` sanitized JSON event schema and shared `allowlist-v1` logging helper for
@@ -510,11 +510,11 @@ The approved Phase 11 teardown and separate manual cleanup are complete for the 
 
 Immediate Cost Explorer review completed for 2026-08-16 through 2026-08-30. Returned data was account-level, estimated, and not project-attributed; it showed historical/account-level S3, CloudWatch, EC2/VPC, and AgentCore service signals. The result is evidence of an immediate billing read, not proof of project-specific cost or final zero billing.
 
-Billing data may lag resource deletion. Delayed billing verification remains a follow-up for the next billing refresh and is outside the bounded Phase 11 completion gate. No project Budget/cost-alert configuration was verified.
+Billing data may lag resource deletion. Delayed read-only Cost Explorer verification completed on 2026-08-27 for 2026-08-16 through 2026-08-28 (end exclusive): all 12 daily periods were estimated and the account-level, service-grouped total was $0.237502973 USD. The result is not project-attributed, includes unrelated account services, and does not establish project-specific zero billing. No project Budget/cost-alert configuration was verified.
 
 ### Current cleanup and retention status
 
-Cleanup evidence and local Terraform state/backup remain preserved and private. No active project Lambda, CloudWatch log group, IAM role, AgentCore resource, S3 bucket/object, EC2 instance, or EBS volume remains. The bounded Phase 11 completion gate is recorded; delayed Cost Explorer/billing verification remains a follow-up for the next billing refresh.
+Cleanup evidence and local Terraform state/backup remain preserved and private. No active project Lambda, CloudWatch log group, IAM role, AgentCore resource, S3 bucket/object, EC2 instance, or EBS volume remains. The bounded Phase 11 completion gate and delayed Cost Explorer/billing verification are recorded with their account-level, estimated, and non-project-attributed limitations.
 
 
 ## Current Design / Governance Decisions
@@ -579,7 +579,7 @@ architecture and do not justify broader IAM permissions.
 
 ### Current Project Blockers
 
-**No resource-cleanup blocker identified.** Terraform teardown and separately managed cleanup are complete and independently verified. The bounded Phase 11 teardown and immediate cost-verification scope is complete; delayed billing verification remains a follow-up for the next billing refresh.
+**No resource-cleanup blocker identified.** Terraform teardown, separately managed cleanup, and delayed read-only Cost Explorer verification are complete and independently documented. The delayed result is account-level, estimated, and not project-attributed.
 
 ### Phase 1 Completion Gate
 
@@ -604,7 +604,7 @@ Phase 2 — Architecture & Technical Design is **COMPLETE**.
 
 ### Project Resources
 
-Terraform teardown is complete and local Terraform state is empty. Separately managed project resources were deleted and independently verified absent, including the nine Network Insights analyses, AgentCore Runtime/Gateway/target, Phase 5 diagnostic Lambda and log group, dedicated IAM roles, Runtime S3 object, and Runtime S3 bucket. No active project EC2 or EBS resources remain; nine stale EC2 tag-index entries represent historical terminated/deleted resources. The bounded Phase 11 teardown and immediate cost-verification scope is complete; delayed billing verification remains a follow-up for the next billing refresh.
+Terraform teardown is complete and local Terraform state is empty. Separately managed project resources were deleted and independently verified absent, including the nine Network Insights analyses, AgentCore Runtime/Gateway/target, Phase 5 diagnostic Lambda and log group, dedicated IAM roles, Runtime S3 object, and Runtime S3 bucket. No active project EC2 or EBS resources remain; nine stale EC2 tag-index entries represent historical terminated/deleted resources. The bounded Phase 11 teardown, immediate cost verification, and delayed billing verification are complete; the delayed result is account-level, estimated, and not project-attributed.
 
 ### Local / Repository State
 
@@ -612,13 +612,13 @@ The ignored local Terraform state and backup record the empty post-teardown stat
 
 ### Future Cleanup
 
-No further project-resource cleanup is pending. After the billing-lag window, perform the delayed Cost Explorer/billing verification and record the result as a follow-up to the completed bounded Phase 11 scope.
+No further project-resource cleanup is pending. The delayed Cost Explorer/billing verification is complete for the recorded account-level, estimated, non-project-attributed review; it does not establish project-specific zero billing.
 
 ---
 
 ## Exact Next Step
 
-The bounded Phase 11 teardown and immediate cost-verification scope is complete. After the billing-lag window, perform the delayed Cost Explorer/billing review and record whether any project-attributable charges remain. No AWS or Terraform action is authorized by this checkpoint.
+The bounded Phase 11 teardown, immediate cost verification, and delayed read-only Cost Explorer review are complete. The delayed review is documented as account-level, estimated, and not project-attributed; it does not establish project-specific zero billing. No AWS or Terraform action is authorized by this checkpoint.
 The preceding Phase 5 implementation checkpoint is retained below for historical context.
 
 Kiro completed the planned independent P5-01/P5-02 review on 2026-08-29. Its three

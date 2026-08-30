@@ -1,8 +1,8 @@
 # Phase 11 Teardown and Cost-Verification Record
 
-**Status:** Bounded Terraform and separately managed project cleanup plus immediate cost verification complete; delayed billing verification remains a follow-up for the next billing refresh. The bounded Phase 11 completion gate is recorded.
+**Status:** Bounded Terraform and separately managed project cleanup plus immediate and delayed cost verification complete. The delayed review is account-level, estimated, and not project-attributed; it does not establish project-specific zero billing. The bounded Phase 11 completion gate is recorded.
 
-**Scope:** This document records the approved `eu-west-1` teardown evidence, the empty Terraform state, manual cleanup results, stale tag-index limitation, immediate Cost Explorer review, and delayed billing follow-up. No further resource action is authorized by this document.
+**Scope:** This document records the approved `eu-west-1` teardown evidence, the empty Terraform state, manual cleanup results, stale tag-index limitation, immediate Cost Explorer review, delayed Cost Explorer verification, and billing attribution limitations. No further resource action is authorized by this document.
 
 ## Reconciled inventory
 
@@ -29,7 +29,7 @@ The Terraform state is **empty** after the approved two-stage destroy. The initi
 | “One retained healthy-path analysis” | Nine analyses were identified, deleted first, and independently verified absent. |
 | “No AgentCore Runtime/Gateway deployed” | Later evidence and console review identified the project Runtime, target, and Gateway; all three were subsequently deleted and verified absent. |
 | Historical temporary-analysis cleanup record | Historical cleanup evidence remains valid for its original scope; the nine analyses were separately deleted and verified. |
-| Phase 11 status | Bounded teardown and immediate cost review are complete. Delayed billing verification remains a follow-up for the next billing refresh and is outside the bounded completion gate. |
+| Phase 11 status | Bounded teardown, immediate cost review, and delayed billing review are complete. The delayed result is account-level, estimated, and not project-attributed; it does not establish project-specific zero billing. |
 
 The Resource Groups Tagging API still returns nine stale `ec2`-service entries associated with terminated/deleted historical Terraform resources. Direct inventory found no active project EC2 instances or EBS volumes. RDS and CloudFormation were not included in the approved project cleanup scope; this record makes no account-wide absence claim for unrelated services.
 
@@ -39,7 +39,8 @@ The Resource Groups Tagging API still returns nine stale `ec2`-service entries a
 - The Phase 5 Lambda, diagnostic log group, AgentCore resources, IAM roles, Runtime S3 object, and Runtime S3 bucket were deleted and independently verified absent.
 - Immediate Cost Explorer review covered 2026-08-16 through 2026-08-30. Results were account-level, estimated, and not project-attributed; selected historical service signals included S3, CloudWatch, EC2/VPC, and AgentCore.
 - The immediate query is not proof of final project-specific zero billing. Cost and usage data can lag deletion and may include unrelated account services.
-- The delayed Cost Explorer/billing review after the billing-lag window remains a follow-up for the next billing refresh and is outside the bounded Phase 11 completion gate.
+- The delayed Cost Explorer/billing review completed on 2026-08-27 for 2026-08-16 through 2026-08-28 (end exclusive), returned 12 daily periods, all marked estimated, and reported an account-level, service-grouped total of **$0.237502973 USD**.
+- The delayed result is not project-attributed, includes unrelated account services, and does not establish project-specific zero billing. Cost and usage data can still be revised or lag service activity.
 - No project Budget/cost-alert configuration was verified.
 
 Keep local Terraform state, its backup, and sanitized cleanup evidence private; they contain infrastructure identifiers and must not be committed.
@@ -73,7 +74,7 @@ The following approved sequence was executed without Terraform changes beyond th
 7. Deleted `phase5/runtime.zip`, confirmed no versions or delete markers remained, then deleted the empty Runtime bucket.
 8. Ran immediate read-only service and tag inventories; the only remaining tagged entries are nine stale EC2-service records for terminated/deleted historical Terraform resources.
 9. Ran immediate Cost Explorer review. Results are account-level, estimated, and not project-attributed.
-10. Delayed billing verification remains a follow-up for the next billing refresh and is not claimed as complete.
+10. Ran delayed read-only Cost Explorer review on 2026-08-27 for 2026-08-16 through 2026-08-28 (end exclusive). All 12 daily periods were estimated; the account-level, service-grouped total was $0.237502973 USD. The initial project role lacked `ce:GetCostAndUsage`, so the successful read-only query used the available default account profile. The result is not project-attributed and does not establish project-specific zero billing.
 
 No unrelated resources, Terraform configuration, repository files, commits, or pushes were changed.
 
@@ -88,10 +89,10 @@ No unrelated resources, Terraform configuration, repository files, commits, or p
 - [x] Runtime S3 object, all discovered versions/delete markers, and bucket are absent.
 - [x] No active project compute or storage resources remain.
 - [x] Immediate Cost Explorer review is recorded as account-level, estimated, and not project-attributed.
-- [ ] Delayed Cost Explorer/billing verification after the billing-lag window is recorded as a follow-up for the next billing refresh.
+- [x] Delayed Cost Explorer/billing verification completed on 2026-08-27 for 2026-08-16 through 2026-08-28 (end exclusive); all 12 daily periods were estimated, account-level, service-grouped, and not project-attributed. The $0.237502973 USD total does not establish project-specific zero billing.
 - [x] Local Terraform state/backend retention is documented and remains private.
-- [x] The bounded Phase 11 completion gate is recorded; delayed billing verification remains outside that bounded gate.
+- [x] The bounded Phase 11 completion gate is recorded; delayed billing verification is documented with its attribution and estimation limitations.
 
 ## Current Phase 11 decision
 
-The bounded Phase 11 teardown and immediate cost-verification scope is complete and independently verified. Delayed billing verification remains a follow-up for the next billing refresh and is not claimed as complete. Immediate Cost Explorer results are account-level, estimated, and not project-attributed; they do not establish final project-specific zero billing.
+The bounded Phase 11 teardown, immediate cost verification, and delayed read-only Cost Explorer review are complete and independently documented. The delayed review was performed on 2026-08-27 for 2026-08-16 through 2026-08-28 (end exclusive); all 12 daily periods were estimated and the account-level, service-grouped total was $0.237502973 USD. The data is not project-attributed, includes unrelated account services, and does not establish project-specific zero billing.

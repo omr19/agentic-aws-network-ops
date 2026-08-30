@@ -490,13 +490,13 @@ Deferred by approved scope:
   - Local Terraform state and backup evidence remain private and uncommitted.
 - [x] Review immediate Cost Explorer/billing signals where available
   - Immediate Cost Explorer review completed; returned data is account-level, estimated, and not project-attributed.
-- [ ] Perform delayed billing verification after the billing-lag window
-  - Follow-up for the next billing refresh; this is outside the bounded teardown and immediate cost-verification completion gate.
+- [x] Perform delayed billing verification after the billing-lag window
+  - Read-only Cost Explorer verification completed on **2026-08-27** for **2026-08-16 through 2026-08-28** (end exclusive). The 12 daily periods were all estimated; the account-level, service-grouped total was **$0.237502973 USD**. The result is not project-attributed, includes unrelated account services, and does not establish project-specific zero billing.
 - [x] Document teardown and independent verification procedure
   - Completed teardown order, resource evidence, inventory limitations, and billing follow-up are documented in the Phase 11 preflight.
 
 - [x] **Phase 11 COMPLETE — bounded teardown and immediate cost verification**
-  - Delayed billing verification remains a follow-up for the next billing refresh.
+  - Delayed billing verification is recorded as a read-only, account-level, estimated, non-project-attributed review; it does not establish project-specific zero billing.
 
 ---
 
