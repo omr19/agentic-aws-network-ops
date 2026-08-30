@@ -130,3 +130,48 @@ P1 Requirements
 - [`iam/`](iam/) — reviewed policy fixtures and IAM boundaries.
 - [`terraform/`](terraform/) — infrastructure definitions and environment composition.
 - [`tests/`](tests/) — unit, contract, and security validation.
+
+## External-reader guide
+
+### Problem → solution → outcome
+Network incidents often require engineers to correlate VPC configuration, routes, security groups, NACLs, Reachability Analyzer, and telemetry across several AWS surfaces. This project demonstrates a controlled assistant that selects read-only diagnostic tools, gathers authoritative evidence, explains the likely cause, proposes a bounded change, and verifies the result after explicit human approval. The intended outcome is faster, more explainable diagnosis with no implicit AI authorization—not autonomous production operations. The [business requirements](docs/requirements.md) define the use cases, learning objectives, and success criteria.
+
+### Audience and learning objectives
+This project is intended for AWS/network engineers, cloud and platform engineers, SRE/DevOps practitioners, architects, security reviewers, Agentic AI practitioners, and hiring managers. It demonstrates five capabilities: AgentCore operations workflow, MCP tool contracts, deterministic evidence plus generative explanation, secure human-controlled remediation, and production-oriented Terraform/testing/observability discipline. These are learning and portfolio outcomes; they are not claims of production readiness.
+
+### Why Agentic AI?
+A scripted workflow can reliably run a fixed checklist, but network failures require adaptive selection and correlation across independent evidence sources. The agent can choose relevant READ tools and explain their combined results. Deterministic AWS APIs and services establish facts; the model correlates and communicates them. The model cannot authorize, invent reachability, invoke generic AWS commands, or bypass policy, IAM, approval, or verification gates. Semantic/model-driven selection and live AgentCore enforcement remain bounded/deferred capabilities in this repository’s validation record.
+
+### Architecture diagrams
+The five diagrams explain how the design fits together. Each has an editable source and SVG export:
+
+| Topic | Editable source | SVG export |
+|---|---|---|
+| End-to-end solution | [draw.io](docs/diagrams/01-end-to-end-solution-architecture.drawio) | [SVG](docs/diagrams/01-end-to-end-solution-architecture.svg) |
+| AWS two-VPC topology | [draw.io](docs/diagrams/02-aws-network-topology.drawio) | [SVG](docs/diagrams/02-aws-network-topology.svg) |
+| AgentCore/MCP tool flow | [draw.io](docs/diagrams/03-agentcore-mcp-tool-flow.drawio) | [SVG](docs/diagrams/03-agentcore-mcp-tool-flow.svg) |
+| Observability/evidence flow | [draw.io](docs/diagrams/04-observability-evidence-flow.drawio) | [SVG](docs/diagrams/04-observability-evidence-flow.svg) |
+| Observe → Diagnose → Remediate | [draw.io](docs/diagrams/05-observe-diagnose-remediate-approval-flow.drawio) | [SVG](docs/diagrams/05-observe-diagnose-remediate-approval-flow.svg) |
+
+The diagrams describe the approved/reproducible MVP, not a currently deployed environment. AWS resources shown as historical/deleted or deferred are labeled accordingly.
+
+### Component responsibilities and workflow
+AgentCore Runtime hosts one operational agent; AgentCore Gateway is the managed MCP/policy boundary; the diagnostic Lambda exposes nine strict READ contracts; a separate remediation Lambda exposes exactly three bounded WRITE tools; and the direct IAM/SigV4 Approval Lambda stores a short-lived one-time approval. The agent correlates evidence from AWS configuration APIs, Reachability Analyzer, CloudWatch metrics, and optional controlled-session Flow Logs.
+
+The intended flow is: **Observe** deterministic facts → **Diagnose** and explain the evidence → **Propose** a canonical bounded action → **Approve or reject** through the authenticated human boundary → **Enforce** independent policy, interceptor, manifest, and IAM checks → **Remediate** only an allowlisted SG ingress, peering route, or destination NACL rule → **Verify** with READ evidence and report Terraform drift. Missing, expired, replayed, changed, or denied approvals terminate before any write.
+
+### Security, failure scenarios, and testing
+READ and WRITE identities are separate, approval is not AWS permission, and policy and IAM are independent gates. Generic AWS execution, IAM changes, public routes, NAT/IGW, deletion, peering lifecycle, compute, endpoint, DNS, Flow Logs, and TGW writes are prohibited. The three reversible network scenarios are a blocked destination security-group rule, a missing/incorrect peering route, and a blocked destination NACL rule. Local tests cover schemas, fakes, approval binding/expiry/replay, denial, fail-closed behavior, IAM simulation, remediation contracts, and verification; live authenticated approval, live remediation, deployed policy/interceptor enforcement, and production telemetry remain deferred. See the [Phase 10 validation matrix](docs/architecture/phase-10-validation-matrix.md) and [development checks](docs/development.md).
+
+### Reproducible deployment and teardown
+The repository is currently torn down. Any redeployment requires a separate authorization gate: review `terraform.tfvars.example`, run `terraform init`, `terraform fmt -check`, `terraform validate`, save and review a plan, and obtain explicit approval before `terraform apply` in `eu-west-1`. Capture sanitized evidence and validate the healthy TCP/443 path before introducing a reversible failure. AgentCore, Gateway, Lambda, IAM, and approval integrations are separate historical/deferred boundaries and must not be inferred from the Terraform network root.
+
+Teardown must begin with an inventory and approved scope. Delete dependent Reachability Analyzer analyses before their paths, apply the reviewed Terraform destroy plan, then clean separately managed AgentCore, Lambda, log-group, IAM, DynamoDB, S3, and temporary Flow Logs resources, and independently verify absence and delayed billing limitations. The [Phase 11 teardown record](docs/architecture/phase-11-teardown-preflight.md) is evidence of the completed historical teardown, not an authorization to change AWS.
+
+### Cost controls, tradeoffs, and limitations
+The design avoids public egress, NAT Gateway, persistent compute, unnecessary endpoints, and TGW in the MVP. Main cost drivers are short-lived EC2/EBS test workloads, Reachability Analyzer analyses, Lambda/log retention, and optional telemetry. The delayed Cost Explorer total of `$0.237502973 USD` was account-level, estimated, and not project-attributed; it is not project-specific zero billing. No project budget was verified.
+
+Important tradeoffs are recorded in the [ADR index](docs/adr/README.md): peering instead of TGW for the two-VPC lab, no default NAT/endpoints, one agent instead of multi-agent complexity, native AgentCore invocation instead of an API Gateway extension, and local state for a single-engineer MVP. Current limitations include no active AWS resources, no live Flow Logs traffic record or Logs Insights query, deferred deployed observability, deferred trusted live approval/remediation and post-change verification, bounded local/mock validation, deferred semantic tool selection, and no production-readiness claim.
+
+### Private controlled sharing
+The repository is intentionally private. Raw screenshots and unsanitized state/evidence remain outside Git; screenshots are optional private/demo assets and are not repository deliverables. Safe tracked sharing relies on Terraform source, sanitized JSON evidence, Markdown, tests, and editable diagrams. Public publication is deferred; secret scanning, sanitization, link review, and external-reader review remain Phase 12 gates. See [project status](PROJECT_STATUS.md), [diagrams guidance](docs/diagrams/README.md), and [tooling-risk guidance](docs/security/tooling-risk.md).
