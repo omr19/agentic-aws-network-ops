@@ -7,6 +7,7 @@ MODULE_MAIN = ROOT / "terraform/modules/phase8_readiness/main.tf"
 MODULE_VARIABLES = ROOT / "terraform/modules/phase8_readiness/variables.tf"
 MODULE_OUTPUTS = ROOT / "terraform/modules/phase8_readiness/outputs.tf"
 LAB_MAIN = ROOT / "terraform/environments/lab/main.tf"
+LAB_VARIABLES = ROOT / "terraform/environments/lab/variables.tf"
 LAB_OUTPUTS = ROOT / "terraform/environments/lab/outputs.tf"
 
 
@@ -45,6 +46,28 @@ def test_phase8_logging_policy_is_narrow_and_agentcore_free() -> None:
     assert 'logs:DescribeLogGroups' not in source
     assert 'aws_lambda_permission' not in source
     assert "agentcore" not in source.lower()
+
+
+def test_phase8_write_policy_uses_exact_account_scope_without_broadening() -> None:
+    source = MODULE_MAIN.read_text(encoding="utf-8")
+    variables = MODULE_VARIABLES.read_text(encoding="utf-8")
+    root_variables = LAB_VARIABLES.read_text(encoding="utf-8")
+    lab_main = LAB_MAIN.read_text(encoding="utf-8")
+
+    assert 'variable "account_id"' in variables
+    assert 'can(regex("^[0-9]{12}$", var.account_id))' in variables
+    assert 'arn:aws:ec2:${var.region}:${var.account_id}:security-group/' in source
+    assert 'arn:aws:ec2:${var.region}:${var.account_id}:route-table/' in source
+    assert 'arn:aws:ec2:${var.region}:${var.account_id}:network-acl/' in source
+    assert 'arn:aws:ec2:${var.region}:*:security-group/' not in source
+    assert 'arn:aws:ec2:${var.region}:*:route-table/' not in source
+    assert 'arn:aws:ec2:${var.region}:*:network-acl/' not in source
+    assert 'variable "phase8_account_id"' in root_variables
+    assert (
+        'var.phase8_account_id == "" || can(regex("^[0-9]{12}$", '
+        'var.phase8_account_id))'
+    ) in root_variables
+    assert 'account_id                    = var.phase8_account_id' in lab_main
 
 
 def test_phase8_root_wires_local_artifacts_and_exposes_deployment_outputs() -> None:

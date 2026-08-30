@@ -129,6 +129,7 @@ module "phase8_readiness" {
   destination_security_group_id = module.destination_workload.security_group_id
   destination_route_table_ids   = module.destination_vpc.private_route_table_ids
   destination_vpc_id            = module.destination_vpc.vpc_id
+  account_id                    = var.phase8_account_id
   name_prefix                   = local.name_prefix
   region                        = var.aws_region
   source_route_table_ids        = module.source_vpc.private_route_table_ids

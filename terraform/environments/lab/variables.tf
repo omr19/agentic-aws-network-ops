@@ -54,6 +54,17 @@ variable "enable_phase8_readiness" {
   default     = false
 }
 
+variable "phase8_account_id" {
+  description = "AWS account ID that owns Phase 8 remediation resources; required when readiness is enabled and kept empty otherwise."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.phase8_account_id == "" || can(regex("^[0-9]{12}$", var.phase8_account_id))
+    error_message = "phase8_account_id must be empty or exactly 12 decimal digits."
+  }
+}
+
 variable "phase8_authorized_approvers" {
   description = "Explicit IAM principal ARNs authorized to submit Phase 8 approval decisions; empty remains fail-closed."
   type        = list(string)

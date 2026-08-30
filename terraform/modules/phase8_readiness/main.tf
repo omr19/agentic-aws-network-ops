@@ -101,7 +101,7 @@ resource "aws_iam_role_policy" "remediation_write" {
         Sid      = "RestoreSecurityGroupIngress"
         Effect   = "Allow"
         Action   = "ec2:AuthorizeSecurityGroupIngress"
-        Resource = "arn:aws:ec2:${var.region}:*:security-group/${var.destination_security_group_id}"
+        Resource = "arn:aws:ec2:${var.region}:${var.account_id}:security-group/${var.destination_security_group_id}"
         Condition = {
           StringEquals = {
             "aws:RequestedRegion"         = var.region
@@ -117,8 +117,8 @@ resource "aws_iam_role_policy" "remediation_write" {
         Effect = "Allow"
         Action = ["ec2:CreateRoute", "ec2:ReplaceRoute"]
         Resource = concat(
-          [for id in var.source_route_table_ids : "arn:aws:ec2:${var.region}:*:route-table/${id}"],
-          [for id in var.destination_route_table_ids : "arn:aws:ec2:${var.region}:*:route-table/${id}"]
+          [for id in var.source_route_table_ids : "arn:aws:ec2:${var.region}:${var.account_id}:route-table/${id}"],
+          [for id in var.destination_route_table_ids : "arn:aws:ec2:${var.region}:${var.account_id}:route-table/${id}"]
         )
         Condition = {
           StringEquals = {
@@ -133,7 +133,7 @@ resource "aws_iam_role_policy" "remediation_write" {
         Sid      = "RestoreNetworkAclEntry"
         Effect   = "Allow"
         Action   = "ec2:ReplaceNetworkAclEntry"
-        Resource = "arn:aws:ec2:${var.region}:*:network-acl/${var.destination_network_acl_id}"
+        Resource = "arn:aws:ec2:${var.region}:${var.account_id}:network-acl/${var.destination_network_acl_id}"
         Condition = {
           StringEquals = {
             "aws:RequestedRegion"         = var.region

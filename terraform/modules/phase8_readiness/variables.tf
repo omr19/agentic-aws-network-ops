@@ -8,6 +8,16 @@ variable "region" {
   description = "Approved deployment region."
 }
 
+variable "account_id" {
+  type        = string
+  description = "AWS account ID that owns the Terraform-managed remediation resources."
+
+  validation {
+    condition     = can(regex("^[0-9]{12}$", var.account_id))
+    error_message = "account_id must be exactly 12 decimal digits."
+  }
+}
+
 variable "tags" {
   type        = map(string)
   description = "Required project ownership tags."
