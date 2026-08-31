@@ -4,9 +4,17 @@ A portfolio project for explainable AWS network diagnosis using deterministic cl
 
 ## Project Status and Achievements
 
-**Current phase: Phase 12 — Public GitHub Packaging & Documentation (local controlled-sharing preparation; repository intentionally private).** Phase 11 is complete for bounded teardown, immediate cost verification, and delayed billing review. The approved Terraform teardown completed and Terraform state is empty. The nine Network Insights analyses, AgentCore Runtime/Gateway/target, Phase 5 diagnostic Lambda and log group, dedicated IAM roles, Runtime S3 object, and Runtime S3 bucket were deleted and independently verified absent. Delayed Cost Explorer review completed on 2026-08-27 for 2026-08-16 through 2026-08-28 (end exclusive): 12 daily periods, all estimated, account-level and service-grouped, totaling $0.237502973 USD. The data is not project-attributed and includes unrelated account services, so it does not establish project-specific zero billing. The [Phase 11 teardown preflight](docs/architecture/phase-11-teardown-preflight.md) records the evidence and limitations.
+**Phase 13 is complete under a private-repository scope.**
 
-README and technical documentation are being prepared for controlled sharing while secret scanning, diagrams, deployment/teardown instructions, and external-reader review remain open. The screenshot strategy is intentionally conservative: raw AWS screenshots remain outside the repository in the private desktop folder, and no raw or sanitized screenshots are copied or committed at this time. Screenshots are optional private/demo evidence rather than required repository deliverables. Reproducibility relies on Terraform source, sanitized JSON evidence, Markdown documentation, tests, and future editable architecture diagrams. Sanitized screenshots may be added later if they provide clear value for an interview, demo, or controlled portfolio review. Public repository publication is deferred and is not required for Phase 12 completion.
+The project delivered a reproducible Terraform-based AWS network lab with two VPCs,
+VPC peering, deterministic diagnostics, AgentCore/MCP integration, bounded remediation
+workflows, observability contracts, architecture diagrams, and career/demo materials.
+
+All temporary AWS resources were torn down and Terraform state is empty. Detailed
+teardown, evidence, limitations, and delayed billing verification are documented in
+the [project status](PROJECT_STATUS.md) and [Phase 11 teardown report](docs/architecture/phase-11-teardown-preflight.md).
+
+README and technical documentation are complete for controlled private sharing. The screenshot strategy is intentionally conservative: raw AWS screenshots remain outside the repository in the private desktop folder, and no raw or sanitized screenshots are copied or committed at this time. Screenshots are optional private/demo evidence rather than required repository deliverables. Reproducibility relies on Terraform source, sanitized JSON evidence, Markdown documentation, tests, and editable architecture diagrams. Public repository publication remains deferred and is not required.
 
 Phase 7 also retains a documented limitation: CloudWatch metrics were validated, but live Flow Logs/CloudWatch Logs traffic evidence was not obtained because the project EC2 instances have no IAM instance profiles or SSM readiness. No live Flow Log record or Logs Insights query is claimed.
 
@@ -50,8 +58,8 @@ The table preserves the 13 authoritative phases in `PROJECT_CHECKLIST.md`.
 | 9 — Monitoring, Alerting & Observability | Complete — bounded local-validation scope | Versioned observability contract, sanitized instrumentation, correlation/session metadata, redaction, and offline validation are complete. Live CloudWatch/AgentCore telemetry, dashboards, alarms, budgets, Flow Logs delivery, and deployed end-to-end correlation are deferred. |
 | 10 — Testing, Architecture Review, Security Review & Cost Review | Complete — bounded validation scope | Repository-only offline functional/repeatability tests, deterministic diagnosis, local approval/denial/verification contracts, architecture/security review, exact-account IAM correction, local quality validation, and cost-control documentation. Live and unresolved capabilities are deferred by approved bounded scope; this is not a production-readiness or full live-remediation claim. |
 | 11 — Destroy & Cost Verification | Complete — bounded teardown, immediate cost verification, and delayed billing review | Terraform state is empty; all nine analyses, AgentCore Runtime/Gateway/target, Phase 5 Lambda/log group, dedicated IAM roles, Runtime S3 object/bucket are deleted and independently verified absent. No active EC2/EBS resources remain; nine EC2 tag-index entries are stale historical records. Delayed Cost Explorer review on 2026-08-27 covered 2026-08-16 through 2026-08-28 (end exclusive), with all 12 daily periods estimated and an account-level, non-project-attributed total of $0.237502973 USD; it does not establish project-specific zero billing. |
-| 12 — Public GitHub Packaging & Documentation | In progress — local controlled-sharing preparation | The GitHub repository intentionally remains private. README and technical documentation, sanitization, secret scanning, diagrams, deployment/teardown instructions, and external-reader review are being prepared for controlled sharing. Public publication is deferred and not required for Phase 12 completion; sanitized screenshots, a demo video, LinkedIn, and a portfolio case study remain viable showcase paths. |
-| 13 — Career & Demo Packaging | Pending / future authorization | Demo, interview, resume, and portfolio packaging remain future work. |
+| 12 — Public GitHub Packaging & Documentation | Complete — controlled private-sharing scope | The GitHub repository intentionally remains private. README and technical documentation, sanitization, secret scanning, diagrams, deployment/teardown instructions, and external-reader review are complete. Public publication is deferred and not required. |
+| 13 — Career & Demo Packaging | Complete — private repository scope | Demo runbook, interview story, resume bullets, LinkedIn/GitHub descriptions, career demonstration matrix, and current-repository readiness review are complete. External publication remains outside scope. |
 
 ### Future enterprise enhancement: TGW and on-premises connectivity
 
@@ -143,15 +151,22 @@ This project is intended for AWS/network engineers, cloud and platform engineers
 A scripted workflow can reliably run a fixed checklist, but network failures require adaptive selection and correlation across independent evidence sources. The agent can choose relevant READ tools and explain their combined results. Deterministic AWS APIs and services establish facts; the model correlates and communicates them. The model cannot authorize, invent reachability, invoke generic AWS commands, or bypass policy, IAM, approval, or verification gates. Semantic/model-driven selection and live AgentCore enforcement remain bounded/deferred capabilities in this repository’s validation record.
 
 ### Architecture diagrams
-The five diagrams explain how the design fits together. Each has an editable source and SVG export:
+The five diagrams below show the approved/reproducible design directly in the README. Editable draw.io sources remain in [`docs/diagrams/`](docs/diagrams/) for maintainers, but are not part of the reader-facing presentation.
 
-| Topic | Editable source | SVG export |
-|---|---|---|
-| End-to-end solution | [draw.io](docs/diagrams/01-end-to-end-solution-architecture.drawio) | [SVG](docs/diagrams/01-end-to-end-solution-architecture.svg) |
-| AWS two-VPC topology | [draw.io](docs/diagrams/02-aws-network-topology.drawio) | [SVG](docs/diagrams/02-aws-network-topology.svg) |
-| AgentCore/MCP tool flow | [draw.io](docs/diagrams/03-agentcore-mcp-tool-flow.drawio) | [SVG](docs/diagrams/03-agentcore-mcp-tool-flow.svg) |
-| Observability/evidence flow | [draw.io](docs/diagrams/04-observability-evidence-flow.drawio) | [SVG](docs/diagrams/04-observability-evidence-flow.svg) |
-| Observe → Diagnose → Remediate | [draw.io](docs/diagrams/05-observe-diagnose-remediate-approval-flow.drawio) | [SVG](docs/diagrams/05-observe-diagnose-remediate-approval-flow.svg) |
+#### End-to-end solution
+<img src="docs/diagrams/01-end-to-end-solution-architecture.svg" alt="End-to-end solution architecture" width="100%">
+
+#### AWS two-VPC topology
+<img src="docs/diagrams/02-aws-network-topology.svg" alt="AWS two-VPC network topology" width="100%">
+
+#### AgentCore/MCP tool flow
+<img src="docs/diagrams/03-agentcore-mcp-tool-flow.svg" alt="AgentCore and MCP tool flow" width="100%">
+
+#### Observability/evidence flow
+<img src="docs/diagrams/04-observability-evidence-flow.svg" alt="Observability and evidence flow" width="100%">
+
+#### Observe → Diagnose → Remediate
+<img src="docs/diagrams/05-observe-diagnose-remediate-approval-flow.svg" alt="Observe diagnose remediate approval flow" width="100%">
 
 The diagrams describe the approved/reproducible MVP, not a currently deployed environment. AWS resources shown as historical/deleted or deferred are labeled accordingly.
 
@@ -184,4 +199,4 @@ Phase 13 materials are collected under [`docs/career/`](docs/career/):
 - [Resume bullets](docs/career/resume-bullets.md) — role-focused achievement statements.
 - [LinkedIn summary](docs/career/linkedin-summary.md) and [GitHub description](docs/career/github-description.md).
 - [Career demonstration matrix](docs/career/career-demonstration-matrix.md) — project evidence mapped to skills.
-- [Portfolio audit checklist](docs/career/portfolio-audit.md) — review of other repositories remains a separate task.
+- [Current-repository portfolio readiness](docs/career/portfolio-audit.md) — final private-sharing review for this repository.
