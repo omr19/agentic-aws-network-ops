@@ -156,17 +156,49 @@ The five diagrams below show the approved/reproducible design directly in the RE
 #### End-to-end solution
 <img src="docs/diagrams/01-end-to-end-solution-architecture.svg" alt="End-to-end solution architecture" width="100%">
 
+1. The operator submits a network diagnosis request.
+2. AgentCore Runtime validates the request and selects an approved MCP READ tool.
+3. AgentCore Gateway forwards the request to the diagnostic Lambda.
+4. The Lambda gathers authoritative AWS network evidence.
+5. The agent correlates the evidence and explains the likely cause.
+6. Any remediation path requires separate human approval.
+
 #### AWS two-VPC topology
 <img src="docs/diagrams/02-aws-network-topology.svg" alt="AWS two-VPC network topology" width="100%">
+
+1. Traffic originates from the source EC2 workload in a private subnet.
+2. The source route table sends the destination CIDR through the VPC peering connection.
+3. The destination route table delivers traffic to the destination private subnet.
+4. Security groups and NACLs govern the path to the destination EC2 workload.
+5. A selected scenario can remove one control and later restore the healthy baseline.
 
 #### AgentCore/MCP tool flow
 <img src="docs/diagrams/03-agentcore-mcp-tool-flow.svg" alt="AgentCore and MCP tool flow" width="100%">
 
+1. A user request enters the governed agent boundary.
+2. The request is checked against the versioned tool contract.
+3. Gateway/MCP selects an approved read-only diagnostic tool.
+4. The tool returns a structured, sanitized result envelope.
+5. Invalid or unauthorized requests terminate in the fail-closed branch.
+
 #### Observability/evidence flow
 <img src="docs/diagrams/04-observability-evidence-flow.svg" alt="Observability and evidence flow" width="100%">
 
+1. A network event or diagnosis request produces deterministic service evidence.
+2. Evidence is converted into a sanitized structured event with correlation metadata.
+3. The agent correlates independent evidence sources and explains the result.
+4. Validated evidence is retained as a reviewable artifact.
+5. Production telemetry remains explicitly deferred where the project records a limitation.
+
 #### Observe → Diagnose → Remediate
 <img src="docs/diagrams/05-observe-diagnose-remediate-approval-flow.svg" alt="Observe diagnose remediate approval flow" width="100%">
+
+1. Observe the network state and collect authoritative evidence.
+2. Diagnose the likely root cause and propose a narrow change.
+3. A human approves or rejects the proposed remediation.
+4. IAM and policy gates authorize only the permitted write action.
+5. Execute the change, verify the post-change state, and record the result.
+6. Rejection, expiry, replay, or failed gates stop the write path.
 
 The diagrams describe the approved/reproducible MVP, not a currently deployed environment. AWS resources shown as historical/deleted or deferred are labeled accordingly.
 
