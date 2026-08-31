@@ -4,6 +4,10 @@ This directory contains editable diagrams.net (`.drawio`) sources and reviewed S
 exports for the five diagrams approved in Phase 2. The root README embeds the SVG
 exports for reader-friendly viewing.
 
+The sixth diagram, `06-future-tgw-multiregion-onprem-route-analyzer`, is a clearly
+deferred enterprise enhancement covering Transit Gateway, multi-Region, on-premises
+connectivity, and Route Analyzer. It is not part of the implemented MVP.
+
 ## Phase 12 diagram set
 
 Each diagram has an editable diagrams.net source and a same-named SVG export:
@@ -13,6 +17,7 @@ Each diagram has an editable diagrams.net source and a same-named SVG export:
 3. `03-agentcore-mcp-tool-flow` — native invocation, Gateway/MCP READ flow, approval gates, bounded WRITE flow, and fail-closed branches.
 4. `04-observability-evidence-flow` — sanitized observable events and deterministic evidence inputs, with deferred production telemetry marked explicitly.
 5. `05-observe-diagnose-remediate-approval-flow` — evidence, recommendation, human authorization, policy/IAM gates, bounded remediation, and verification.
+6. `06-future-tgw-multiregion-onprem-route-analyzer` — deferred Transit Gateway, multi-Region, on-premises, and Route Analyzer concept.
 
 Blue nodes/rows represent approved architecture or validated local contracts. Amber nodes/rows represent historical/deleted resources or deferred/bounded capabilities. The diagrams intentionally use logical names and CIDRs only; they contain no account IDs, ARNs, credentials, tokens, raw screenshots, or unrelated identifiers.
 

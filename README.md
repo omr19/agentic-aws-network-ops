@@ -4,7 +4,7 @@ A portfolio project for explainable AWS network diagnosis using deterministic cl
 
 ## Project Status and Achievements
 
-**Phase 13 is complete under a private-repository scope.**
+**Final project gate complete under a private-repository and bounded-validation scope.**
 
 The project delivered a reproducible Terraform-based AWS network lab with two VPCs,
 VPC peering, deterministic diagnostics, AgentCore/MCP integration, bounded remediation
@@ -14,7 +14,13 @@ All temporary AWS resources were torn down and Terraform state is empty. Detaile
 teardown, evidence, limitations, and delayed billing verification are documented in
 the [project status](PROJECT_STATUS.md) and [Phase 11 teardown report](docs/architecture/phase-11-teardown-preflight.md).
 
-README and technical documentation are complete for controlled private sharing. The screenshot strategy is intentionally conservative: raw AWS screenshots remain outside the repository in the private desktop folder, and no raw or sanitized screenshots are copied or committed at this time. Screenshots are optional private/demo evidence rather than required repository deliverables. Reproducibility relies on Terraform source, sanitized JSON evidence, Markdown documentation, tests, and editable architecture diagrams. Public repository publication remains deferred and is not required.
+The project completion gate is closed for the documented portfolio scope. This means the
+reproducible repository, bounded local/live evidence, security and architecture reviews,
+teardown verification, diagrams, documentation, and career/demo materials are complete.
+It does not claim public release, production readiness, trusted live remediation, or
+unsupported production telemetry; those boundaries remain explicitly documented.
+
+README and technical documentation are complete for controlled private sharing. The screenshot strategy is intentionally conservative: raw AWS screenshots remain outside the repository in the private desktop folder, and no raw or sanitized screenshots are copied or committed at this time. Screenshots are optional private/demo evidence rather than required repository deliverables. Reproducibility relies on Terraform source, sanitized JSON evidence, Markdown documentation, tests, and architecture diagrams. Public repository publication remains deferred and is not required.
 
 Phase 7 also retains a documented limitation: CloudWatch metrics were validated, but live Flow Logs/CloudWatch Logs traffic evidence was not obtained because the project EC2 instances have no IAM instance profiles or SSM readiness. No live Flow Log record or Logs Insights query is claimed.
 
@@ -151,7 +157,7 @@ This project is intended for AWS/network engineers, cloud and platform engineers
 A scripted workflow can reliably run a fixed checklist, but network failures require adaptive selection and correlation across independent evidence sources. The agent can choose relevant READ tools and explain their combined results. Deterministic AWS APIs and services establish facts; the model correlates and communicates them. The model cannot authorize, invent reachability, invoke generic AWS commands, or bypass policy, IAM, approval, or verification gates. Semantic/model-driven selection and live AgentCore enforcement remain bounded/deferred capabilities in this repository’s validation record.
 
 ### Architecture diagrams
-The five diagrams below show the approved/reproducible design directly in the README. Editable draw.io sources remain in [`docs/diagrams/`](docs/diagrams/) for maintainers, but are not part of the reader-facing presentation.
+The diagrams below show the approved/reproducible design directly in the README. Maintainer source files are kept separately under `docs/diagrams/` and are not part of this reader-facing presentation.
 
 #### End-to-end solution
 <img src="docs/diagrams/01-end-to-end-solution-architecture.svg" alt="End-to-end solution architecture" width="100%">
@@ -200,6 +206,16 @@ The five diagrams below show the approved/reproducible design directly in the RE
 5. Execute the change, verify the post-change state, and record the result.
 6. Rejection, expiry, replay, or failed gates stop the write path.
 
+#### Future enterprise enhancement: TGW, multi-Region, on-premises, and Route Analyzer
+<img src="docs/diagrams/06-future-tgw-multiregion-onprem-route-analyzer.svg" alt="Future Transit Gateway multi-Region on-premises Route Analyzer architecture" width="100%">
+
+1. On-premises networks connect to an AWS Region through a future Transit Gateway attachment.
+2. Regional Transit Gateways provide the future inter-Region routing path.
+3. Route Analyzer supplies cross-Region and on-premises reachability evidence.
+4. AgentCore/MCP consumes the evidence in a future enterprise diagnostic workflow.
+
+This sixth diagram is a future enhancement only; no TGW, Route Analyzer, multi-Region, or on-premises resources are currently deployed.
+
 The diagrams describe the approved/reproducible MVP, not a currently deployed environment. AWS resources shown as historical/deleted or deferred are labeled accordingly.
 
 ### Component responsibilities and workflow
@@ -221,7 +237,7 @@ The design avoids public egress, NAT Gateway, persistent compute, unnecessary en
 Important tradeoffs are recorded in the [ADR index](docs/adr/README.md): peering instead of TGW for the two-VPC lab, no default NAT/endpoints, one agent instead of multi-agent complexity, native AgentCore invocation instead of an API Gateway extension, and local state for a single-engineer MVP. Current limitations include no active AWS resources, no live Flow Logs traffic record or Logs Insights query, deferred deployed observability, deferred trusted live approval/remediation and post-change verification, bounded local/mock validation, deferred semantic tool selection, and no production-readiness claim.
 
 ### Private controlled sharing
-The repository is intentionally private. Raw screenshots and unsanitized state/evidence remain outside Git; screenshots are optional private/demo assets and are not repository deliverables. Safe tracked sharing relies on Terraform source, sanitized JSON evidence, Markdown, tests, and editable diagrams. Public publication is deferred; secret scanning, sanitization, link review, and external-reader review remain Phase 12 gates. See [project status](PROJECT_STATUS.md), [diagrams guidance](docs/diagrams/README.md), and [tooling-risk guidance](docs/security/tooling-risk.md).
+The repository is intentionally private. Raw screenshots and unsanitized state/evidence remain outside Git; screenshots are optional private/demo assets and are not repository deliverables. Safe tracked sharing relies on Terraform source, sanitized JSON evidence, Markdown, tests, and the rendered SVG diagrams. Public publication is deferred; secret scanning, sanitization, link review, and external-reader review remain Phase 12 gates. See [project status](PROJECT_STATUS.md), [diagrams guidance](docs/diagrams/README.md), and [tooling-risk guidance](docs/security/tooling-risk.md).
 
 ### Career and demo packaging
 
