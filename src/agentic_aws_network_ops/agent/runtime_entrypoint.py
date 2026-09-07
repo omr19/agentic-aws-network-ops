@@ -7,6 +7,7 @@ import logging
 import os
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Any
@@ -54,7 +55,8 @@ class RuntimeHandler(BaseHTTPRequestHandler):
 
 def main() -> None:
     """Start the local/AgentCore HTTP server."""
-    HTTPServer(("0.0.0.0", int(os.getenv("PORT", "8080"))), RuntimeHandler).serve_forever()  # noqa: S104
+    bind_host = os.getenv("HOST", "0.0.0.0")  # noqa: S104  # nosec B104 - AgentCore listener requires all interfaces
+    HTTPServer((bind_host, int(os.getenv("PORT", "8080"))), RuntimeHandler).serve_forever()
 
 
 def invoke_gateway(request: RuntimeRequest) -> dict[str, Any]:
@@ -108,6 +110,16 @@ def invoke_gateway(request: RuntimeRequest) -> dict[str, Any]:
     }
     data = json.dumps(body).encode()
     url = endpoint.rstrip("/") + "/mcp"
+    if urllib.parse.urlsplit(url).scheme != "https":
+        return {
+            "accepted": False,
+            "correlation_id": request.correlation_id,
+            "session_id": request.session_id,
+            "error": {
+                "code": "INVALID_GATEWAY_ENDPOINT",
+                "message": "AGENTCORE_GATEWAY_ENDPOINT must use HTTPS",
+            },
+        }
     signed = AWSRequest(
         method="POST",
         url=url,
@@ -123,10 +135,10 @@ def invoke_gateway(request: RuntimeRequest) -> dict[str, Any]:
     )
     SigV4Auth(credentials, "bedrock-agentcore", request.region).add_auth(signed)
     try:
-        with urllib.request.urlopen(  # noqa: S310 - endpoint is operator-configured HTTPS URL
+        with urllib.request.urlopen(  # noqa: S310  # nosec B310 - URL scheme is validated above
             urllib.request.Request(url, data=data, headers=dict(signed.headers), method="POST"),  # noqa: S310
             timeout=60,
-        ) as response:  # noqa: S310 - endpoint is operator-configured HTTPS Gateway URL
+        ) as response:
             result = {
                 "accepted": True,
                 "correlation_id": request.correlation_id,
