@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0.0",
+  "phase": "5",
+  "evidence_type": "agentcore_gateway_smoke",
+  "captured_at": "2026-08-29T18:14:20Z",
+  "account_id": "redacted",
+  "region": "eu-west-1",
+  "gateway": "agentic-aws-network-ops-phase5-gateway",
+  "target": "phase5-diagnostic-lambda",
+  "protocol_version": "2025-03-26",
+  "tool": "describe_vpcs",
+  "correlation_id": "corr-gateway-0004",
+  "http_status": 200,
+  "mcp_error": false,
+  "result_status": "success",
+  "authorization_decision": "allowed",
+  "evidence_completeness": "complete",
+  "resources_returned": 2,
+  "aws_actions_observed": ["ec2:DescribeVpcs"],
+  "write_operations": false,
+  "notes": ["SigV4 request traversed Gateway to Lambda successfully.", "Resource identifiers are redacted from tracked evidence."]
+}

@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0.0",
+  "evidence_type": "phase_7_temporary_observability_role_validation",
+  "region": "eu-west-1",
+  "profile": "rizwan-sts-role",
+  "role": {
+    "name": "agentic-aws-network-ops-phase7-observer-temp",
+    "purpose": "temporary_phase7_observability_validation",
+    "created": true,
+    "tagged": true,
+    "trust_principal": "arn:aws:iam::<account>:role/rizwan-sts-role",
+    "attached_policies": ["Phase7ObservabilityRead"],
+    "deleted_after_validation": true,
+    "cleanup_verified": true
+  },
+  "iam_simulation": {
+    "allowed": [
+      "ec2:DescribeFlowLogs",
+      "ec2:DescribeInstances",
+      "ec2:DescribeTags",
+      "logs:DescribeLogGroups",
+      "logs:StartQuery",
+      "logs:GetQueryResults",
+      "cloudwatch:GetMetricData",
+      "cloudwatch:GetMetricStatistics",
+      "cloudwatch:ListMetrics"
+    ],
+    "logs_start_query_exact_log_group_resource": "allowed",
+    "denied": [
+      "ec2:CreateRoute",
+      "ec2:AuthorizeSecurityGroupIngress",
+      "ec2:ReplaceNetworkAclEntry",
+      "ec2:AcceptVpcPeeringConnection",
+      "ec2:StartNetworkInsightsAnalysis",
+      "iam:PassRole",
+      "lambda:InvokeFunction",
+      "sts:AssumeRole",
+      "ec2:StartInstances",
+      "ec2:StopInstances",
+      "ec2:TerminateInstances"
+    ]
+  },
+  "observability_use": {
+    "assume_role_succeeded": true,
+    "flow_logs_discovery": "no_project_flow_logs_found",
+    "tagged_instance_observation": "succeeded_both_instances_stopped",
+    "cloudwatch_metric_listing": "succeeded_project_instance_cpu_metrics_found",
+    "cloudwatch_metric_data": "succeeded",
+    "cloudwatch_log_group_discovery": "denied_by_logs_log_group_name_condition_in_actual_api_call",
+    "logs_insights_query": "not_run_no_delivery_log_group_or_flow_logs",
+    "test_traffic_generated": false,
+    "flow_logs_created": false
+  },
+  "role_integrity": {
+    "existing_runtime_policy_unchanged": true,
+    "existing_diagnostic_policy_unchanged": true,
+    "new_delivery_role_created": false,
+    "new_log_group_created": false,
+    "terraform_changed": false,
+    "instances_started": false
+  },
+  "prerequisites": [
+    "A Flow Logs delivery log group and delivery role require separate explicit approval.",
+    "The observability policy fixture needs a reviewed Logs discovery condition or an API-compatible scoping design before live Logs discovery can succeed."
+  ],
+  "provenance": "Sanitized local record; account identifier, credentials, raw logs, and raw metric values omitted."
+}

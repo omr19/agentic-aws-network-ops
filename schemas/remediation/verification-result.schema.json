@@ -1,0 +1,10 @@
+{
+  "$id": "https://agentic-aws-network-ops.example/schemas/remediation/verification-result.schema.json",
+  "title": "Separate READ remediation verification result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "correlation_id", "execution_id", "status", "remediation_fact"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" }, "correlation_id": { "type": "string", "format": "uuid" }, "execution_id": { "type": "string", "format": "uuid" }, "status": { "enum": ["verified", "not_verified", "verification_failed"] }, "remediation_fact": { "type": "string", "minLength": 1 }, "terraform_drift": { "type": "boolean" }
+  }
+}

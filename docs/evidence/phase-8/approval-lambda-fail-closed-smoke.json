@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0.0",
+  "evidence_type": "phase_8_live_approval_fail_closed_smoke",
+  "validation_status": "rejected_fail_closed",
+  "live_aws_validation": true,
+  "region": "eu-west-1",
+  "function_name": "agentic-aws-network-ops-lab-phase8-approval",
+  "invocation_count": 1,
+  "event_validation": {
+    "shape": "exact approval event contract",
+    "invalid_field": "operation",
+    "invalid_value": "phase8_invalid_smoke",
+    "validation_order": "rejected before authenticated-principal lookup, service construction, and DynamoDB access"
+  },
+  "smoke_tags": {
+    "approval_id": "00000000-0000-4000-8000-000000000801",
+    "correlation_id": "00000000-0000-4000-8000-000000000803"
+  },
+  "invocation": {
+    "status_code": 200,
+    "function_error": "Unhandled",
+    "rejected": true
+  },
+  "dynamodb": {
+    "table_name": "agentic-aws-network-ops-lab-phase8-approvals",
+    "precheck_item_present": false,
+    "postcheck_item_present": false,
+    "approval_or_denial_record_written": false,
+    "read_mode": "consistent read"
+  },
+  "cloudwatch": {
+    "log_group": "/aws/lambda/agentic-aws-network-ops-lab-phase8-approval",
+    "structured_rejection_log_present": true,
+    "sanitized": true,
+    "record": {
+      "event": "phase8_approval_invocation",
+      "status": "rejected",
+      "aws_request_id": "c4f54711-0fcd-4867-bdf2-4ebaa1d22a7b",
+      "approval_id": null,
+      "correlation_id": null
+    },
+    "raw_request_or_credentials_logged": false
+  },
+  "identifier_limitation": "approval_id and correlation_id were null because validation failed before payload assignment in the deployed wrapper; the handler cannot retain event identifiers when validate_approval_event raises.",
+  "remediation": {
+    "lambda_invoked": false,
+    "matching_remediation_log_events": 0
+  },
+  "network_mutation": {
+    "performed": false,
+    "basis": "invalid operation was rejected before the AWS-backed service and remediation path could be constructed"
+  },
+  "repository": {
+    "environment_variables_changed": false,
+    "iam_changed": false,
+    "agentcore_changed": false,
+    "ec2_changed": false,
+    "networking_changed": false,
+    "terraform_applied": false,
+    "commit_or_push_performed_for_smoke": false
+  },
+  "prohibited_claims": [
+    "This evidence does not validate a trusted authenticated approval path.",
+    "No remediation execution or live post-remediation verification occurred.",
+    "Phase 8 is not complete."
+  ],
+  "provenance": "Sanitized evidence captured from the single authorized live invalid-event approval Lambda invocation and read-only DynamoDB/CloudWatch verification."
+}

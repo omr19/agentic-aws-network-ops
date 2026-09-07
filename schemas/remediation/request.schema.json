@@ -1,0 +1,15 @@
+{
+  "$id": "https://agentic-aws-network-ops.example/schemas/remediation/request.schema.json",
+  "title": "Remediation request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "scenario_id", "approval_id", "request_hash", "correlation_id", "policy_session_id"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "scenario_id": { "enum": ["security_group_rule", "route_table_entry", "nacl_rule", "peering_routes_dns"] },
+    "approval_id": { "type": "string", "format": "uuid" },
+    "request_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "correlation_id": { "type": "string", "format": "uuid" },
+    "policy_session_id": { "type": "string", "format": "uuid" }
+  }
+}

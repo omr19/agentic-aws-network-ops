@@ -1,0 +1,12 @@
+{
+  "tool": "describe_vpcs",
+  "arguments": {
+    "schema_version": "1.0.0",
+    "correlation_id": "corr-p5-04-0001",
+    "region": "eu-west-1",
+    "project_tag": "agentic-aws-network-ops"
+  },
+  "correlation_id": "corr-p5-04-0001",
+  "session_id": "session-p5-04-0001",
+  "region": "eu-west-1"
+}

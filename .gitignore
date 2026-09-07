@@ -29,8 +29,9 @@ override.tf.json
 # Include override files you do wish to add to version control using negated pattern
 # !example_override.tf
 
-# Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
-# example: *tfplan*
+# Terraform plan output files
+*.tfplan
+tfplan
 
 # Ignore CLI configuration files
 .terraformrc
@@ -42,3 +43,72 @@ terraform.rc
 # Optional: ignore plan files saved before destroying Terraform configuration
 # Uncomment the line below if you want to ignore planout files.
 # planout
+
+# ──────────────────────────────────────────
+# Python
+# ──────────────────────────────────────────
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Bytecode & compiled files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Distribution / packaging artifacts
+*.egg-info/
+dist/
+build/
+.eggs/
+.artifacts/
+
+# Tool caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tflint.d/
+
+# Test coverage
+.coverage
+*.coverage
+coverage.xml
+htmlcov/
+
+# ──────────────────────────────────────────
+# macOS
+# ──────────────────────────────────────────
+
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# ──────────────────────────────────────────
+# Environment & secrets files
+# ──────────────────────────────────────────
+
+# dotenv — keep .env.example / .env.template eligible for version control
+.env
+.env.*
+!.env.example
+!.env.template
+
+# Private keys & certificates
+*.pem
+*.key
+*.p12
+*.pfx
+
+# ──────────────────────────────────────────
+# AWS & local credential artifacts
+# ──────────────────────────────────────────
+
+# Credential files that may be dropped locally
+.aws/credentials
+aws_credentials
+credentials.json

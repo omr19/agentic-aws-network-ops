@@ -1,0 +1,18 @@
+{
+  "phase": 6,
+  "scenario": "broken_dns",
+  "region": "eu-west-1",
+  "sanitization": {"account_id": "<redacted>", "credentials_included": false},
+  "execution": {
+    "mode": "local_only",
+    "aws_contacted": false,
+    "terraform_applied": false,
+    "injected_signature": {"dns_fixture_broken": true},
+    "expected_root_cause": "local_dns_fixture_unresolved",
+    "observed_root_cause": "local_dns_fixture_unresolved",
+    "deviation_count": 1,
+    "restored_healthy": true
+  },
+  "scope": {"vpc_endpoints": "not_applicable_no_project_endpoints", "transit_gateway": "out_of_scope"},
+  "result": {"passed": true, "notes": "Local fixture only; no Route 53 or other AWS DNS resource was created."}
+}

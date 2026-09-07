@@ -1,0 +1,6 @@
+{
+  "prompt": "Inspect the project VPC inventory.",
+  "correlation_id": "corr-p5-04-0001",
+  "session_id": "session-p5-04-0001",
+  "region": "eu-west-1"
+}

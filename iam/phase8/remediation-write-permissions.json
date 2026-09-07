@@ -1,0 +1,55 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "RestoreApprovedSecurityGroupIngress",
+      "Effect": "Allow",
+      "Action": "ec2:AuthorizeSecurityGroupIngress",
+      "Resource": "arn:aws:ec2:${region}:${account_id}:security-group/${destination_security_group_id}",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "eu-west-1",
+          "aws:ResourceTag/Project": "agentic-aws-network-ops",
+          "aws:ResourceTag/Environment": "lab",
+          "aws:ResourceTag/ManagedBy": "terraform",
+          "ec2:Vpc": "${destination_vpc_id}"
+        }
+      }
+    },
+    {
+      "Sid": "RestoreApprovedPeeringRoutes",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:CreateRoute",
+        "ec2:ReplaceRoute"
+      ],
+      "Resource": [
+        "arn:aws:ec2:${region}:${account_id}:route-table/${source_route_table_id}",
+        "arn:aws:ec2:${region}:${account_id}:route-table/${destination_route_table_id}"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "eu-west-1",
+          "aws:ResourceTag/Project": "agentic-aws-network-ops",
+          "aws:ResourceTag/Environment": "lab",
+          "aws:ResourceTag/ManagedBy": "terraform"
+        }
+      }
+    },
+    {
+      "Sid": "RestoreApprovedNetworkAclEntry",
+      "Effect": "Allow",
+      "Action": "ec2:ReplaceNetworkAclEntry",
+      "Resource": "arn:aws:ec2:${region}:${account_id}:network-acl/${destination_network_acl_id}",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "eu-west-1",
+          "aws:ResourceTag/Project": "agentic-aws-network-ops",
+          "aws:ResourceTag/Environment": "lab",
+          "aws:ResourceTag/ManagedBy": "terraform",
+          "ec2:Vpc": "${destination_vpc_id}"
+        }
+      }
+    }
+  ]
+}

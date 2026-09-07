@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "phase": "5",
+  "evidence_type": "runtime_iam_and_artifact_verification",
+  "captured_at": "2026-08-29T18:35:00Z",
+  "account_id": "redacted",
+  "region": "eu-west-1",
+  "role": "agentic-aws-network-ops-lab-runtime",
+  "allowed": ["bedrock-agentcore:InvokeGateway", "s3:GetObject"],
+  "denied": ["ec2:DescribeVpcs", "ec2:CreateRoute", "lambda:InvokeFunction", "iam:PassRole"],
+  "artifact": {"bucket": "agentic-aws-network-ops-runtime-000000000000-euw1", "key": "phase5/runtime.zip", "content_length": 14814576, "content_type": "application/zip", "server_side_encryption": "AES256", "sha256": "07f878212325514338f581fec6db18d0f5ea5cbff21e32937432160721244d45"},
+  "result": "PASS",
+  "notes": ["IAM simulation was run from the operator terminal.", "S3 head-object confirmed the uploaded artifact."]
+}

@@ -1,0 +1,45 @@
+{
+  "$id": "https://agentic-aws-network-ops.example/schemas/diagnostic/diagnosis-result.schema.json",
+  "title": "Deterministic diagnosis result",
+  "type": "object",
+  "required": ["schema_version", "tool", "status", "correlation_id", "observed_at", "region", "authorization", "evidence_completeness", "evidence", "limitations", "errors", "data"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "tool": { "const": "deterministic_diagnosis" },
+    "status": { "enum": ["no_finding", "unreachable", "invalid_request"] },
+    "correlation_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$" },
+    "observed_at": { "type": "string", "format": "date-time" },
+    "region": { "type": "string", "pattern": "^[a-z]{2}(?:-gov)?-[a-z]+-\\d$" },
+    "authorization": {
+      "type": "object",
+      "required": ["decision", "missing_actions"],
+      "properties": { "decision": { "const": "allowed" }, "missing_actions": { "type": "array", "maxItems": 0 } },
+      "additionalProperties": false
+    },
+    "evidence_completeness": { "enum": ["complete", "partial", "none"] },
+    "evidence": { "type": "array", "items": { "type": "object", "required": ["source", "fact"], "properties": { "source": { "type": "string", "minLength": 1 }, "fact": { "type": "string", "minLength": 1 } }, "additionalProperties": false } },
+    "limitations": { "type": "array", "items": { "type": "string" } },
+    "errors": { "type": "array", "items": { "type": "object", "required": ["code", "message", "retryable"], "properties": { "code": { "type": "string", "minLength": 1 }, "message": { "type": "string", "minLength": 1 }, "retryable": { "type": "boolean" } }, "additionalProperties": false } },
+    "data": {
+      "type": "object",
+      "required": ["classification", "root_cause", "observed_facts", "recommendations"],
+      "properties": {
+        "classification": { "enum": ["healthy", "security_group_mismatch", "missing_route", "nacl_restriction", "peering_path_dns_failure", "indeterminate"] },
+        "root_cause": {
+          "type": ["string", "null"],
+          "enum": [
+            null,
+            "destination_security_group_ingress_does_not_match_source",
+            "missing_source_to_destination_peering_route",
+            "destination_nacl_denies_tcp_443_ingress",
+            "peering_path_disabled_both_route_directions_and_dns"
+          ]
+        },
+        "observed_facts": { "type": "array", "items": { "type": "string" } },
+        "recommendations": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

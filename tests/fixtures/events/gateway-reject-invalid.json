@@ -1,0 +1,11 @@
+{
+  "tool": "execute_boto3",
+  "arguments": {
+    "schema_version": "1.0.0",
+    "correlation_id": "corr-p5-04-0002",
+    "region": "eu-west-1"
+  },
+  "correlation_id": "corr-p5-04-0002",
+  "session_id": "session-p5-04-0002",
+  "region": "eu-west-1"
+}

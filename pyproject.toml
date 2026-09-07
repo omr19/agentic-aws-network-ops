@@ -1,0 +1,64 @@
+[project]
+name = "agentic-aws-network-ops"
+version = "0.1.0"
+description = "Agentic AI for controlled AWS network diagnostics and remediation."
+readme = "README.md"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "boto3>=1.35.49",
+    "jsonschema>=4.26.0",
+    "referencing>=0.37.0",
+]
+
+[dependency-groups]
+dev = [
+    "bandit>=1.9.4",
+    "mypy>=2.3.1",
+    "pip-audit>=2.10.1",
+    "pre-commit>=4.6.2",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.16.5",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "S", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101"]
+
+[tool.mypy]
+files = ["src", "tests"]
+python_version = "3.13"
+strict = true
+
+[tool.pytest.ini_options]
+addopts = [
+  "--strict-config",
+  "--strict-markers",
+  "--cov=agentic_aws_network_ops",
+  "--cov-branch",
+  "--cov-report=term-missing",
+]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["agentic_aws_network_ops"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+
+[tool.bandit]
+exclude_dirs = ["tests"]
+targets = ["src"]

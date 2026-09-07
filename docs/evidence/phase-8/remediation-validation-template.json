@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "evidence_type": "phase_8_local_remediation_validation_template",
+  "validation_status": "template_only_no_aws_execution",
+  "local_only": true,
+  "aws_called": false,
+  "terraform_changed": false,
+  "iam_changed": false,
+  "scenarios": [
+    "security_group_rule",
+    "route_table_entry",
+    "nacl_rule",
+    "peering_routes_dns"
+  ],
+  "checks": {
+    "proposal_does_not_execute": null,
+    "explicit_approval_required": null,
+    "denial_has_zero_write_side_effects": null,
+    "wrong_correlation_rejected": null,
+    "wrong_policy_session_rejected": null,
+    "expired_approval_rejected": null,
+    "approval_replay_rejected": null,
+    "unsupported_action_rejected": null,
+    "malformed_request_rejected": null,
+    "verification_is_separate": null,
+    "terraform_drift_is_reported": null
+  },
+  "observations": [],
+  "prohibited_claims": [
+    "No live AWS remediation was executed.",
+    "No live Flow Log or CloudWatch Logs traffic evidence is implied.",
+    "Phase 8 is not complete."
+  ],
+  "provenance": "Local sanitized template; populate only with offline test evidence until separately authorized."
+}

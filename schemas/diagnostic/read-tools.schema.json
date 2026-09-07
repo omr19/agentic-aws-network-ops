@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-aws-network-ops.example/schemas/diagnostic/read-tools.schema.json",
+  "title": "Approved diagnostic READ contracts",
+  "$defs": {
+    "baseInput": {
+      "type": "object", "required": ["schema_version", "correlation_id", "region"],
+      "properties": { "schema_version": { "const": "1.0.0" }, "correlation_id": { "$ref": "../common/result-envelope.schema.json#/$defs/correlationId" }, "region": { "$ref": "../common/result-envelope.schema.json#/$defs/region" } }
+    },
+    "describe_vpcs_input": {
+      "allOf": [{ "$ref": "#/$defs/baseInput" }, { "required": ["project_tag"], "properties": { "project_tag": { "const": "agentic-aws-network-ops" } } }], "unevaluatedProperties": false
+    },
+    "describe_subnets_input": {
+      "allOf": [{ "$ref": "#/$defs/baseInput" }, { "required": ["vpc_id"], "properties": { "vpc_id": { "pattern": "^vpc-[a-z0-9]+$" } } }], "unevaluatedProperties": false
+    },
+    "describe_route_tables_input": {
+      "allOf": [{ "$ref": "#/$defs/baseInput" }, { "required": ["vpc_id"], "properties": { "vpc_id": { "pattern": "^vpc-[a-z0-9]+$" }, "subnet_id": { "pattern": "^subnet-[a-z0-9]+$" } } }], "unevaluatedProperties": false
+    },
+    "describe_security_groups_input": {
+      "allOf": [{ "$ref": "#/$defs/baseInput" }, { "required": ["vpc_id"], "properties": { "vpc_id": { "pattern": "^vpc-[a-z0-9]+$" }, "group_ids": { "type": "array", "maxItems": 40, "uniqueItems": true, "items": { "pattern": "^sg-[a-z0-9]+$" } } } }], "unevaluatedProperties": false
+    },
+    "describe_network_acls_input": {
+      "allOf": [{ "$ref": "#/$defs/baseInput" }, { "required": ["vpc_id"], "properties": { "vpc_id": { "pattern": "^vpc-[a-z0-9]+$" }, "subnet_id": { "pattern": "^subnet-[a-z0-9]+$" } } }], "unevaluatedProperties": false
+    },
+    "describe_vpc_endpoints_input": {
+      "allOf": [{ "$ref": "#/$defs/baseInput" }, { "required": ["vpc_id"], "properties": { "vpc_id": { "pattern": "^vpc-[a-z0-9]+$" } } }], "unevaluatedProperties": false
+    },
+    "analyze_reachability_input": {
+      "allOf": [{ "$ref": "#/$defs/baseInput" }, { "required": ["network_insights_path_id"], "properties": { "network_insights_path_id": { "pattern": "^nip-[a-z0-9]+$" }, "analysis_id": { "pattern": "^nia-[a-z0-9]+$" } } }], "unevaluatedProperties": false
+    },
+    "query_flow_logs_input": {
+      "allOf": [{ "$ref": "#/$defs/baseInput" }, { "required": ["log_group_name", "start_time", "end_time"], "properties": { "log_group_name": { "type": "string", "pattern": "^/aws/vpc/flowlogs/agentic-aws-network-ops(?:/|$)" }, "start_time": { "type": "string", "format": "date-time" }, "end_time": { "type": "string", "format": "date-time" }, "source_address": { "type": "string", "format": "ipv4" }, "destination_address": { "type": "string", "format": "ipv4" }, "destination_port": { "type": "integer", "minimum": 1, "maximum": 65535 }, "limit": { "type": "integer", "minimum": 1, "maximum": 100 } } }], "unevaluatedProperties": false
+    },
+    "get_cloudwatch_metrics_input": {
+      "allOf": [{ "$ref": "#/$defs/baseInput" }, { "required": ["namespace", "metric_name", "start_time", "end_time", "period", "statistic"], "properties": { "namespace": { "enum": ["AWS/EC2", "AWS/NetworkFirewall", "AWS/NATGateway", "AWS/TransitGateway", "AWS/VPC"] }, "metric_name": { "type": "string", "minLength": 1 }, "dimensions": { "type": "array", "maxItems": 10, "items": { "$ref": "#/$defs/dimension" } }, "start_time": { "type": "string", "format": "date-time" }, "end_time": { "type": "string", "format": "date-time" }, "period": { "type": "integer", "minimum": 60, "maximum": 86400, "multipleOf": 60 }, "statistic": { "enum": ["Average", "Minimum", "Maximum", "Sum", "SampleCount"] } } }], "unevaluatedProperties": false
+    },
+    "describe_vpcs_output": { "allOf": [{ "$ref": "../common/result-envelope.schema.json" }, { "properties": { "tool": { "const": "describe_vpcs" }, "data": { "$ref": "#/$defs/resourceList" } } }] },
+    "describe_subnets_output": { "allOf": [{ "$ref": "../common/result-envelope.schema.json" }, { "properties": { "tool": { "const": "describe_subnets" }, "data": { "$ref": "#/$defs/resourceList" } } }] },
+    "describe_route_tables_output": { "allOf": [{ "$ref": "../common/result-envelope.schema.json" }, { "properties": { "tool": { "const": "describe_route_tables" }, "data": { "$ref": "#/$defs/resourceList" } } }] },
+    "describe_security_groups_output": { "allOf": [{ "$ref": "../common/result-envelope.schema.json" }, { "properties": { "tool": { "const": "describe_security_groups" }, "data": { "$ref": "#/$defs/resourceList" } } }] },
+    "describe_network_acls_output": { "allOf": [{ "$ref": "../common/result-envelope.schema.json" }, { "properties": { "tool": { "const": "describe_network_acls" }, "data": { "$ref": "#/$defs/resourceList" } } }] },
+    "describe_vpc_endpoints_output": { "allOf": [{ "$ref": "../common/result-envelope.schema.json" }, { "properties": { "tool": { "const": "describe_vpc_endpoints" }, "data": { "$ref": "#/$defs/resourceList" } } }] },
+    "analyze_reachability_output": { "allOf": [{ "$ref": "../common/result-envelope.schema.json" }, { "properties": { "tool": { "const": "analyze_reachability" }, "data": { "anyOf": [{ "$ref": "#/$defs/emptyData" }, { "type": "object", "required": ["analysis_status", "path_found", "explanations"], "properties": { "analysis_status": { "enum": ["pending", "running", "succeeded", "failed", "unknown"] }, "path_found": { "type": ["boolean", "null"] }, "explanations": { "type": "array", "items": { "type": "object" } } }, "additionalProperties": false }] } } }] },
+    "query_flow_logs_output": { "allOf": [{ "$ref": "../common/result-envelope.schema.json" }, { "properties": { "tool": { "const": "query_flow_logs" }, "data": { "anyOf": [{ "$ref": "#/$defs/emptyData" }, { "type": "object", "required": ["query_status", "records"], "properties": { "query_status": { "enum": ["running", "complete", "failed"] }, "records": { "type": "array", "maxItems": 100, "items": { "type": "object" } } }, "additionalProperties": false }] } } }] },
+    "get_cloudwatch_metrics_output": { "allOf": [{ "$ref": "../common/result-envelope.schema.json" }, { "properties": { "tool": { "const": "get_cloudwatch_metrics" }, "data": { "anyOf": [{ "$ref": "#/$defs/emptyData" }, { "type": "object", "required": ["datapoints"], "properties": { "datapoints": { "type": "array", "items": { "type": "object" } }, "unit": { "type": "string" } }, "additionalProperties": false }] } } }] },
+    "resourceList": { "anyOf": [{ "$ref": "#/$defs/emptyData" }, { "type": "object", "required": ["resources"], "properties": { "resources": { "type": "array", "items": { "type": "object" } } }, "additionalProperties": false }] },
+    "emptyData": { "type": "object", "maxProperties": 0 },
+    "dimension": { "type": "object", "required": ["name", "value"], "properties": { "name": { "type": "string", "minLength": 1, "maxLength": 255 }, "value": { "type": "string", "minLength": 1, "maxLength": 1024 } }, "additionalProperties": false }
+  }
+}

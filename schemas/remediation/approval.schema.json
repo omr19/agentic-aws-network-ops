@@ -1,0 +1,10 @@
+{
+  "$id": "https://agentic-aws-network-ops.example/schemas/remediation/approval.schema.json",
+  "title": "Explicit human remediation approval",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "approval_id", "proposal_id", "correlation_id", "policy_session_id", "request_hash", "action", "resource", "operation", "approver_principal", "decision", "approved_at", "expires_at", "consumed", "execution_id", "execution_status"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" }, "approval_id": { "type": "string", "format": "uuid" }, "proposal_id": { "type": "string", "format": "uuid" }, "correlation_id": { "type": "string", "format": "uuid" }, "policy_session_id": { "type": "string", "format": "uuid" }, "request_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }, "action": { "type": "string", "minLength": 1 }, "resource": { "type": "string", "minLength": 1 }, "operation": { "type": "string", "minLength": 1 }, "approver_principal": { "type": "string", "minLength": 1 }, "decision": { "enum": ["APPROVED", "DENIED"] }, "approved_at": { "type": "string", "format": "date-time" }, "expires_at": { "type": "string", "format": "date-time" }, "consumed": { "type": "boolean" }, "execution_id": { "type": ["string", "null"], "format": "uuid" }, "execution_status": { "enum": ["PENDING", "EXECUTING", "COMPLETED", "FAILED"] }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0.0",
+  "tool": "describe_vpcs",
+  "status": "success",
+  "correlation_id": "corr-p5-04-0001",
+  "observed_at": "2026-08-29T01:00:00Z",
+  "region": "eu-west-1",
+  "authorization": {
+    "decision": "allowed",
+    "missing_actions": []
+  },
+  "evidence_completeness": "complete",
+  "evidence": [
+    {
+      "source": "ec2:DescribeVpcs",
+      "fact": "resources=1"
+    }
+  ],
+  "limitations": [],
+  "errors": [],
+  "data": {
+    "resources": [
+      {
+        "VpcId": "vpc-example"
+      }
+    ]
+  }
+}

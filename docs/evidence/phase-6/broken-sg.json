@@ -1,0 +1,80 @@
+{
+  "phase": 6,
+  "scenario": "broken_sg",
+  "region": "eu-west-1",
+  "sanitization": {
+    "account_id": "<redacted>",
+    "credentials_included": false
+  },
+  "terraform": {
+    "plan": {
+      "to_add": 0,
+      "to_change": 1,
+      "to_destroy": 0,
+      "changed_resources": [
+        "module.destination_workload.aws_vpc_security_group_ingress_rule.destination_https[0]"
+      ]
+    },
+    "apply": {
+      "added": 0,
+      "changed": 1,
+      "destroyed": 0
+    },
+    "injected_change": {
+      "resource": "module.destination_workload.aws_vpc_security_group_ingress_rule.destination_https[0]",
+      "attribute": "cidr_ipv4",
+      "from": "10.10.0.0/16",
+      "to": "192.0.2.0/32",
+      "operation": "updated_in_place"
+    }
+  },
+  "reachability_analyzer": {
+    "path_id": "nip-0b3a839ce75bb3a97",
+    "analysis_id": "nia-0cc05f549fcde9b4b",
+    "status": "succeeded",
+    "path_found": false,
+    "explanation_codes": [
+      "ENI_SG_RULES_MISMATCH"
+    ],
+    "approximate_cost_usd_per_analysis": 0.1,
+    "analysis_count": 2,
+    "approximate_total_cost_usd": 0.2
+  },
+  "restoration": {
+    "scenario": "healthy",
+    "plan": {
+      "to_add": 0,
+      "to_change": 1,
+      "to_destroy": 0
+    },
+    "apply": {
+      "added": 0,
+      "changed": 1,
+      "destroyed": 0
+    },
+    "restored_change": {
+      "resource": "module.destination_workload.aws_vpc_security_group_ingress_rule.destination_https[0]",
+      "attribute": "cidr_ipv4",
+      "from": "192.0.2.0/32",
+      "to": "10.10.0.0/16",
+      "operation": "updated_in_place"
+    },
+    "final_healthy_verification": {
+      "security_group_rule_id": "sgr-0be599317a0d52eca",
+      "cidr_ipv4": "10.10.0.0/16",
+      "protocol": "tcp",
+      "from_port": 443,
+      "to_port": 443,
+      "analysis_id": "nia-005a1a2272b6a2e7f",
+      "status": "succeeded",
+      "path_found": true,
+      "explanation_codes": [],
+      "healthy_cidr_restored": true
+    }
+  },
+  "boundaries": {
+    "ec2_instances_started": false,
+    "iam_modified": false,
+    "other_scenarios_tested": false
+  }
+}

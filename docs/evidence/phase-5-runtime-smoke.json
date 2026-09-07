@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0.0",
+  "phase": "5",
+  "evidence_type": "agentcore_runtime_smoke",
+  "captured_at": "2026-08-29T18:29:51Z",
+  "account_id": "redacted",
+  "region": "eu-west-1",
+  "runtime_name": "agentic_aws_network_ops_p5_runtime",
+  "runtime_id": "redacted",
+  "runtime_status": "READY",
+  "network_mode": "PUBLIC",
+  "protocol": "HTTP",
+  "request": {"prompt": "Describe the project VPCs read-only.", "correlation_id": "corr-runtime-0002", "session_id": "sess-runtime-0002"},
+  "response": {"status_code": 200, "accepted": true, "tool": "describe_vpcs", "authorization_decision": "allowed", "evidence_completeness": "complete", "resources_returned": 2, "aws_actions_observed": ["ec2:DescribeVpcs"]},
+  "write_operations": false,
+  "notes": ["Validated Runtime to Gateway to Lambda read-only path.", "Resource identifiers are redacted from tracked evidence."]
+}

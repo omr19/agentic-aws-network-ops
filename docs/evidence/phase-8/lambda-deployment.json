@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0.0",
+  "evidence_type": "phase_8_lambda_deployment_boundary",
+  "validation_status": "succeeded",
+  "region": "eu-west-1",
+  "terraform_apply": {
+    "plan_scope": "exact saved Phase 8 Lambda boundary plan",
+    "resources_added": 6,
+    "resources_changed": 0,
+    "resources_destroyed": 0,
+    "resource_types": {
+      "aws_lambda_function": 2,
+      "aws_cloudwatch_log_group": 2,
+      "aws_iam_role_policy": 2
+    }
+  },
+  "lambda_functions": {
+    "approval": {
+      "deployed": true,
+      "name": "agentic-aws-network-ops-lab-phase8-approval",
+      "runtime": "python3.13",
+      "handler": "agentic_aws_network_ops.adapters.approval_lambda.handler",
+      "architectures": ["arm64"],
+      "memory_mb": 256,
+      "timeout_seconds": 30,
+      "tags": {
+        "Project": "agentic-aws-network-ops",
+        "Environment": "lab",
+        "ManagedBy": "terraform",
+        "Component": "phase8-approval"
+      },
+      "environment_variables": {
+        "PHASE8_AWS_REGION": "eu-west-1",
+        "PHASE8_APPROVAL_TABLE_NAME": "agentic-aws-network-ops-lab-phase8-approvals"
+      }
+    },
+    "remediation": {
+      "deployed": true,
+      "name": "agentic-aws-network-ops-lab-phase8-remediation",
+      "runtime": "python3.13",
+      "handler": "agentic_aws_network_ops.adapters.remediation_lambda.handler",
+      "architectures": ["arm64"],
+      "memory_mb": 256,
+      "timeout_seconds": 30,
+      "tags": {
+        "Project": "agentic-aws-network-ops",
+        "Environment": "lab",
+        "ManagedBy": "terraform",
+        "Component": "phase8-remediation"
+      },
+      "environment_variables": {
+        "PHASE8_AWS_REGION": "eu-west-1",
+        "PHASE8_APPROVAL_TABLE_NAME": "agentic-aws-network-ops-lab-phase8-approvals"
+      }
+    }
+  },
+  "cloudwatch_log_groups": {
+    "approval": {
+      "name": "/aws/lambda/agentic-aws-network-ops-lab-phase8-approval",
+      "retention_days": 7,
+      "tags": {
+        "Project": "agentic-aws-network-ops",
+        "Environment": "lab",
+        "ManagedBy": "terraform",
+        "Component": "phase8-approval"
+      }
+    },
+    "remediation": {
+      "name": "/aws/lambda/agentic-aws-network-ops-lab-phase8-remediation",
+      "retention_days": 7,
+      "tags": {
+        "Project": "agentic-aws-network-ops",
+        "Environment": "lab",
+        "ManagedBy": "terraform",
+        "Component": "phase8-remediation"
+      }
+    }
+  },
+  "logging_policies": {
+    "approval": {
+      "attached_to": "agentic-aws-network-ops-lab-phase8-approval-lambda",
+      "policy_name": "agentic-aws-network-ops-lab-phase8-approval-logging",
+      "actions": ["logs:CreateLogStream", "logs:PutLogEvents"],
+      "resource_scope": "corresponding approval Lambda log-group ARN only",
+      "requested_region_condition": "eu-west-1"
+    },
+    "remediation": {
+      "attached_to": "agentic-aws-network-ops-lab-phase8-remediation-lambda",
+      "policy_name": "agentic-aws-network-ops-lab-phase8-remediation-logging",
+      "actions": ["logs:CreateLogStream", "logs:PutLogEvents"],
+      "resource_scope": "corresponding remediation Lambda log-group ARN only",
+      "requested_region_condition": "eu-west-1"
+    }
+  },
+  "post_apply_terraform_plan": {
+    "status": "no_changes",
+    "other_resource_changes": false
+  },
+  "excluded_operations": {
+    "lambda_invocation": false,
+    "agentcore_remediation_integration": false,
+    "ec2_start": false,
+    "remediation_execution": false
+  },
+  "provenance": "Sanitized summary of the authorized Terraform apply and read-only configuration verification. No account identifiers, credentials, secrets, or raw AWS response payloads are stored. This evidence does not mark Phase 8 complete."
+}

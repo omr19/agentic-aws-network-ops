@@ -1,0 +1,1 @@
+"""Thin deployment adapter boundary."""

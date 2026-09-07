@@ -1,0 +1,58 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ObserveProjectInstancesAndFlowLogs",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeFlowLogs",
+        "ec2:DescribeInstances",
+        "ec2:DescribeTags"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": { "aws:RequestedRegion": "${region}" }
+      }
+    },
+    {
+      "Sid": "DiscoverProjectLogGroups",
+      "Effect": "Allow",
+      "Action": "logs:DescribeLogGroups",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": { "aws:RequestedRegion": "${region}" }
+      }
+    },
+    {
+      "Sid": "QueryOnlyProjectObservabilityLogs",
+      "Effect": "Allow",
+      "Action": "logs:StartQuery",
+      "Resource": "arn:aws:logs:${region}:${account_id}:log-group:${observability_log_group_name}:*",
+      "Condition": {
+        "StringEquals": { "aws:RequestedRegion": "${region}" }
+      }
+    },
+    {
+      "Sid": "ReadProjectLogQueryResults",
+      "Effect": "Allow",
+      "Action": "logs:GetQueryResults",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": { "aws:RequestedRegion": "${region}" }
+      }
+    },
+    {
+      "Sid": "ReadProjectNetworkMetrics",
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:GetMetricData",
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": { "aws:RequestedRegion": "${region}" }
+      }
+    }
+  ]
+}

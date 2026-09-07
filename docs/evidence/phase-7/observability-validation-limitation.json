@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0.0",
+  "evidence_type": "phase_7_observability_validation_limitation",
+  "validation_status": "blocked_by_least_privilege",
+  "region": "eu-west-1",
+  "execution_scope": "temporary_authorized_validation",
+  "instance_state": {
+    "two_tagged_instances_started": true,
+    "two_tagged_instances_restored_to_stopped": true
+  },
+  "flow_logs": {
+    "created": false,
+    "live_evidence_collected": false,
+    "test_traffic_generated": false
+  },
+  "cloudwatch": {
+    "live_evidence_collected": false
+  },
+  "denied_actions": [
+    "ssm:DescribeInstanceInformation",
+    "cloudwatch:GetMetricData",
+    "logs:DescribeLogGroups"
+  ],
+  "iam_boundary": {
+    "existing_diagnostic_and_runtime_roles_broadened": false,
+    "future_enhancement": "separate_temporary_read_only_observability_role"
+  },
+  "cleanup": {
+    "temporary_flow_logs_disabled_or_deleted": "not_applicable_none_created",
+    "instances_verified_stopped": true
+  },
+  "limitations": [
+    "The validation produced no live VPC Flow Logs evidence.",
+    "The validation produced no live CloudWatch metrics or log evidence.",
+    "Local normalized observability contract tests do not replace live AWS evidence."
+  ],
+  "provenance": "Sanitized local record; no account IDs, instance IDs, credentials, or raw log data included."
+}

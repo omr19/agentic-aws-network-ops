@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-aws-network-ops.example/schemas/common/result-envelope.schema.json",
+  "title": "Diagnostic result envelope",
+  "type": "object",
+  "required": ["schema_version", "tool", "status", "correlation_id", "observed_at", "region", "authorization", "evidence_completeness", "evidence", "limitations", "errors", "data"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "tool": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["success", "no_finding", "unreachable", "authorization_denied", "api_error", "timeout", "invalid_request"] },
+    "correlation_id": { "$ref": "#/$defs/correlationId" },
+    "observed_at": { "type": "string", "format": "date-time" },
+    "region": { "$ref": "#/$defs/region" },
+    "authorization": {
+      "type": "object",
+      "required": ["decision", "missing_actions"],
+      "properties": {
+        "decision": { "enum": ["allowed", "denied", "unknown"] },
+        "missing_actions": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
+      },
+      "additionalProperties": false
+    },
+    "evidence_completeness": { "enum": ["complete", "partial", "none"] },
+    "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } },
+    "limitations": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "errors": { "type": "array", "items": { "$ref": "#/$defs/error" } },
+    "data": {}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "correlationId": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$" },
+    "region": { "type": "string", "pattern": "^[a-z]{2}(?:-gov)?-[a-z]+-\\d$" },
+    "tagFilter": {
+      "type": "object", "required": ["key", "values"],
+      "properties": { "key": { "type": "string", "minLength": 1, "maxLength": 128 }, "values": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1, "maxLength": 256 }, "uniqueItems": true } },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object", "required": ["source", "fact"],
+      "properties": { "source": { "type": "string", "minLength": 1 }, "fact": { "type": "string", "minLength": 1 }, "resource_id": { "type": "string", "minLength": 1 } },
+      "additionalProperties": false
+    },
+    "error": {
+      "type": "object", "required": ["code", "message", "retryable"],
+      "properties": { "code": { "type": "string", "minLength": 1 }, "message": { "type": "string", "minLength": 1 }, "retryable": { "type": "boolean" } },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadNetworkConfigurationAndExistingAnalysis",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeNetworkAcls",
+        "ec2:DescribeNetworkInsightsAnalyses",
+        "ec2:DescribeRouteTables",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcEndpoints",
+        "ec2:DescribeVpcs"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": { "aws:RequestedRegion": "${region}" }
+      }
+    },
+    {
+      "Sid": "StartOnlyProjectFlowLogQueries",
+      "Effect": "Allow",
+      "Action": "logs:StartQuery",
+      "Resource": "arn:aws:logs:${region}:${account_id}:log-group:${diagnostic_log_group_name}:*",
+      "Condition": {
+        "StringEquals": { "aws:RequestedRegion": "${region}" }
+      }
+    },
+    {
+      "Sid": "ReadQueryResultsAndMetrics",
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:GetMetricStatistics",
+        "logs:GetQueryResults"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": { "aws:RequestedRegion": "${region}" }
+      }
+    }
+  ]
+}
