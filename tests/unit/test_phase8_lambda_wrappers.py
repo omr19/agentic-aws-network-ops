@@ -101,7 +101,6 @@ def test_approval_handler_rejects_unverified_client_context_identity() -> None:
     with pytest.raises(Phase8WrapperError):
         approval_lambda.dispatch(event, untrusted_context, now=NOW)
 
-
     event = approval_event()
     event["unexpected_field"] = "redacted-value"
     with pytest.raises(Phase8WrapperError):

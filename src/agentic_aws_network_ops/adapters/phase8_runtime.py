@@ -133,9 +133,7 @@ def build_remediation_executor(
     from agentic_aws_network_ops.remediation.aws_executor import TrustedPhase8Resources
 
     resources = TrustedPhase8Resources(
-        destination_security_group_id=_resource_id(
-            settings, DESTINATION_SECURITY_GROUP_ENV, "sg-"
-        ),
+        destination_security_group_id=_resource_id(settings, DESTINATION_SECURITY_GROUP_ENV, "sg-"),
         destination_vpc_id=_resource_id(settings, DESTINATION_VPC_ENV, "vpc-"),
         source_vpc_id=_resource_id(settings, SOURCE_VPC_ENV, "vpc-"),
     )

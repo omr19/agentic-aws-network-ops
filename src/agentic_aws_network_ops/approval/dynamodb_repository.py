@@ -201,9 +201,7 @@ class DynamoDBApprovalRepository(ApprovalRepository):
         return item
 
     def _from_item(self, item: Mapping[str, Any]) -> dict[str, Any]:
-        record = {
-            str(key): self._deserializer.deserialize(value) for key, value in item.items()
-        }
+        record = {str(key): self._deserializer.deserialize(value) for key, value in item.items()}
         record.setdefault("execution_id", None)
         record.setdefault("execution_result", None)
         return record

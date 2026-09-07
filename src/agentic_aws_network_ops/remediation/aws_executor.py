@@ -143,8 +143,7 @@ class AwsRemediationExecutor(RemediationExecutor):
                     terraform_drift=True,
                     reconciliation_required=True,
                     message=(
-                        "Independent post-write verification failed; "
-                        "reconcile Terraform source."
+                        "Independent post-write verification failed; reconcile Terraform source."
                     ),
                 )
             else:
@@ -206,8 +205,7 @@ class AwsRemediationExecutor(RemediationExecutor):
             ]
             response = self._call_ec2("describe_route_tables", RouteTableIds=route_ids)
             tables = {
-                str(table.get("RouteTableId")): table
-                for table in response.get("RouteTables", [])
+                str(table.get("RouteTableId")): table for table in response.get("RouteTables", [])
             }
             if set(tables) != set(route_ids):
                 raise RemediationAdapterError(
@@ -245,9 +243,7 @@ class AwsRemediationExecutor(RemediationExecutor):
             return _Preflight(not operations, tuple(operations))
 
         if spec.action == "restore_network_acl_entry":
-            response = self._call_ec2(
-                "describe_network_acls", NetworkAclIds=[spec.resource_id]
-            )
+            response = self._call_ec2("describe_network_acls", NetworkAclIds=[spec.resource_id])
             acls = response.get("NetworkAcls", [])
             if len(acls) != 1:
                 raise RemediationAdapterError(
@@ -277,9 +273,12 @@ class AwsRemediationExecutor(RemediationExecutor):
             )
             return
         if spec.action == "restore_vpc_peering_route":
-            for operation, route_table_id, destination_cidr, peering_id in (
-                preflight.route_operations
-            ):
+            for (
+                operation,
+                route_table_id,
+                destination_cidr,
+                peering_id,
+            ) in preflight.route_operations:
                 self._call_ec2(
                     self._ec2_method(operation),
                     RouteTableId=route_table_id,
@@ -480,9 +479,7 @@ class AwsRemediationExecutor(RemediationExecutor):
                 "Throttling",
                 "ThrottlingException",
             }
-        return RemediationAdapterError(
-            f"AWS {operation} failed", code=code, retryable=retryable
-        )
+        return RemediationAdapterError(f"AWS {operation} failed", code=code, retryable=retryable)
 
     @staticmethod
     def _safe_failure_message(error: ClientError | BotoCoreError) -> str:
