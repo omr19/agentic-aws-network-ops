@@ -28,7 +28,7 @@ def test_phase8_declares_two_local_zip_lambda_functions_and_log_groups() -> None
         assert 'architectures' in source and '["arm64"]' in source
         assert "memory_size" in source and "= 256" in source
         assert "timeout" in source and "= 30" in source
-        assert f"filename" in source and f"var.{component}_lambda_filename" in source
+        assert "filename" in source and f"var.{component}_lambda_filename" in source
         assert f"filebase64sha256(var.{component}_lambda_filename)" in source
         assert "retention_in_days" in source and "= 7" in source
         assert "PHASE8_AWS_REGION" in source
