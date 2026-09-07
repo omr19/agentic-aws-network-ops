@@ -24,8 +24,8 @@ def test_phase8_declares_two_local_zip_lambda_functions_and_log_groups() -> None
     ):
         assert f'resource "aws_lambda_function" "{component}"' in source
         assert f'"{handler}"' in source
-        assert 'runtime' in source and '"python3.13"' in source
-        assert 'architectures' in source and '["arm64"]' in source
+        assert "runtime" in source and '"python3.13"' in source
+        assert "architectures" in source and '["arm64"]' in source
         assert "memory_size" in source and "= 256" in source
         assert "timeout" in source and "= 30" in source
         assert "filename" in source and f"var.{component}_lambda_filename" in source
